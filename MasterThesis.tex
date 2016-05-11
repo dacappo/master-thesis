@@ -1,0 +1,176 @@
+ %% Präambel
+\documentclass[
+	11homerhopt,
+	a4paper,
+	oneside, 
+	liststotoc, 					% Tabellen- und Abbildungsverzeichnis ins Inhaltsverzeichnis
+	bibtotoc,						  % Literaturverzeichnis ins Inhaltsverzeichnis aufnehmen
+	titlepage, 						% Titlepage-Umgebung statt \maketitle
+	headsepline, 					% horizontale Linie unter Kolumnentitel
+]{scrreprt}
+
+
+\usepackage[english]{babel} 		% deutsche Trennungsregeln und Übersetzung der festcodierten Überschriften
+\usepackage[T1]{fontenc} 			% Ausgabe aller zeichen in einer T1-Codierung (wichtig für die Ausgabe von Umlauten!)
+\usepackage{graphicx}  				% Einbinden von Grafiken erlauben
+\usepackage{textcomp} 				% zum Einsatz von Eurozeichen u. a. Symbolen
+\usepackage{listings}				% Datstellung von Quellcode mit den Umgebungen {lstlisting}, \lstinline und \lstinputlisting
+\usepackage[table]{xcolor} 			% einfache Verwendung von Farben in nahezu allen Farbmodellen
+\usepackage[intoc]{nomencl} 		% zur Erstellung des Abkürzungsberzeichnisses
+\makenomenclature					% Abkürzungsverzeichnis erstellen
+\usepackage{setspace}				% Zusatzpaket zur Einstellung des Zeilenabstands
+\usepackage{longtable}
+ 
+\usepackage[lmargin=2.5cm, rmargin=2.5cm,tmargin=2.50cm,bmargin=2.50cm]{geometry}		% Seitenrändekr formatieren
+\usepackage[style=alphabetic,citestyle=alphabetic,backend=bibtex]{biblatex}
+\addbibresource[]{bib/bibtex.bib}
+
+\usepackage{url}
+\usepackage{eurosym}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{amsthm}
+
+\setlength{\nomlabelwidth}{.20\hsize}
+
+% -----------------------------------------------------------------------------------------------------------------
+% Zum Aktualisieren des Abkürzungsverzeichnisses bitte auf der Kommandozeile folgenden Befehl aufrufen :
+%  makeindex Bachelorarbeit.nlo -s nomencl.ist -o Bachelorarbeit.nls
+% -----------------------------------------------------------------------------------------------------------------
+
+\definecolor{grey}{RGB}{050,050,050}
+\definecolor{lightblue}{RGB}{224,238,238}
+\definecolor{lightgrey}{RGB}{240,240,240}
+\definecolor{darkgray}{rgb}{.4,.4,.4}
+\definecolor{js_grey}{HTML}{778899}
+\definecolor{js_blue}{HTML}{0077AA}
+\definecolor{js_red}{HTML}{DD4A68}
+\definecolor{js_green}{HTML}{669900}
+
+
+\newcommand{\tab}{\qquad \qquad \qquad \qquad \qquad \qquad \qquad}
+\setlength{\parindent}{0em}  	% Absatzeinrückung eliminieren
+
+% ------------------------------ Persönliche Daten ------------------------------------------
+
+\newcommand{\thesisTitle}{Application Security}
+\newcommand{\thesisSubtitle}{Investigating and Validation of NoSQL Injection Vulnerabilites}
+\newcommand{\work}{Master Thesis}
+\newcommand{\studyCourse}{Computer Science}
+\newcommand{\auth}{Patrick Spiegel}
+\newcommand{\studendNumber}{1854488}
+\newcommand{\deadline}{\today}
+\newcommand{\period}{01. April - 30. September 2016}
+\newcommand{\professor}{Prof. Dr. J\"orn M\"uller-Quade}
+\newcommand{\professorTwo}{Prof. Dr. Dennis Hofheinz}
+\newcommand{\companySupervisor}{Dr. Martin Johns}
+
+% ------------------------------ Befehle ----------------------------------------------------
+\newcommand{\jahr}{2016}			% für Angabe im Copyright-Vermerk der Titelseite
+
+\newcommand{\changefont}[3]{\fontfamily{#1} \fontseries{#2} \fontshape{#3} \selectfont}
+
+% ------------------------------ Abkürzungen ------------------------------------------------
+\newcommand{\ua}{\mbox{u.\,a.\ }}
+\newcommand{\zB}{\mbox{z.\,B.\ }}
+\newcommand{\bs}{$\backslash$}
+
+% ------------------------------ Titeländerungen --------------------------------------------
+\renewcommand{\nomname}{List of Abbreviations}
+\renewcommand{\lstlistlistingname}{List of Listings}
+
+% -------------------------------------------------------------------------------------------
+% Design von Listings
+% -------------------------------------------------------------------------------------------
+\lstset{
+	basicstyle=\ttfamily\scriptsize,
+	commentstyle=\color{commentgray}\textit,
+	showstringspaces=false,
+	stringstyle=\color{darkgreen},
+	keywordstyle=\color{blue},
+	numbers=left,
+	numberstyle=\tiny,
+	stepnumber=1,
+	numbersep=15pt,
+	tabsize=2,
+	fontadjust=true,
+	%frame=single,
+	backgroundcolor=\color{white},
+	captionpos=b,
+	%linewidth=1.0\linewidth,
+	xleftmargin=0.1\linewidth,
+	breaklines=true,
+	aboveskip=16pt
+}
+
+\lstdefinelanguage{JavaScript}{
+  keywords={typeof, new, true, false, catch, function, return, null, catch, switch, var, if, in, while, do, else, case, break},
+  keywordstyle=\color{js_blue}\bfseries,
+  ndkeywords={class, export, boolean, throw, implements, import, this, delete},
+  ndkeywordstyle=\color{js_green}\bfseries,
+  identifierstyle=\color{black},
+  sensitive=false,
+  comment=[l]{//},
+  morecomment=[s]{/*}{*/},
+  commentstyle=\color{js_grey}\ttfamily,
+  stringstyle=\color{js_red}\ttfamily,
+  morestring=[b]',
+  morestring=[b]"
+}
+
+% -------------------------------------------------------------------------------------------
+% Definition of Abbreviation-file 
+% -------------------------------------------------------------------------------------------
+\input{content/abbreviations}				% Datei mit Abkürzungen laden
+
+% -------------------------------------------------------------------------------------------
+%                     Beginn des Dokumenteninhalts
+% -------------------------------------------------------------------------------------------
+\begin{document}
+\setcounter{secnumdepth}{3}				% Nummerierungstiefe fürs Inhaltsverzeichnis
+\setcounter{tocdepth}{3}					% Tiefe des Inhaltsverzeichnises
+\changefont{cmr}{m}{n}						% Schriftart definieren
+
+% ------------------------------ Titelei -----------------------------------------------------
+\include{content/titlepage} 				% erzeugt die Titelseite
+
+\pagenumbering{Roman}             % große, römische Seitenzahlen für Titelei
+\begin{onehalfspace}
+  \include{content/statement} 				% Einbinden der eidestattlichen Erklärung
+  \include{content/abstract}   				% Einbinden des Abstracts
+\end{onehalfspace}
+\tableofcontents							% Erzeugen des Inhalsverzeichnisses
+\listoffigures 								% Erzeugen des Abbildungsverzeichnisses 
+\listoftables 								% Erzeugen des Tabellenverzeichnisses
+\lstlistoflistings
+
+\printnomenclature							% Erzeugen des Abkürzungsverzeichnisses
+% pdflatex - pdflatex - cmd: makeindex filename.nlo  -s nomencl.ist -o filename.nls        - pdflatex
+\pagebreak
+
+% --------------------------------------------------------------------------------------------
+%                    Inhalt der Bachelorarbeit
+%---------------------------------------------------------------------------------------------
+\pagenumbering{arabic}              % arabische Seitenzahlen für den Hauptteil
+\begin{onehalfspace}                % Zeilenabstand einstellen
+
+  \include{content/introduction}
+  \include{content/fundamentals}
+  \include{content/theory}
+  \include{content/conception}
+  \include{content/implementation}
+  \include{content/evaluation}
+  \include{content/related_work}
+  \include{content/conclusion}
+
+\end{onehalfspace}
+
+% ---------------------------- Literaturverzeichnis ----------------------------------------------
+\printbibliography
+
+% ------------------------------- Anhang ---------------------------------------------------------
+%\begin{appendix}
+%\clearpage Appendix
+%\end{appendix}
+
+\end{document}
