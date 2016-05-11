@@ -35,3 +35,6 @@ report:
 	makeindex $(DOCUMENT_NAME).nlo -s nomencl.ist -o $(DOCUMENT_NAME).nls
 	pdflatex -interaction=errorstopmode $(DOCUMENT_NAME)
 	pdflatex -interaction=errorstopmode $(DOCUMENT_NAME)
+
+deploy:
+	scp MasterThesis.pdf patrick@patrick-spiegel.de:/var/www/html/MasterThesis.pdf
