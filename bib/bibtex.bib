@@ -17,8 +17,9 @@
 @Journal{Ron:2016,
   author  = {Ron, Aviv and Shulman-Peleg, Alexandra and Puzanov, Anton},
   title   = {{Analysis and Mitigation of NoSQL Injections}},
-  month   = aug,
+  month   = {March},
   year    = {2016},
+  groups  = {Related Work},
   journal = {IEEE Security {\&} Privacy},
   number  = {2},
   pages   = {30--39},
@@ -31,7 +32,7 @@
   title   = {{Server-side JavaScript Injection}},
   journal = {Black Hat USA},
   year    = {2011},
-  groups  = {NoSQL Injection Papers},
+  groups  = {NoSQL Injection Papers, Related Work},
   url     = {http://www.hakim.ws/BHUS2011/materials/Sullivan/BH_US_11_Sullivan_Server_Side_Slides.pdf},
 }
 
@@ -54,7 +55,7 @@
   eprint      = {1506.04082v1},
   eprintclass = {cs.CR},
   eprinttype  = {arxiv},
-  groups      = {NoSQL Injection Papers},
+  groups      = {NoSQL Injection Papers, Related Work},
   url         = {http://arxiv.org/abs/1506.04082},
 }
 
@@ -66,6 +67,7 @@
   pages     = {541--547},
   month     = oct,
   publisher = {IEEE},
+  groups    = {Related Work},
   url       = {http://ieeexplore.ieee.org/lpdocs/epic03/wrapper.htm?arnumber=6120863},
 }
 
@@ -78,16 +80,16 @@
   pages     = {538--546},
   address   = {Cham},
   month     = aug,
+  groups    = {Related Work},
   url       = {http://link.springer.com/10.1007/978-3-319-22915-7_49},
 }
 
-@Article{Noiumkar:2014,
-  author   = {Noiumkar, P and Chomsiri, T},
-  title    = {{A Comparison the Level of Security on Top 5 Open Source NoSQL Databases}},
-  journal  = {The 9th International Conference on Information {\ldots}},
-  year     = {2014},
-  abstract = {This research investigated the effective factors on the security of the top 5 open source NoSQL databases which are MongoDB, Cassandra, CouchDB, Hypertable, and Redis, focusing on 5 effective security factors including: (1) Data files encryption, (2) Client/Server Authentication/Encryption, (3) Inter- cluster Authentication/Encryption, (4) Script Injection, and (5) Denial of Service attacks. The researchers also compared the strength and weakness regarding these databases’ security and found that Hypertables and Redis are the most secured databases to handle the attack launched by internet users (mostly with injection and DoS), and CouchDB, MongoDB, and Cassandra were the database that is mostly safe from packet sniffing during the communication between the servers. Surprisingly, these five databases did not perform the data file encryption. In this research, the researchers also suggested the useful methods to improve security level for these databases.},
-  url      = {http://www.icita.org/2014/papers/th-chomsiri.pdf},
+@InProceedings{Noiumkar:2014,
+  author    = {Noiumkar, Preecha and Chomsiri, Tawatchai},
+  title     = {A Comparison the Level of Security on Top 5 Open Source NoSQL Databases},
+  booktitle = {The 9th International Conference on Information Technology and Applications (ICITA2014)},
+  year      = {2014},
+  url       = {http://www.icita.org/2014/papers/th-chomsiri.pdf},
 }
 
 @Online{OWASP_SQLICS:2016,
@@ -145,20 +147,22 @@
   urldate = {2016-08-15},
 }
 
-@Online{Petkov2:2014,
+@Online{Petkov:2014a,
   author  = {Petkov, Petko},
   title   = {Hacking Node.js and MongoDB},
   month   = {August},
   year    = {2014},
+  groups  = {Related Work},
   url     = {http://blog.websecurify.com/2014/08/hacking-nodejs-and-mongodb.html},
   urldate = {2016-08-15},
 }
 
-@Online{Petkov1:2014,
+@Online{Petkov:2014b,
   author  = {Petkov, Petko},
   title   = {Attacking Node.js and MongoDB - Part Two},
   month   = {August},
   year    = {2014},
+  groups  = {Related Work},
   url     = {http://blog.websecurify.com/2014/08/attacks-nodejs-and-mongodb-part-to.html},
   urldate = {2016-08-15},
 }
@@ -181,13 +185,14 @@
   url    = {http://www.kalzumeus.com/2010/09/22/security-lessons-learned-from-the-diaspora-launch/},
 }
 
-@InProceedings{son:2013,
+@InProceedings{Son:2013,
   author       = {Son, Sooel and McKinley, Kathryn S and Shmatikov, Vitaly},
   title        = {Diglossia: detecting code injection attacks with precision and efficiency},
   booktitle    = {Proceedings of the 2013 ACM SIGSAC conference on Computer \& communications security},
   year         = {2013},
   pages        = {1181--1192},
   organization = {ACM},
+  groups       = {Related Work},
   url          = {https://www.microsoft.com/en-us/research/publication/diglossia-detecting-code-injection-attacks-with-precision-and-efficiency/},
 }
 
@@ -241,12 +246,24 @@
   title   = {The New Page of Injections Book: Memcached Injections},
   journal = {Black Hat USA},
   year    = {2014},
+  groups  = {Related Work},
   url     = {https://www.blackhat.com/docs/us-14/materials/us-14-Novikov-The-New-Page-Of-Injections-Book-Memcached-Injections-WP.pdf},
+}
+
+@InProceedings{halfond2006classification,
+  author       = {Halfond, William G and Viegas, Jeremy and Orso, Alessandro},
+  title        = {A classification of SQL-injection attacks and countermeasures},
+  booktitle    = {Proceedings of the IEEE International Symposium on Secure Software Engineering},
+  year         = {2006},
+  volume       = {1},
+  pages        = {13--15},
+  organization = {IEEE},
+  url          = {http://www.cc.gatech.edu/fac/Alex.Orso/papers/halfond.viegas.orso.ISSSE06.pdf},
 }
 
 @Comment{jabref-meta: databaseType:bibtex;}
 
 @Comment{jabref-meta: groupstree:
 0 AllEntriesGroup:;
-1 ExplicitGroup:NoSQL Injection Papers\;0\;;
+1 ExplicitGroup:Related Work\;0\;;
 }
