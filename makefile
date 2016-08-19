@@ -5,7 +5,7 @@ all: report
 
 # Generate PDF output from LaTeX input files.
 report:
-	rsync -a ./ tmp/ --exclude=tmp
+	rsync -a ./ tmp/ --exclude=tmp --exclude=.*
 	cd tmp/; \
 		pdflatex -interaction=errorstopmode $(DOCUMENT_NAME); \
 		bibtex $(DOCUMENT_NAME); \
