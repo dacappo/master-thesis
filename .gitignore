@@ -1,4 +1,5 @@
 MasterThesis.pdf
 tmp
 .DS_Store
-.$* 
+*.$*
+*.bak 
