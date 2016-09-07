@@ -7,11 +7,11 @@
 
 \section{Contributions}
 
-The main contributions of this thesis about NoSQL application security are:
+The main contributions of this thesis concerning NoSQL application security are:
 \begin{description}
-\item [Injection Attacks] are not a database oder application layer specific problem. Therefore, this thesis reveals new injection vectors for multiple NoSQL databases in combination with common application layers. With this broad range of investigated databases, it is shown that NoSQL injection is a general issue.
-\item [Attacker Models] do not always equal the existing SQL injection attacker model. Since NoSQL databases are created to handle huge amounts of unstructured data from several sources, restrictions are low. These circumstances may allow the insertion of user controlled data in the import process. On account of this, an additional attacker model is introduced to cover these new conditions.
-\item [Injection Prevention] is hard to ensure, since the data and therefore the requests assume various shapes. In order to reduce the risk of injection attacks, this thesis breaks down known injection vectors to the underlying design problem. On basis of this a new database driver design is presented, that is resistant to known injection attacks.
+\item [Injection Attacks] NoSQL injection vulnerabilities are not a database oder application layer specific problem. Therefore, this thesis reveals new injection vectors for multiple NoSQL databases in combination with common application layers. With this broad range of investigated technology stacks, it is shown, that NoSQL injection is a general issue across non-relational databases.
+\item [Attacker Models] Despite parallels to SQL injection attacks, the existing attacker models are not sufficient considering NoSQL injection. Since NoSQL databases are created with the aim to handle huge amounts of unstructured data from several sources, format restrictions are low. These circumstances may allow insertions of attacker controlled data from external sources. On account of this, an additional attacker model is introduced and exemplary attacks are presented to cover these new conditions.
+\item [Injection Prevention] The mitigation of NoSQL injection is hard to ensure, since the data and therefore the requests assume various shapes across databases. In order to reduce the risk of injection attacks, this thesis breaks down known injection vectors to the underlying design problems. On basis of these a new database driver design is presented, that is resistant to known injection attacks.
 \end{description}
 
 \section{Structure}
