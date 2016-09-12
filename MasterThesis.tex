@@ -15,7 +15,7 @@
 \usepackage{graphicx}  				% Einbinden von Grafiken erlauben
 \usepackage{textcomp} 				% zum Einsatz von Eurozeichen u. a. Symbolen
 \usepackage{listings}				% Datstellung von Quellcode mit den Umgebungen {lstlisting}, \lstinline und \lstinputlisting
-\usepackage[table]{xcolor} 			% einfache Verwendung von Farben in nahezu allen Farbmodellen
+\usepackage[dvipsnames]{xcolor} 			% einfache Verwendung von Farben in nahezu allen Farbmodellen
 \usepackage[intoc]{nomencl} 		% zur Erstellung des Abkürzungsberzeichnisses
 \makenomenclature					% Abkürzungsverzeichnis erstellen
 \usepackage{setspace}				% Zusatzpaket zur Einstellung des Zeilenabstands
@@ -31,6 +31,9 @@
 \usepackage{amsmath}
 \usepackage{amsthm}
 \usepackage{todonotes}
+
+%\usepackage{courier}
+\usepackage[scaled]{beramono}
 
 \setlength{\nomlabelwidth}{.20\hsize}
 
@@ -84,24 +87,22 @@
 % Design von Listings
 % -------------------------------------------------------------------------------------------
 \lstset{
-	basicstyle=\ttfamily\scriptsize,
-	commentstyle=\color{commentgray}\textit,
-	showstringspaces=false,
-	stringstyle=\color{darkgreen},
-	keywordstyle=\color{blue},
-	numbers=left,
-	numberstyle=\tiny,
-	stepnumber=1,
-	numbersep=15pt,
-	tabsize=2,
-	fontadjust=true,
-	%frame=single,
-	backgroundcolor=\color{white},
-	captionpos=b,
-	%linewidth=1.0\linewidth,
-	xleftmargin=0.1\linewidth,
-	breaklines=true,
-	aboveskip=16pt
+  basicstyle=\ttfamily\scriptsize,
+  commentstyle=\color{commentgray}\textit,
+  showstringspaces=false,
+  stringstyle=\color{ForestGreen},
+  keywordstyle=\color{blue},
+  numbers=left,
+  numberstyle=\tiny,
+  stepnumber=1,
+  numbersep=15pt,
+  tabsize=2,
+  fontadjust=true,
+  backgroundcolor=\color{white},
+  captionpos=b,
+  xleftmargin=0.1\linewidth,
+  breaklines=true,
+  aboveskip=16pt
 }
 
 \lstdefinelanguage{JavaScript}{
