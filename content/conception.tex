@@ -12,6 +12,8 @@
   \label{fig:normalAttackerModel}
 \end{figure}
 
+% Objective
+
 \subsection{Extended Attacker Model}
 
 \begin{figure}[h]
@@ -21,20 +23,40 @@
   \label{fig:extendedAttackerModel}
 \end{figure}
 
+% Objective
 
-\subsection{Attacker Objective}
+\subsection{Direct Attacker Model}
 
+\begin{figure}[h]
+\centering
+  \includegraphics[width=1\linewidth]{Images/attacker_model_direct}
+  \caption{Direct attacker model for NoSQL injection}
+  \label{fig:extendedAttackerModel}
+\end{figure}
+
+% Objective
 
 
 \section{Considered Technology Stack}
 \subsection{Selected Databases}
 \subsection{Selected Application Platforms}
 
+
 \chapter{NoSQL Injection Attacks}
 
 \section{MongoDB Document Store}
 \subsection{Node.js Type Injection Attack}
 \subsection{PHP Type Injection Attack}
+
+\begin{lstlisting}[caption={Vulnerable PHP - MongoDb application}, label={lst:PHPArrayInjection}, language=PHP]
+$collection->find(array('user' => $_GET['user'], 'password' => $_GET['password']));
+\end{lstlisting}
+
+
+\begin{lstlisting}[caption={MongoDB injection with PHP's associative arrays}, label={lst:PHPArrayInjection}]
+https://example.org?user=patrick&password[%24ne]=1
+\end{lstlisting}
+
 
 \section{Redis Key-Value Store}
 \subsection{Node.js Type Injection Attack}
