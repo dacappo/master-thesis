@@ -48,13 +48,17 @@
 \subsection{Node.js Type Injection Attack}
 \subsection{PHP Type Injection Attack}
 
-\begin{lstlisting}[caption={Vulnerable PHP - MongoDb application}, label={lst:PHPArrayInjection}, language=PHP]
+\begin{lstlisting}[caption={Vulnerable PHP - MongoDb application}, label={lst:PHPArrayInjection}]
 $collection->find(array('user' => $_GET['user'], 'password' => $_GET['password']));
 \end{lstlisting}
 
 
 \begin{lstlisting}[caption={MongoDB injection with PHP's associative arrays}, label={lst:PHPArrayInjection}]
 https://example.org?user=patrick&password[%24ne]=1
+\end{lstlisting}
+
+\begin{lstlisting}[caption={Injected query parameter for MongoDB PHP injection}, label={lst:PHPArrayParam}]
+{'user': 'patrick', 'password': {'&ne':1}}
 \end{lstlisting}
 
 
