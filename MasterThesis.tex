@@ -32,8 +32,11 @@
 \usepackage{amsthm}
 \usepackage{todonotes}
 
+% Fonts
 %\usepackage{courier}
-\usepackage[scaled]{beramono}
+\usepackage[scaled]{beramono} % script font
+\usepackage{caption}  % adapted captions
+\usepackage{textcomp} % straight single quotes
 
 \setlength{\nomlabelwidth}{.20\hsize}
 
@@ -87,23 +90,31 @@
 % Design von Listings
 % -------------------------------------------------------------------------------------------
 \lstset{
-  basicstyle=\ttfamily\scriptsize,
-  commentstyle=\color{commentgray}\textit,
+  frame=top,frame=bottom,
+  basicstyle=\ttfamily\footnotesize,    % the size of the fonts that are used for the code
+  stepnumber=1,                           % the step between two line-numbers. If it is 1 each line will be numbered
+  numbersep=10pt,                         % how far the line-numbers are from the code
+  tabsize=2,                              % tab size in blank spaces
+  extendedchars=true,                     %
+  breaklines=true,                        % sets automatic line breaking
+  captionpos=t,                           % sets the caption-position to top
+  stringstyle=\color{blue}\ttfamily, % Farbe der String
+  showspaces=false,           % Leerzeichen anzeigen ?
+  showtabs=false,             % Tabs anzeigen ?
+  xleftmargin=17pt,
+  framexleftmargin=17pt,
+  framexrightmargin=17pt,
+  framexbottommargin=2pt,
+  framextopmargin=2pt,
   showstringspaces=false,
-  stringstyle=\color{ForestGreen},
-  keywordstyle=\color{blue},
   numbers=left,
   numberstyle=\tiny,
-  stepnumber=1,
-  numbersep=15pt,
-  tabsize=2,
-  fontadjust=true,
-  backgroundcolor=\color{white},
-  captionpos=b,
-  xleftmargin=0.1\linewidth,
-  breaklines=true,
-  aboveskip=16pt
+  upquote=true
 }
+
+\DeclareCaptionFormat{listing}{\vskip1pt#1#2#3}
+\captionsetup[lstlisting]{format=listing,singlelinecheck=false, margin=0pt, font={small,sf},labelsep=space,labelfont=bf}
+\captionsetup[figure]{format=listing,singlelinecheck=false, margin=0pt, font={small,sf},labelsep=space,labelfont=bf, justification=centering}
 
 \lstdefinelanguage{JavaScript}{
   keywords={typeof, new, true, false, catch, function, return, null, catch, switch, var, if, in, while, do, else, case, break},
