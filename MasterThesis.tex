@@ -15,7 +15,7 @@
 \usepackage{graphicx}  				% Einbinden von Grafiken erlauben
 \usepackage{textcomp} 				% zum Einsatz von Eurozeichen u. a. Symbolen
 \usepackage{listings}				% Datstellung von Quellcode mit den Umgebungen {lstlisting}, \lstinline und \lstinputlisting
-\usepackage[dvipsnames]{xcolor} 			% einfache Verwendung von Farben in nahezu allen Farbmodellen
+\usepackage[dvipsnames, table]{xcolor} 			% einfache Verwendung von Farben in nahezu allen Farbmodellen
 \usepackage[intoc]{nomencl} 		% zur Erstellung des Abkürzungsberzeichnisses
 \makenomenclature					% Abkürzungsverzeichnis erstellen
 \usepackage{setspace}				% Zusatzpaket zur Einstellung des Zeilenabstands
@@ -37,6 +37,16 @@
 \usepackage[scaled]{beramono} % script font
 \usepackage{caption}  % adapted captions
 \usepackage{textcomp} % straight single quotes
+\usepackage{pifont}
+
+% Check mark and cross mark
+\newcommand{\cmark}{\ding{51}}%
+\newcommand{\xmark}{\ding{55}}%
+
+% Table
+\usepackage{booktabs}
+\usepackage{arydshln}
+\renewcommand{\arraystretch}{1.2}
 
 \setlength{\nomlabelwidth}{.20\hsize}
 
