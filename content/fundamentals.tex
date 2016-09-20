@@ -1,19 +1,43 @@
-\chapter{Technical Background}
+ \chapter{Technical Background}
 \label{cha:technicalBackground}
+This chapter outlines the essential technologies and techniques in the context of NoSQL injection. Thereby, the relevant fundamentals in the scope of this thesis are covered.
 
 \section{Underlying Technologies}
-\subsection{HTTP}
+Within this section, the prevalent protocols and paradigms for data exchange between systems are explained.
 
-\cite{Berners-Lee1996}
-\cite{Fielding:1999}
+\subsection{HTTP}
+The Hypertext Transfer Protocol (HTTP) represents an application-layer protocol for the transfer of connected multimedia documents \cite{Berners-Lee1996}\cite{Fielding:1999}. Initially, HTTP was created regarding web-server to web-browser communication, but today the protocol is applied for various purposes. As a stateless protocol following a client-server model, HTTP itself does not retain any state between requests. While the protocol is often applied as a part of the TCP/IP stack, it is also applicable with other reliable and error-checked protocols on the transport layer. A required header block and an optional body block build the basic structure of each request and response. Depending on the intended kind of operation, different methods for requests exist. Table \ref{tab:http_methods} gives an overview of the available HTTP methods and their characteristics.\\
+
+\begin{table}[h] 
+ \centering
+ \begin{tabular}{llccc}
+  \textbf{\begin{tabular}{@{}c@{}}HTTP \\ method\end{tabular}} & \textbf{Description} & \textbf{\begin{tabular}{@{}c@{}}Request \\ body\end{tabular}} & \textbf{\begin{tabular}{@{}c@{}}Response \\ body\end{tabular}} & \textbf{Idempotent} \\ \hline
+  GET     & Retrieve specified resource & \xmark & \cmark & \cmark \\
+  HEAD    & Retrieve specified resource headers & \xmark & \xmark & \cmark \\
+  POST    & Update specified resource & \cmark & \cmark & \xmark \\
+  PATCH   & Partially updated specified resource & \cmark & \cmark & \xmark \\
+  PUT     & Create specified resource & \cmark & \cmark & \cmark \\
+  DELETE  & Delete specified resource & \xmark & \cmark & \cmark \\ \midrule
+  CONNECT & Convert connection to tunnel & \cmark & \cmark & \xmark \\
+  OPTIONS & Return supported HTTP methods & \cmark & \cmark & \cmark \\
+  TRACE   & Echo received request & \xmark & \cmark & \cmark \\
+  \bottomrule
+ \end{tabular}
+ \caption{Overview of HTTP methods' characteristics}
+ \label{tab:http_methods}
+\end{table}
+
+Basically, the first six methods implement create, read, update and delete operations for resources on the server. Thereby, a URI in the header specifies the resource, that the operation should be applied to. In case of create or update operations, the optional body block in the request contains the new resource data. Since no new data is needed for resource retrieving and deleting methods, they work solely with the request header block. All operations, apart form the HEAD request, deliver the result of the operation within the response's body block. Idempotents indicates, whether the behavior of a method stays the same for multiple consecutive requests. Especially update operations do not feature idempotent characteristics. The last three methods represent helper functions for connection inspection and TCP tunneling. An example for a request, that retrieves a specified resource form the server, is given in listing \ref{lst:http_request}.
 
 \begin{lstlisting}[caption={HTTP GET request}, label={lst:http_request}]
-GET / HTTP/1.1
+GET /index.html HTTP/1.1
 Host: example.org
 Accept-Language: en
 \end{lstlisting}
 
-\begin{lstlisting}[caption={HTTP response}, label={lst:http_response}]
+The first line of the request header is composed of the HTTP method, followed by resource identifier and completed with the version of the used protocol. In the given example a  GET request is used in order to retrieve the \textit{index.html} file. Afterwards, the host of the server is defined by the domain name. Accepted types of files, char-sets, encodings, languages and many more settings can be defined as additional headers. In case the requested resource exists and no error appears during request processing, the server sends a response as exemplified in listing \ref{lst:http_response}.
+
+\begin{lstlisting}[caption={HTTP GET response}, label={lst:http_response}]
 HTTP/1.1 200 OK
 Date: Sat, 09 Sep 2016 14:28:02 GMT
 Server: Apache
@@ -26,8 +50,10 @@ Content-Type: text/html
 <!DOCTYPE html... (here comes the 29769 bytes of the requested web page)
 \end{lstlisting}
 
+In the first line of the response, the server version of the protocol as well as the status code and message are returned. Depending on the success of the request, the status code and message in the response change. Further headers contain meta information about the server, the requested resource and the body block. Separated by a blank line, the body block follows the header. In this example the body contains the requested HTML document. With the end of the response body, the HTTP request-response cycle is finished.
+
 \subsection{REST}
-\cite{Fielding:2000}
+Representational State Transfer (REST) describes a programming paradigm for distributed systems in a stateless client-server environment \cite{Fielding:2000}. It specifies an architectural style, that enforces a consistent system interface design. Therefore, REST represents an alternative to prior approaches, such as SOAP or WDSL. The paradigm separates resource location and the applied method. Functional instructions are therefore not allowed to be included within the URI. A special implementation or protocol is not defined by the paradigm, whereby REST is commonly used in combination with HTTP and HTTPS. In the course of this, the HTTP methods encode the functional instructions and resources has to be uniquely identified by the requested URI. Though, the usage of HTTP and HTTPS does not imply REST conformance. Methods are often misused for different functionalities and as a result REST conformance is not provided.
 
 \section{NoSQL Databases}
 \subsection{Overview}
