@@ -71,11 +71,16 @@ In 1998 the word \textit{NoSQL} was first used by Carlo Strozzi in context of a 
 Apart from the presented categories of NoSQL databases, there also exist hybrid models implementing features originating from multiple categories. An example is OrientDB, that combines a document store with graph database abilities. 
 
 \subsection{MongoDB}
-The non-relational, document-oriented database MongoDB was published as an open source project in 2009. Deriving its name from the word humongous, it is designed to provide high performance, high availability as well as automatic horizontal scaling. The JSON style data model enables complex hierarchies for stored documents, but still allows efficient querying and indexing. Documents are stored in Binary JSON (BSON) format into collections, that in turn can be queried by JSON expressions. BSON extends JSON with additional data types, such as date, time stamps and regular expressions and is binary encoded. By default every MongoDB instance holds special system collections for indexes, namespaces, users and JavaScript code. MongoDB provides official drivers for various popular programming languages next to many unofficial community-supported drivers. 
+The non-relational, document-oriented database MongoDB was published as an open-source project in 2009. Deriving its name from the word humongous, it is designed to provide high performance, high availability as well as automatic horizontal scaling. The JSON style data model enables complex hierarchies for stored documents, but still allows efficient querying and indexing. Documents are stored in Binary JSON (BSON) format into collections, that in turn can be queried by JSON expressions. BSON extends JSON with additional data types, such as date, time stamps and regular expressions and is binary encoded. By default every MongoDB instance holds special system collections for indexes, namespaces, users and JavaScript code. MongoDB provides official drivers for various popular programming languages next to many unofficial community-supported drivers. 
 
 \subsection{Redis}
+Redis is an in-memory operating key-value store for strings, hashes, lists and sets. The 2009 released open-source database allows range queries and has built in Lua support for scripting. Due to its low data structure complexity, Redis provides large performance advantages in comparison to relational databases. Snapshotting or append only files allow on-disk persistence of the in-memory stored data. Later versions also allow distributed storage across clusters. Redis provides driver bindings for the most prevalent programming languages.
+
 \subsection{Memcached}
+
+
 \subsection{CouchDB}
+CouchDB is an document-oriented database written in Erlang. First published in 2005, the database is now maintained by the Apache Software Foundation and distributed under the Apache license. CouchDB is designed to combine the relaxed data model of document stores as well as the performance and scalability of relational databases. Therefore, the database offers horizontal scaling and implements the MapReduce framework for data processing. On Account of this, CouchDB includes Mozilla's JavaScript engine SpiderMonkey to facilitate scripting. Access for all major programming languages is provides with a RESTful HTTP interface. 
 
 \section{Application Security}
 \subsection{NoSQL Security}
