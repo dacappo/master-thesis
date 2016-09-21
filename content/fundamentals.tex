@@ -68,13 +68,16 @@ In 1998 the word \textit{NoSQL} was first used by Carlo Strozzi in context of a 
 \item [Column Stores] Similar to relational databases, data is very structured, but the underlying persistence layer differs strongly. Data is arranged column after column instead of row after row. This column oriented storage allows the processing and especially analysis of large amounts of data over distributed systems. Notable examples for column stores are Apache Cassandra, HBase or SAP HANA.
 \end{description}
 
-Apart from the presented categories of NoSQL databases, there also exist hybrid models implementing features originating from multiple categories. An example is OrientDB, that combines a document store with graph database abilities.
+Apart from the presented categories of NoSQL databases, there also exist hybrid models implementing features originating from multiple categories. An example is OrientDB, that combines a document store with graph database abilities. 
 
 \subsection{MongoDB}
+The non-relational, document-oriented database MongoDB was published as an open source project in 2009. Deriving its name from the word humongous, it is designed to provide high performance, high availability as well as automatic horizontal scaling. The JSON style data model enables complex hierarchies for stored documents, but still allows efficient querying and indexing. Documents are stored in Binary JSON (BSON) format into collections, that in turn can be queried by JSON expressions. BSON extends JSON with additional data types, such as date, time stamps and regular expressions and is binary encoded. By default every MongoDB instance holds special system collections for indexes, namespaces, users and JavaScript code. MongoDB provides official drivers for various popular programming languages next to many unofficial community-supported drivers. 
+
 \subsection{Redis}
 \subsection{Memcached}
 \subsection{CouchDB}
 
 \section{Application Security}
 \subsection{NoSQL Security}
+According to 
 \subsection{Injection Attacks}
