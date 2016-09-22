@@ -84,6 +84,8 @@ The in 2003 released database Memcached is an in-memory key-value store for data
 CouchDB is an document-oriented database written in Erlang. First published in 2005, the database is now maintained by the Apache Software Foundation and distributed under the Apache license. CouchDB is designed to combine the relaxed data model of document stores as well as the performance and scalability of relational databases. Therefore, the database offers horizontal scaling and implements the MapReduce framework for data processing. On Account of this, CouchDB includes Mozilla's JavaScript engine SpiderMonkey to facilitate scripting. Access for all major programming languages is provides with a RESTful HTTP interface. 
 
 \section{Application Security}
+In this section an introduction to the relevant security topics of this thesis is given. Therefore, the general state of NoSQl security is outlined and afterwards, the concept of injection attacks is described.
 \subsection{NoSQL Security}
-According to 
+To give an overview of NoSQl security, multiple security aspects have to be considered. Data persisted to the disc has to be protected, but many NoSQL databases store data in rest unencrypted. That situation allows direct access, when the server is compromised. Authentication and authorization are also an important issue. By default, most NoSQL databases run without these mechanisms. This allows CSRF attacks or even direct, unauthenticated access, when the database ports are exposed to external systems. When it comes to inter-cluster and client communication, some databases are still missing encryption. Last of all, also injection attacks represent an important security aspect of NoSQl databases. Despite other query languages are used, string concatenation of parameters reveals attack surface.    
+
 \subsection{Injection Attacks}
