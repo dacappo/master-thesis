@@ -1,14 +1,18 @@
 \chapter{Introduction}
 \label{cha:introduction}
+This first chapter outlines the underlying motivation for the investigation of NoSQL injection, defines the objectives in scope of this work and gives a look forward to the achieved academic contributions. Lastly, the structure of the thesis is elucidated.
 
 \section{Motivation}
-- Trend to big data from several sources on 
-- solutions for distributed databases given with new generation of NoSQL databases
-- widespread in current application stacks (on the rise)
-- but new concept and therefore SQL injection is not really considered
-- diaspora shows that injection is real, but not not really addressed
-- many different query methods
-- Is there a general NoSQL injection problematic or not
+In the last decade many new challenges, such as big data, social media and the internet of things, changed the way we build applications. More and more devices got connected to the internet and started producing huge amounts of unstructured data. This new situation demanded for highly scalable, always available systems for large numbers of concurrent and globally distributed users. The by then prevailing relational databases did not meet the upcoming requirements and reached their limits facing the enormous amounts of data. Given these circumstances, the generation of NoSQL databases emerged. With a non-relational approach in common, these databases provided a solution for the given challenges. Flexible handling of unstructured and semi-structured data originating from different sources in combination with powerful horizontal scaling abilities lead to the break through of NoSQL technologies. Since then, these databases were deployed in many application stacks and serve millions of users every day. Google uses NoSQL solutions as a part of their compute engine, Facebook adapted its storage engine for NoSQL integration and SAP selected NoSQL technologies for the core content management of their PaaS offering. These and many more examples leave no doubt that this new generation of databases offers notable advantages for modern applications, but do they provide security? When innovative concepts find their way to production, the security aspect is often neglected. Especially a well-known attack vector against relational databases - SQL injection - was not taken into account for NoSQL applications. Regarding injection, the prevalent opinion is that we are not building queries from strings, so we do not have to worry about injection vulnerabilities. This attitude may rest upon the few known attack vectors for NoSQL injection against specific platforms. However, the launch of the social media platform diaspora showed, that NoSQL injection is an actual issue. This raises the question, whether the known examples were individual cases or NoSQL injection presents a general problematic for our modern applications. On account of this prevailing situation, the subject of NoSQL injection has to be investigated comprehensively and in greater detail.
+
+
+% Trend to big data from several sources on 
+% solutions for distributed databases given with new generation of NoSQL databases
+% widespread in current application stacks (on the rise)
+% but new concept and therefore SQL injection is not really considered
+% diaspora shows that injection is real, but not not really addressed
+% many different query methods
+% Is there a general NoSQL injection problematic or not
 
 \section{Objective}
 
@@ -28,4 +32,4 @@ The main contributions of this thesis concerning NoSQL application security are:
 \end{description}
 
 \section{Structure}
-This thesis is  structured as follows: In Chapter 2 an overview of fundamental technologies of the thesis is given. Used protocols, investigated databases and the necessary security topics are outlined in this part. Chapter 3 gives an introduction to the concept of NoSQL injection as well as corresponding attacker models. Subsequently, the in scope of this thesis discovered injection vectors are presented in chapter 4. A diverse technology stacks are addressed in this part. Chapter 5 classifies the found attack vectors based on their underlying problem. Based on this classification, chapter 6 presents a new approach for NoSQL injection mitigation. Within chapter 7 the presented solution is evaluated with real world applications. A comparison of this thesis to related publications is given in chapter 8. The last part, chapter 9, discusses the results of this work and gives a potential outlook for future work on the subject of NoSQL injection.
+This thesis is  structured as follows: In Chapter 2 an overview of fundamental technologies of the thesis is given. Used protocols, investigated databases and the necessary security topics are outlined in this part. Chapter 3 gives an introduction to the concept of NoSQL injection as well as corresponding attacker models. Subsequently, the in scope of this thesis discovered injection vectors are presented in chapter 4. A diverse technology stacks are addressed in this part. Chapter 5 classifies the found attack vectors based on their underlying problem. Based on this classification, chapter 6 presents a new approach for NoSQL injection mitigation. Within chapter 7 the presented solution is evaluated with real world applications. A comparison of this thesis to related publications is given in chapter 8. The last part, chapter 9, discusses the results of this work and gives a potential outlook for future work on the subject of NoSQL injection.f
