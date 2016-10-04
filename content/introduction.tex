@@ -12,13 +12,18 @@ This thesis aims to give an encompassing overview of injection attacks against N
 
 Outgoing from these definitions concrete injection vulnerabilities in NoSQL databases has to be searched. Previous studies concentrated on single databases in combination with a specific application layer. In contrast to these published attack vectors, a more holistic approach is needed in order to give a widespread overview of the topic. On that account the most prevalent NoSQL technology stacks have to be selected and investigated with regard to injection vulnerabilities. For this reason, objective 2 of this work is defined as follows: \\
 
-\textbf{Objective 2:} \textit{Investigation of a selected group of technology stacks for injection vulnerabilities.} \\
+\textbf{Objective 2:} \textit{Investigation of a selected group of NoSQL technology stacks for injection vulnerabilities regarding the defined attacker models.} \\
 
 With the results of the investigation the vulnerabilities examined for their underlying problems. A differentiation between conceptional and implementation problems is an important aspect of this step. Vulnerabilities originating from implementation flaws can easily be fixed when reported, whereas conceptional problems are hard to solve in most cases. Conceptional vulnerabilities are based on the underlying design of the database. Therefore, objective 3 covers the classification as follows: \\
 
-\textbf{Objective 3:} \textit{Classification of NoSQL injection vulnerabilities according to the underlying design problem.} \\
+\textbf{Objective 3:} \textit{Classification of known and found NoSQL injection vulnerabilities according to the underlying design problem.} \\
 
-The elaboration of these three objectives should allow a general overview of NoSQL injection and provide an outline of the threads modern applications have to face with this class of attacks.
+Based on the exposed design problems, the prevention of NoSQL injection attacks can be approached. An appropriate prevention mechanism should be able to reliably stop potential injection attacks, but all the same avoid false positives breaking existing applications. Thereby, a mitigation technique should require a reasonable amount of code changes and engineering effort. The final objective of this thesis is therefore set in the following way:\\
+
+\textbf{Objective 4:} \textit{Elaboration of an approach for NoSQL injection mitigation addressing the underlying design problems.} \\
+
+% and mitigation
+The elaboration of these four objectives should allow a general overview of NoSQL injection and provide an outline of the threads modern applications have to face with this class of attacks. \\
 
 
 \section{Contributions}
@@ -31,4 +36,4 @@ The main contributions of this thesis concerning NoSQL application security are:
 \end{description}
 
 \section{Structure}
-This thesis is  structured as follows: In Chapter 2 an overview of fundamental technologies of the thesis is given. Used protocols, investigated databases and the necessary security topics are outlined in this part. Chapter 3 gives an introduction to the concept of NoSQL injection as well as corresponding attacker models. Subsequently, the in scope of this thesis discovered injection vectors are presented in chapter 4. A diverse technology stacks are addressed in this part. Chapter 5 classifies the found attack vectors based on their underlying problem. Based on this classification, chapter 6 presents a new approach for NoSQL injection mitigation. Within chapter 7 the presented solution is evaluated with real world applications. A comparison of this thesis to related publications is given in chapter 8. The last part, chapter 9, discusses the results of this work and gives a potential outlook for future work on the subject of NoSQL injection.f
+This thesis is  structured as follows: In Chapter 2 an overview of fundamental technologies of the thesis is given. Used protocols, investigated databases and the necessary security topics are outlined in this part. Chapter 3 gives an introduction to the concept of NoSQL injection as well as corresponding attacker models. Subsequently, the in scope of this thesis discovered injection vectors are presented in chapter 4. A diverse technology stacks are addressed in this part. Chapter 5 classifies the found attack vectors based on their underlying problem. Based on this classification, chapter 6 presents a new approach for NoSQL injection mitigation. Within chapter 7 the presented solution is evaluated with real world applications. A comparison of this thesis to related publications is given in chapter 8. The last part, chapter 9, discusses the results of this thesis and gives a potential outlook for future work on the subject of NoSQL injection.f
