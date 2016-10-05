@@ -10,16 +10,24 @@ Beside the query techniques, also the architecture of systems diversified with t
 
 \section{Definition of NoSQL Injection}
 
-- and indeed the attacker models for NoSQL injection are much more diverse in comparison to conventional SQL injection
-- also the processing logic is partly moved to the application layer
-- bypasses become possible
-- analyze the underlying problem of known and found injection attacks
+In order to give a definition for injection attacks against NoSQL databases, multiple aspects have to be taken into account. The objective of an attack has to be clarified as well as the mightiness of an attacker. In the course of this, the varying system structures has to be considered. Thus, attacker models for NoSQL injection expose themselves much more diverse in comparison to conventional SQL injection. In general, NoSQL injection can be defined the following way:\\
+
+\begin{description}
+\item [NoSQL Injection] represents a class of attacks against non-relational databases, that cause unintended behavior of a query through insertion of malicious data into the query context. These vulnerabilities originate from unvalidated user input used as or as a part of a database query. Depending on the attacked database, the injected input is crafted with the aim to trigger unintended operations of the database layer affecting confidentiality, integrity or availability of data.
+\end{description}
+
+Similar to other classes of attacks, NoSQL injection aims at one of the three security goals - confidentiality, integrity and availability. In this case, the attack is focused on the database layer of an application. This can be achieved by altering the query behavior, especially with regard to typical CRUD operations. Queries in turn can be influenced through user input. When this input is not properly sanitized for the query context, an attacker might be able to change the semantics of the operation. The user input in turn, derives from requests received from a client. These requests represent the attacker surface for NoSQL injection, since their content can be arbitrary manipulated. A successful attack sends a crafted request, so that the database interprets the query in a way that breaks one of the mentioned security goals. \\
 
 % focused on HTTP/HTTPS as attacker surface, but other protocols possible
 % control over entire request, in case of HTTP HEADER + BODY and the HTTP-Method
+% Which HTTP methods are relevant (CRUD)
 % parameters for application server interesting, these usually are used for server-side processing
 % Body (JSON, XML, x-www-form-urlencoded), Header (Cookies), URL (Querystring, Path)
 % type of system architecture to attack
+% ACTUAL definition 
+
+
+% CRUD operations
 
 \subsection{Common Attacker Model}
 
@@ -74,9 +82,11 @@ The deployment of RESTful interfaces allows a direct access from the client, omi
   \label{fig:extendedAttackerModel}
 \end{figure}
 
-% Objective
+% Objective 1 covered with this section!
 
 
 \section{Considered Technology Stack}
+
+% analyze the underlying problem of known and found injection attacks
 \subsection{Selected Databases}
 \subsection{Selected Application Platforms}
