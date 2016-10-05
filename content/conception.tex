@@ -15,7 +15,17 @@ Beside the query techniques, also the architecture of systems diversified with t
 - bypasses become possible
 - analyze the underlying problem of known and found injection attacks
 
+% focused on HTTP/HTTPS as attacker surface, but other protocols possible
+% control over entire request, in case of HTTP HEADER + BODY and the HTTP-Method
+% parameters for application server interesting, these usually are used for server-side processing
+% Body (JSON, XML, x-www-form-urlencoded), Header (Cookies), URL (Querystring, Path)
+% type of system architecture to attack
+
 \subsection{Common Attacker Model}
+
+% known attacker model similar to SQL injection
+% three tier model common in web context
+% ATTACKER Mightiness + GOAL
 
 \begin{figure}[h]
 \centering
@@ -27,6 +37,15 @@ Beside the query techniques, also the architecture of systems diversified with t
 % Objective
 
 \subsection{Extended Attacker Model}
+
+% complex system architecture
+% multiple systems for different purposes
+% data exchange with different formats
+% normal entry in one database, critical entry in another
+% 2-step approach
+% assumption to be able to insert arbitrary data into a external system or further 
+% attacker is able to insert arbitrary entry in database
+% ATTACKER Mightiness + GOAL (- insert)
 
 \begin{figure}[h]
 \centering
@@ -40,6 +59,13 @@ Beside the query techniques, also the architecture of systems diversified with t
 \subsection{Direct Attacker Model}
 
 The deployment of RESTful interfaces allows a direct access from the client, omitting any application layer. Databases such as CouchDB explicitly refer to this architectural style for a simpler application design.
+
+% RESTful interface 
+% direct access from client - no application layer needed
+% normal application uses only read
+% but write other operations can be injected
+% different attacker surface! direct REST access via HTTP (parameter in URL or Body)
+% ATTACKER Mightiness + GOAL
 
 \begin{figure}[h]
 \centering
