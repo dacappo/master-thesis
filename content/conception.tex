@@ -19,13 +19,11 @@ In order to give a definition for injection attacks against NoSQL databases, mul
 
 Similar to other classes of attacks, NoSQL injection is directed against at least one of the three security goals - confidentiality, integrity and availability. This class of attack is focused on the database layer of an application or more precisely the therein stored data. The attacker goal of NoSQL injection is to compromise this data with regard to any of the mentioned security goals. Unauthorized modification or retrieval of data as well as restriction of data access for others, represent successful attacks. These results can be achieved by triggering malicious query behavior, especially with regard to typical create, read, update and delete operations. Malicious behavior can be accomplished through manipulation of existing queries as well as the invocation of unauthorized queries. Bypasses for preceding confidentiality and integrity checks allow such query manipulation and invocation and constitute an important aspect for this class of attacks. User provided input in turn enables users as well as attackers to influence database queries. When data received from user input is not properly sanitized for the query context, an attacker might be able to manipulate the semantics and structure of the database operation. Inputs provided by users derive from requests received from clients. Since their content can be manipulated, these requests represent the attacker surface for NoSQL injection. Arbitrary manipulation is only limited by the fixed protocol structure used for the request. Otherwise, further processing of the request on the recipient side may fail. For an attack, a request with adapted contents is built, that leads to a database query with malicious user input. The database interprets the triggered query in a way that breaks one of the security goals for the underlying data. These circumstances define a successful NoSQL injection attack.\\
 
-The given definition of NoSQL injection is described in a relatively generic way. This goes in accordance with the in section \ref{sec:fromSQLtoNoSQLinjection} elucidated diverse system environments. On account of these circumstances, the way user input takes until it reaches the database query distinguishes depending on the system environment. Therefore, the phase between attacker initiated request and actual invocation of a database operation faces different scenarios. To address this in scope of the NoSQL injection definition, the following sections analyze the most significant scenarios and outline the according attacker models.
+The given definition of NoSQL injection is described in a relatively generic way. This goes in accordance with the in section \ref{sec:fromSQLtoNoSQLinjection} elucidated diverse system environments. On account of these circumstances, the way user input takes until it reaches the database query distinguishes depending on the system environment. Therefore, the phase between attacker initiated request and actual invocation of a database operation faces different scenarios. To address this in scope of the NoSQL injection definition, the following sections analyze the most significant system scenarios and outline the according attacker models.
 
 \subsection{Common Attacker Model}
 
-% known attacker model similar to SQL injection
-% three tier model common in web context
-% ATTACKER Mightiness + GOAL
+When analyzing the potential system structures of the NoSQL environment, the three tier model still plays a major role in the NoSQL environment. The combination of client, application server and database layer represents a fundamental structure for web applications. This architectural style builds the basis for the long known class of SQL injection attacks. Non-relational databases are also often deployed in the same way. Therefore, the common attacker model from SQL injection applies in a similar way for NoSQL injection attacks. An overview of the according attacker model including feasible protocols, application platforms and databases is illustrated in figure \ref{fig:normalAttackerModel}.
 
 \begin{figure}[h]
 \centering
@@ -33,6 +31,18 @@ The given definition of NoSQL injection is described in a relatively generic way
   \caption{Common attacker model for NoSQL injection}
   \label{fig:normalAttackerModel}
 \end{figure}
+
+With the common attacker model, requests to the application layer can arbitrary manipulated and represent untrusted data. The applied protocol for server-client communication represents the attacker surface and determines the scope for content manipulation. Application layer protocols, such as HTTP or HTTPS, but in rare cases also lower-level protocols like TCP are deployed at this interface. Afterwards, the application server processes the received request with the malicious contents. NodeJS, PHP and Python are widespread application servers in the context of web applications, but virtually any programming language can take this place. When the malicious contents reach the query invocation, the data is sent to the database layer. Depending on the underlying database, the query is formatted differently \\
+
+\begin{minipage}[t]{0.48\textwidth}
+  \textbf{Attacker Mightiness} \\ 
+  represents a class of attacks against non-relational databases, that cause unintended behavior of a query through insertion of malicious data into the query context.
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.48\textwidth}
+  \textbf{Attacker Goal} \\ 
+  represents a class of attacks against non-relational databases, that cause unintended behavior of a query through insertion of malicious data into the query context.
+\end{minipage}
 
 % Objective
 
@@ -57,6 +67,8 @@ The given definition of NoSQL injection is described in a relatively generic way
 % Objective
 
 \subsection{Direct Attacker Model}
+
+\subsection{Combined Attacker Models}
 
 The deployment of RESTful interfaces allows a direct access from the client, omitting any application layer. Databases such as CouchDB explicitly refer to this architectural style for a simpler application design.
 
