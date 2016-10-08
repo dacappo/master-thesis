@@ -23,7 +23,7 @@ The given definition of NoSQL injection is described in a relatively generic way
 
 \subsection{Common Attacker Model}
 
-When analyzing the potential system structures of the NoSQL environment, the three tier model still plays a major role. The combination of client, application server and database layer represents a fundamental structure for web applications. This architectural style builds the basis for the long known class of SQL injection attacks. Non-relational databases are also often deployed in the same way. Therefore, the common attacker model from SQL injection applies in a similar way for NoSQL injection attacks. An overview of the according attacker model including feasible protocols, application platforms and databases is illustrated in figure \ref{fig:normalAttackerModel}.
+When analyzing the potential system structures of the NoSQL environment, the three tier model still plays a major role. The combination of client, application server and database layer represents a fundamental structure for web applications. This architectural style builds the basis for the long known class of SQL injection attacks. Non-relational databases are also often deployed in the same way. Therefore, the common attacker model from SQL injection applies in a similar way for NoSQL injection attacks. An overview of the according attacker model including the involved data flows is illustrated in figure \ref{fig:normalAttackerModel}.
 
 \begin{figure}[h]
 \centering
@@ -32,16 +32,16 @@ When analyzing the potential system structures of the NoSQL environment, the thr
   \label{fig:normalAttackerModel}
 \end{figure}
 
-With the common attacker model, requests to the application layer can arbitrary manipulated and represent untrusted data. The applied protocol for server-client communication represents the attacker surface and determines the scope for content manipulation. Application layer protocols, such as HTTP or HTTPS, but in rare cases also lower-level protocols like TCP are deployed at this interface. Afterwards, the application server processes the received request with the malicious contents. NodeJS, PHP and Python are widespread application servers in the context of web applications, but virtually any programming language can take this place. When the malicious contents reach the query invocation, the data is sent to the database layer. Depending on the underlying database, the query is formatted differently \\
+The common attacker model can be modeled as a request-response cycle between the tree tiers. Initial requests of these cycles are normally originating from a client-side application. Since these client-side applications are under the control of individual users, requests sent to the application layer can be arbitrary manipulated and represent untrusted data. An attacker takes advantage of this and undertakes the role of a user or respectively the client-side application. The communication between client and server therefore represents the attacker surface and determines the scope for content manipulation. In order to initiate an attack, a request with the designated payload is crafted and sent to the application server. There, the received request containing malicious data is processed and becomes part of a database query. On the database layer, the manipulated query is interpreted and the results of this operation are returned to the application-layer. The resulting data is indirectly influenced by the doctored query, is passed through the response processing and delivered to the attacker in order to finish the request-response cycle. All processing steps mentioned in this cycle make changes to the data. When implemented securely, untrusted data is sanitized in these processing steps and injection attacks are prevented. Incomplete or even missing input sanitizing for the query context lead to potential NoSQL injection vulnerabilities.\\
 
 \begin{minipage}[t]{0.48\textwidth}
   \textbf{Attacker Mightiness} \\ 
-  The attacker is aware of the deployed tree tier technology stack and is able to send arbitrary manipulated requests to the application server. Direct access to the database layer for the attacker is not given.
+  The attacker is aware of the deployed tree tier technology stack including the utilized communication protocols, application platform and database. He is able to send arbitrary manipulated requests to the application server. Direct access to the database layer for the attacker is not given.
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.48\textwidth}
   \textbf{Attacker Goal} \\ 
-  The attacker aims to achieve unintended behavior of at least one database query by altering its parameters. A successful attack compromises confidentiality, integrity or availability of the underlying data.
+  The attacker aims to achieve unintended behavior of at least one database query by altering its parameters. A successful attack compromises confidentiality, integrity or availability of the underlying data through the query processing step or the data received with the resulting response.
 \end{minipage}
 
 % Objective
