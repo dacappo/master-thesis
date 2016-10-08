@@ -33,7 +33,7 @@ When analyzing the potential system structures of the NoSQL environment, the thr
   \label{fig:normalAttackerModel}
 \end{figure}
 
-The common attacker model can be modeled as a request-response cycle between the tree tiers. Initial requests of these cycles are normally originating from a client-side application. Since these client-side applications are under the control of individual users, requests sent to the application layer can be arbitrary manipulated and represent untrusted data. An attacker takes advantage of this and undertakes the role of a user or respectively the client-side application. The communication between client and server therefore represents the attacker surface and determines the scope for content manipulation. In order to initiate an attack, a request with the designated payload is crafted and sent to the application server. There, the received request containing malicious data is processed and becomes part of a database query. On the database layer, the manipulated query is interpreted and the results of this operation are returned to the application-layer. The resulting data is indirectly influenced by the doctored query, is passed through the response processing and delivered to the attacker in order to finish the request-response cycle. All processing steps mentioned in this cycle make changes to the data. When implemented securely, untrusted data is sanitized in these processing steps and injection attacks are prevented. Incomplete or even missing input sanitizing for the query context lead to potential NoSQL injection vulnerabilities.\\
+The common attacker model can be described with a request-response cycle between the tree tiers. Initial requests of these cycles are normally originating from a client-side application. Since these client-side applications are under the control of individual users, requests sent to the application layer can be arbitrary manipulated and represent untrusted data. An attacker takes advantage of this and undertakes the role of a user or respectively the client-side application. The communication between client and server therefore represents the attacker surface and determines the scope for content manipulation. In order to initiate an attack, a request with the designated payload is crafted and sent to the application server. There, the received request containing malicious data is processed and becomes part of a database query. On the database layer, the manipulated query is interpreted and the results of this operation are returned to the application-layer. The resulting data is indirectly influenced by the doctored query, is passed through the response processing and delivered to the attacker in order to finish the request-response cycle. All processing steps mentioned in this cycle make changes to the data. When implemented securely, untrusted data is sanitized in these processing steps and injection attacks are prevented. Incomplete or even missing input sanitizing for the query context lead to potential NoSQL injection vulnerabilities.\\
 
 \begin{minipage}[t]{0.48\textwidth}
   \textbf{Attacker Mightiness} \\ 
@@ -76,34 +76,32 @@ This model extends the common attacker model described in section \ref{sec:commo
 
 
 \subsection{Direct Attacker Model}
-
-\begin{minipage}[t]{0.48\textwidth}
-  \textbf{Attacker Mightiness} \\ 
-  The attacker is aware of the entire deployed database layer and is able to send arbitrary manipulated requests to this database. This scenario implies direct access for the attacker to the attacked database with user-level authorization.
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.48\textwidth}
-  \textbf{Attacker Goal} \\ 
-  The attacker aims to achieve unintended behavior the attacked database. A successful attack compromises confidentiality, integrity or availability of the underlying data.
-\end{minipage}
-
-\subsection{Combined Attacker Models}
-
-The deployment of RESTful interfaces allows a direct access from the client, omitting any application layer. Databases such as CouchDB explicitly refer to this architectural style for a simpler application design.
-
-% RESTful interface 
-% direct access from client - no application layer needed
-% normal application uses only read
-% but write other operations can be injected
-% different attacker surface! direct REST access via HTTP (parameter in URL or Body)
-% ATTACKER Mightiness + GOAL
+Another scenario that become important with NoSQL databases is direct communication between client and database layer. This is represented by a reduced three teer architecture, that does not deploy any application layer. The idea seems inconvenient, but is actually induced by multiple NoSQL databases. In contrast to the extended attacker model, also a simplified model is needed to address these kind of system structure. The two tier architecture and the corresponding attacker model are visualized within figure \ref{fig:directAttackerModel}.
 
 \begin{figure}[h]
 \centering
   \includegraphics[width=1\linewidth]{Images/attacker_model_direct}
   \caption{Direct attacker model for NoSQL injection}
-  \label{fig:extendedAttackerModel}
+  \label{fig:directAttackerModel}
 \end{figure}
+
+The direct attacker model is based on a request-response cycle between client and database layer. Similar to the other models, the attacker overtakes the role of the client-side application and crafts a request containing the payload. This request is sent directly to the database layer. An important aspect of the entire attacker model is the authentication and authorization mechanism of the database. Otherwise, an attacker would be able to invoke arbitrary queries. In the scope of this model, the attacker is restricted by the authorization of an typical application user. At this point the granularity of the applied checks plays an important role. An successful attacker may craft a request, that passes the authorization checks and still triggers a potentially malicious behavior of the processed query. The major advantage for an attacker is that the manipulated request and resulting response are not processed, filtered or protected by any application layer. \\
+
+\begin{minipage}[t]{0.48\textwidth}
+  \textbf{Attacker Mightiness} \\ 
+  The attacker is aware of the entire deployed technology stack including database layer, authorization checks and utilized communication protocol. He is able to send arbitrary manipulated requests directly to the database layer. This scenario implies direct access for the attacker to the attacked database with user-level authorization.
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.48\textwidth}
+  \textbf{Attacker Goal} \\ 
+  The attacker aims to achieve unintended behavior the attacked database. A successful attack compromises confidentiality, integrity or availability of the underlying data through the query processing step or the data received with the resulting response.
+\end{minipage}
+
+\subsection{Combined Attacker Models}
+
+
+% common attacker model + more complex + simpler mirrors the flexible application areas of nosql databases.
+% other combinations possible
 
 
 % Objective 1 covered with this section!
