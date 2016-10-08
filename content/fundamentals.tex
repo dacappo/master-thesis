@@ -85,8 +85,17 @@ CouchDB is an document-oriented database written in Erlang. First published in 2
 
 \section{Application Security}
 In this section an introduction to the relevant security topics of this thesis is given. Therefore, the general state of NoSQl security is outlined and afterwards, the concept of injection attacks is described.
+
+\subsection{Security Goals}
+\begin{description}
+\item [Confidentiality] 
+\item [Integrity] 
+\item [Availability]
+\end{description}
+
+
 \subsection{NoSQL Security}
-To give an overview of NoSQL security, multiple security aspects have to be considered. Data persisted to the disc has to be protected, but many NoSQL databases store data in rest unencrypted. That situation allows direct access, when the server is compromised. Authentication and authorization are also an important issue. By default, most NoSQL databases run without these mechanisms. This allows CSRF attacks or even direct, unauthenticated access, when the database ports are exposed to external systems. When it comes to inter-cluster and client communication, some databases are missing encryption. Last of all, also injection attacks represent an important security aspect of NoSQl databases. Despite other query languages than SQL are used, string concatenation of parameters still reveals attack surface.    
+To give an overview of NoSQL security, multiple security aspects have to be considered. Data persisted to the disc has to be protected, but many NoSQL databases store data in rest unencrypted. That situation allows direct access, when the server is compromised. Authentication and authorization are also an important issue. By default, most NoSQL databases run without these mechanisms. This allows CSRF attacks or even direct, unauthenticated access, when the database ports are exposed to external systems. When it comes to inter-cluster and client communication, some databases are missing encryption. Last of all, also injection attacks represent an important security aspect of NoSQL databases. Despite other query languages than SQL are used, string concatenation of parameters still reveals attack surface.    
 
 \subsection{Injection Attacks}
 Injection vulnerabilities occur when data from untrusted sources is passed to an interpreter. According to the OWASP top ten project ranking web application security risks, injection attacks represent the most critical type overall. Everyone who is able to send untrusted data to the system could conduct an injection attack. Therefore, text-based payloads exploit the syntax of the interpreter in oder to achieve unintended behavior. As a result, code included in the payload is interpreted and executed. This may lead to data corruption, data loss, denial of access or even complete system takeover. SQL, LDAP, OS commands or XML are common formats, that are targeted by injection attacks. Best practice for injection prevention is the usage of parameterized APIs or alternatively stored procedures. The OWASP also recommends validation by white-listing input data.
