@@ -22,6 +22,7 @@ Similar to other classes of attacks, NoSQL injection is directed against at leas
 The given definition of NoSQL injection is described in a relatively generic way. This goes in accordance with the in section \ref{sec:fromSQLtoNoSQLinjection} elucidated diverse system environments. On account of these circumstances, the way user input takes until it reaches the database query distinguishes depending on the system environment. Therefore, the phase between attacker initiated request and actual invocation of a database operation faces different scenarios. To address this in scope of the NoSQL injection definition, the following sections analyze the most significant system scenarios and outline the according attacker models.
 
 \subsection{Common Attacker Model}
+\label{sec:commonAttackerModel}
 
 When analyzing the potential system structures of the NoSQL environment, the three tier model still plays a major role. The combination of client, application server and database layer represents a fundamental structure for web applications. This architectural style builds the basis for the long known class of SQL injection attacks. Non-relational databases are also often deployed in the same way. Therefore, the common attacker model from SQL injection applies in a similar way for NoSQL injection attacks. An overview of the according attacker model including the involved data flows is illustrated in figure \ref{fig:normalAttackerModel}.
 
@@ -36,7 +37,7 @@ The common attacker model can be modeled as a request-response cycle between the
 
 \begin{minipage}[t]{0.48\textwidth}
   \textbf{Attacker Mightiness} \\ 
-  The attacker is aware of the deployed tree tier technology stack including the utilized communication protocols, application platform and database. He is able to send arbitrary manipulated requests to the application server. Direct access to the database layer for the attacker is not given.
+  The attacker is aware of the deployed tree tier technology stack including the utilized communication protocols, application platform and database. He is able to send arbitrary manipulated requests to the application server. Direct access to the NoSQL database layer for the attacker is not given.
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.48\textwidth}
@@ -44,18 +45,9 @@ The common attacker model can be modeled as a request-response cycle between the
   The attacker aims to achieve unintended behavior of at least one database query by altering its parameters. A successful attack compromises confidentiality, integrity or availability of the underlying data through the query processing step or the data received with the resulting response.
 \end{minipage}
 
-% Objective
-
 \subsection{Extended Attacker Model}
 
-% complex system architecture
-% multiple systems for different purposes
-% data exchange with different formats
-% normal entry in one database, critical entry in another
-% 2-step approach
-% assumption to be able to insert arbitrary data into a external system or further 
-% attacker is able to insert arbitrary entry in database
-% ATTACKER Mightiness + GOAL (- insert)
+The emergence of NoSQL databases entailed diverse system structures and high data exchange between components as explained in section \ref{sec:fromSQLtoNoSQLinjection}. Multiple systems are deployed for different purposes and therefore exchange their data. As a consequence, data is transformed between different data models. A benign entry in one system may be critical in another one. An entry valid in one context, may result in a vulnerability when imported to another context. Therefore, data exchange becomes a critical aspect for interconnected systems. This situation has to be considered for determination of feasible attacker models. Figure \ref{fig:extendedAttackerModel} addresses suchlike environments and presents an extended attacker model. \\
 
 \begin{figure}[h]
 \centering
@@ -64,15 +56,22 @@ The common attacker model can be modeled as a request-response cycle between the
   \label{fig:extendedAttackerModel}
 \end{figure}
 
+This model extends the common attacker model described in section \ref{sec:commonAttackerModel} by a preceding step. NoSQL system circumstances do not necessarily allow the assumption, that the underlying data is completely tamper-proof. In this model, the database layer imports data from at least one external source. This source can be a file, another database or even an complete external system. The procedure of an attack begins with manipulated data added to this external source. It has to be clarified, that the added data can be totally eligible in this context. Any import of this data, into another system leads to a tampered data stock. The degree of attacker influence depends on the import processing, but in the worst case, the data is transfered one-to-one. This means, that such a preliminary step allows an attacker to add arbitrary manipulated records to the attacked database. In a second step the procedure of the common attacker model is executed. The question is, whether this extended model allows new kind of injection attacks not applicable for the common model. Certainly, the definition of attack mightiness and goal have to be adapted for the extended model as follows. \\
+
+% 2-step approach
+% assumption to be able to insert arbitrary data into a external system or further 
+% attacker is able to insert arbitrary entry in database
+% ATTACKER Mightiness + GOAL (- insert)
+
 % Objective
 \begin{minipage}[t]{0.48\textwidth}
   \textbf{Attacker Mightiness} \\ 
-  The attacker is aware of the entire deployed technology stack and is able to insert arbitrary manipulated data to an secondary database. Direct access for the attacker to the attacked database instance is not given.
+  The attacker is aware of the entire deployed technology stack including the utilized communication protocols, application platform, database and external data source. He is able to insert arbitrary manipulated data to the external source and send arbitrary manipulated requests to the application server. Direct access to the NoSQL database layer for the attacker is not given.
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.48\textwidth}
   \textbf{Attacker Goal} \\ 
-  The attacker aims to achieve unintended behavior the attacked database. A successful attack compromises confidentiality, integrity or availability of data not derived from the attacker.
+  The attacker aims to achieve unintended behavior of at least one database query by altering its parameters. A successful attack compromises confidentiality, integrity or availability of the underlying data, that not derived from the attacker. This can be achieve as a result of the import process, query processing step or the data received with the resulting response.
 \end{minipage}
 
 
@@ -105,6 +104,7 @@ The deployment of RESTful interfaces allows a direct access from the client, omi
   \caption{Direct attacker model for NoSQL injection}
   \label{fig:extendedAttackerModel}
 \end{figure}
+
 
 % Objective 1 covered with this section!
 
