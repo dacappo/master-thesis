@@ -23,7 +23,7 @@ The given definition of NoSQL injection is described in a relatively generic way
 
 \subsection{Common Attacker Model}
 
-When analyzing the potential system structures of the NoSQL environment, the three tier model still plays a major role in the NoSQL environment. The combination of client, application server and database layer represents a fundamental structure for web applications. This architectural style builds the basis for the long known class of SQL injection attacks. Non-relational databases are also often deployed in the same way. Therefore, the common attacker model from SQL injection applies in a similar way for NoSQL injection attacks. An overview of the according attacker model including feasible protocols, application platforms and databases is illustrated in figure \ref{fig:normalAttackerModel}.
+When analyzing the potential system structures of the NoSQL environment, the three tier model still plays a major role. The combination of client, application server and database layer represents a fundamental structure for web applications. This architectural style builds the basis for the long known class of SQL injection attacks. Non-relational databases are also often deployed in the same way. Therefore, the common attacker model from SQL injection applies in a similar way for NoSQL injection attacks. An overview of the according attacker model including feasible protocols, application platforms and databases is illustrated in figure \ref{fig:normalAttackerModel}.
 
 \begin{figure}[h]
 \centering
@@ -36,12 +36,12 @@ With the common attacker model, requests to the application layer can arbitrary 
 
 \begin{minipage}[t]{0.48\textwidth}
   \textbf{Attacker Mightiness} \\ 
-  represents a class of attacks against non-relational databases, that cause unintended behavior of a query through insertion of malicious data into the query context.
+  The attacker is aware of the deployed tree tier technology stack and is able to send arbitrary manipulated requests to the application server. Direct access to the database layer for the attacker is not given.
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.48\textwidth}
   \textbf{Attacker Goal} \\ 
-  represents a class of attacks against non-relational databases, that cause unintended behavior of a query through insertion of malicious data into the query context.
+  The attacker aims to achieve unintended behavior of at least one database query by altering its parameters. A successful attack compromises confidentiality, integrity or availability of the underlying data.
 \end{minipage}
 
 % Objective
@@ -65,8 +65,28 @@ With the common attacker model, requests to the application layer can arbitrary 
 \end{figure}
 
 % Objective
+\begin{minipage}[t]{0.48\textwidth}
+  \textbf{Attacker Mightiness} \\ 
+  The attacker is aware of the entire deployed technology stack and is able to insert arbitrary manipulated data to an secondary database. Direct access for the attacker to the attacked database instance is not given.
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.48\textwidth}
+  \textbf{Attacker Goal} \\ 
+  The attacker aims to achieve unintended behavior the attacked database. A successful attack compromises confidentiality, integrity or availability of data not derived from the attacker.
+\end{minipage}
+
 
 \subsection{Direct Attacker Model}
+
+\begin{minipage}[t]{0.48\textwidth}
+  \textbf{Attacker Mightiness} \\ 
+  The attacker is aware of the entire deployed database layer and is able to send arbitrary manipulated requests to this database. This scenario implies direct access for the attacker to the attacked database with user-level authorization.
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.48\textwidth}
+  \textbf{Attacker Goal} \\ 
+  The attacker aims to achieve unintended behavior the attacked database. A successful attack compromises confidentiality, integrity or availability of the underlying data.
+\end{minipage}
 
 \subsection{Combined Attacker Models}
 
