@@ -109,7 +109,7 @@ The previously defined attacker models are held generic by not involving involve
 
 \subsection{Selected Databases}
 
-The database layer constitutes a key aspect for the investigation of NoSQl injection. In order to provide a comprehensive exploration of the topic, the prevalence of the databases represents an important factor. The underlying data structures as well as query techniques have to be considered for a diverse selection, too. Especially databases, that implement concepts differing strongly form the well explored relational approach represent suitable candidates. As a basis for the selection, a ranking rating the popularity of databases was used. An extract of the top ranking non-relational databases is shown in table \ref{tab:db_ranking}.
+The database layer constitutes a key aspect for the investigation of NoSQL injection. In order to provide a comprehensive exploration of the topic, the prevalence of the databases represents an important factor. The underlying data structures as well as query techniques have to be considered for a diverse selection, too. Especially databases, that implement concepts differing strongly form the well explored relational approach represent suitable candidates. As a basis for the selection, a ranking rating the popularity of databases was used. An extract of the top ranking non-relational databases is shown in table \ref{tab:db_ranking}.
 
 % focused on non-relational databaes, therefore most widespread NoSQl databases selected
 % DB-rankings show importances of databases
@@ -129,22 +129,27 @@ The database layer constitutes a key aspect for the investigation of NoSQl injec
   \rowcolor{light-gray} 7. &  Memcached & Key-value store & 23. & $\rightarrow$ \\
   8. &  DynamoDB & Document store & 24. & $\scriptstyle\nearrow$ \\
   \rowcolor{light-gray} 9. &  CouchDB   & Document store & 27. & $\scriptstyle\searrow$ \\
+  10. &  Riak KV & Key-value store & 32. & $\scriptstyle\searrow$ \\
   \bottomrule
  \end{tabular}
  \caption{Ranking of databases according to their popularity.}
  \label{tab:db_ranking}
 \end{table}
-Concepts similar to relational databases become 
-% Why no column stores -> because, similar injection problematic than in relational databses -> prepared statements solve this situation
-% The same applies to the NEO4J database
+
+Listed are the ten most popular non-relational databases measured by a combination of search trends, social network and developer discussions as well as job offerings. Every entry contains the name of the database or more precisely the database management system, the type of the underlying data model, its overall rank considering relational databases and search engines and the popularity trend of the last month. 
+
+
+
 % Why the others are slected for investigation, is outlined in the listing below
 
 \begin{description}
-\item [MongoDB] 
-\item [Redis] 
-\item [Memcached]
-\item [CouchDB]
+\item [MongoDB] represents the prime non-relational database of the ranking and the trend indicates further growth. This document store challenges the leading relational databases and is therefore a suitable candidate for further investigation. 
+\item [Redis] is the highest ranking key-value store and exhibits the uppermost growth rate of all listed NoSQL databases. Its growth is also reflected by the shown trend scores. With the in-memory stored key-value pairs, a new concept arrived in leading databases. These circumstances make Redis the second databases, considered for the scope of this work.
+\item [Memcached] is another key-value store, but differs strongly from others like Redis. This database is optimized for any kind of caching on distributed systems. Data is only store temporarily and never persisted to disc. Due to the discrete approach of this database, is represents the third candidate for NoSQL injection examination.
+\item [CouchDB] implements another document-store with an declining popularity trend. Since its concepts differs strongly from other document stores and builds the basis for multiple other non-relational databases, it still embodies an interesting database for the investigation of injection attacks.
 \end{description}
+
+The second ranking non-relational database Apache Cassandra and the fourth ranking HBase are not considered, since their querying techniques are based on SQL-like languages and prepared statements are offered as a secure injection mitigation technique. In case of the graph structured Neo4j data store, the same reasons apply. Concepts relatively close to the relational approach can probably secured with known techniques and are hence not addressed by this thesis. Couchbase is in large parts a fork of the selected CouchDB, implements an similar approach and therefore not taken into account. The main reason for the disregarding of DynamoDB is its proprietary nature as a part of Amazon web service products. Last of all, the Riak key-value store is not considered, because of its similar approach with Redis and declining popularity. With the selected four candidates for NoSQl injection investigation, a broad range of non-relational concepts is covered.
 
 
 \subsection{Selected Application Platforms}
