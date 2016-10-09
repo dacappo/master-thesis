@@ -98,29 +98,73 @@ The direct attacker model is based on a request-response cycle between client an
 \end{minipage}
 
 \subsection{Combined Attacker Models}
+With the previously outlined attacker models, the diverse scenarios for NoSQL-based systems are covered. The extended attacker model addresses the aspects of complex and unstructured data exchange between system components. With the direct attacker model the simplified two-tier architectures are taken into account. Due to the diverse system structures entailed by NoSQL databases, also combinations of these models become relevant in special cases. In comparison to the pretty uniform relational database environment, the definition of a holistic attacker model for the heterogeneous NoSQL environment is hard to ensure. Nevertheless, with the three presented attacker models, the most prevalent application structures of NoSQL databases are covered for the scope of this thesis. \\
 
-
-% common attacker model + more complex + simpler mirrors the flexible application areas of nosql databases.
-% other combinations possible
-
-
-% Objective 1 covered with this section!
+By the detailed definition of NoSQL injection and the introduction of corresponding known as well as new attacker models, the in section \ref{sec:objective} set \textbf{Objective 1} is covered and the basis for the following elaboration is given.
 
 
 \section{Considered Technology Stack}
 
+The previously defined attacker models are held generic by not involving involve concrete databases, protocols or application servers. In this way, a holistic definition for NoSQL injection could be given. However, actual vulnerabilities and according attack vectors depend on designated technology configurations. With regard to the objective of NoSQL injection investigation, a scope for the considered technologies has to be set. An examination of all feasible technology combinations is not viable. This section selects the most prevalent technologies of each layer for the further investigation in scope of this thesis.
+
+\subsection{Selected Databases}
+
+The database layer constitutes a key aspect for the investigation of NoSQl injection. In order to provide a comprehensive exploration of the topic, the prevalence of the databases represents an important factor. The underlying data structures as well as query techniques have to be considered for a diverse selection, too. Especially databases, that implement concepts differing strongly form the well explored relational approach represent suitable candidates. As a basis for the selection, a ranking rating the popularity of databases was used. An extract of the top ranking non-relational databases is shown in table \ref{tab:db_ranking}.
+
+% focused on non-relational databaes, therefore most widespread NoSQl databases selected
+% DB-rankings show importances of databases
+% select concepts, that differ strongly from relational databses - skip equal approaches based on SQL-like query languages
+% differn types in scope of this work
+\definecolor{light-gray}{rgb}{0.92,0.92,0.92}
+\begin{table}[h] 
+ \centering
+ \begin{tabular}{cllcc}
+  \textbf{NoSQL Rank} & \textbf{Database} & \textbf{Type} & \textbf{Overall Rank} & \textbf{Trend} \\ \hline
+  \rowcolor{light-gray} 1. &  MongoDB     & Document store & 4. & $\scriptstyle\nearrow$ \\
+  2. &  Cassandra   & Column store & 7. & $\rightarrow$ \\
+  \rowcolor{light-gray} 3. &  Redis       & Key-value store & 9. & $\scriptstyle\nearrow$ \\
+  4. &  HBase       & Column store & 15. & $\rightarrow$ \\
+  5. &  Neo4j       & Graph store & 21. & $\rightarrow$ \\
+  6. &  Couchbase  & Document store & 22. & $\rightarrow$ \\
+  \rowcolor{light-gray} 7. &  Memcached & Key-value store & 23. & $\rightarrow$ \\
+  8. &  DynamoDB & Document store & 24. & $\scriptstyle\nearrow$ \\
+  \rowcolor{light-gray} 9. &  CouchDB   & Document store & 27. & $\scriptstyle\searrow$ \\
+  \bottomrule
+ \end{tabular}
+ \caption{Ranking of databases according to their popularity.}
+ \label{tab:db_ranking}
+\end{table}
+Concepts similar to relational databases become 
+% Why no column stores -> because, similar injection problematic than in relational databses -> prepared statements solve this situation
+% The same applies to the NEO4J database
+% Why the others are slected for investigation, is outlined in the listing below
+
+\begin{description}
+\item [MongoDB] 
+\item [Redis] 
+\item [Memcached]
+\item [CouchDB]
+\end{description}
+
+
+\subsection{Selected Application Platforms}
+
+% focus on typical web stack application layers
+% mostly dynamically typed
+% therefore Node.js, PHP, Ruby and Python selected for scope of this thesis
+
+
+\subsection{Selected Application Layer Protocols}
+
+% implied by selected aplplication plfatforms, but theoretically any appplication layer protocl or even lower-level protocols prossible
 % focused on HTTP/HTTPS as attacker surface, but other protocols possible
 % control over entire request, in case of HTTP HEADER + BODY and the HTTP-Method
 % Which HTTP methods are relevant (CRUD)
 % parameters for application server interesting, these usually are used for server-side processing
 % Body (JSON, XML, x-www-form-urlencoded), Header (Cookies), URL (Querystring, Path)
 % type of system architecture to attack
-% ACTUAL definition 
+% ACTUAL definition of Attacker surface
 
-% analyze the underlying problem of known and found injection attacks
-\subsection{Selected Databases}
-\subsection{Selected Application Platforms}
-\subsection{Selected Application Layer Protocols}
 
 \textbf{HTTP}
 \textbf{HTTPS}
