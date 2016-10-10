@@ -84,15 +84,18 @@ The in 2003 released database Memcached is an in-memory key-value store for data
 CouchDB is an document-oriented database written in Erlang. First published in 2005, the database is now maintained by the Apache Software Foundation and distributed under the Apache license. CouchDB is designed to combine the relaxed data model of document stores as well as the performance and scalability of relational databases. Therefore, the database offers horizontal scaling and implements the MapReduce framework for data processing. On Account of this, CouchDB includes Mozilla's JavaScript engine SpiderMonkey to facilitate scripting. Access for all major programming languages is provides with a RESTful HTTP interface. 
 
 \section{Application Security}
-In this section an introduction to the relevant security topics of this thesis is given. Therefore, the general state of NoSQl security is outlined and afterwards, the concept of injection attacks is described.
+In this section an introduction to the relevant security topics of this thesis is given. Therefore, general security goals are introduced ,the current state of NoSQl security is outlined and afterwards, the concept of injection attacks is described.
 
 \subsection{Security Goals}
+Information security is a general term comprising a practice for protection of data by defending it against attacks. It involves three major security goals for the underlying data. These goals, known as the CIA security model, are defined as follows:
+
 \begin{description}
-\item [Confidentiality] 
-\item [Integrity] 
-\item [Availability]
+\item [Confidentiality] Data has to be protected against any kind of unauthorized disclosure and the authenticity of data sources hast to be ensured.
+\item [Integrity] Data hast to be protected from any kind of unauthorized modification and consistency, accuracy as well as trustworthy have to be ensured.
+\item [Availability] Data hast to be accessible for authorized entities and a usability as well as timely access hast to be ensured. A delay or denial of access and unauthorized removal of data have to be prevented.
 \end{description}
 
+Vulnerabilities like missing encryption, software bugs, weak passwords or inaccurate checks enable an attacker to break one of these goals for the targeted data. Attacks in turn are the act of exploiting vulnerabilities.
 
 \subsection{NoSQL Security}
 To give an overview of NoSQL security, multiple security aspects have to be considered. Data persisted to the disc has to be protected, but many NoSQL databases store data in rest unencrypted. That situation allows direct access, when the server is compromised. Authentication and authorization are also an important issue. By default, most NoSQL databases run without these mechanisms. This allows CSRF attacks or even direct, unauthenticated access, when the database ports are exposed to external systems. When it comes to inter-cluster and client communication, some databases are missing encryption. Last of all, also injection attacks represent an important security aspect of NoSQL databases. Despite other query languages than SQL are used, string concatenation of parameters still reveals attack surface.    
