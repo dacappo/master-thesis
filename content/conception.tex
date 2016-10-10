@@ -192,14 +192,24 @@ With the selected four application layers a broad realm for our attacker models 
 
 \subsection{Selected Application Layer Protocols}
 
-Through the selection of databases and application platforms, the applicable communications protocols are already entailed. The attacker models enable an attacker to send arbitrary manipulated requests. An important restriction at this point is, that the request has to be interpreted and the contained payload processed by the application or database layer. Therefore, protocol-breaking request are mostly discarded. Manipulation of requests is for this reason restricted to designated parts in practice. Theoretically any application layer protocol or even lower-level ones can be used for cross-layer communication. For the selected technology stacks, HTTP and HTTPS represents the relevant protocols regarding the attacker surface. The following list explains the components, that are predestinated for attacker manipulation.
+Through the selection of databases and application platforms, the applicable communications protocols are already entailed. The attacker models enable an attacker to send arbitrary manipulated requests. An important restriction at this point is, that the request has to be interpreted and the contained payload processed by the application or database layer. Therefore, protocol-breaking request are mostly discarded. Manipulation of requests is for this reason restricted to designated parts in practice. Theoretically any application layer protocol or even lower-level ones can be used for cross-layer communication. For the selected technology stacks, HTTP and HTTPS represents the relevant protocols regarding the attacker surface. The following list explains the components, that are predestinated for attacker manipulation. \\
 
-\textbf{HTTP}
-\textbf{HTTPS}
+\textbf{HTTP}\\
+The HTTP protocol implements several methods indication the server-side operation type. These methods can be set by the attacker as well as the URI of the addressed resource. Especially, the query string of the URL or even the path are often used for parameterization of the server-side application. Cookies are passed as a header for custom data transfer and are also part of the attacker surface. Depending on the used method type, a request body section is included in the request. The data contained within the body is used to pass data from the client to the server or vice versa and therefore represents another suitable part for malicious modification. \\
 
-\textbf{JSON}
-\textbf{URL Encoded}
-\textbf{XML}
+\textbf{HTTPS}\\
+HTTPS embodies a secured version of the HTTP protocol with transport level encryption. The actual format as well as the attacker surface is fairly equal to the one revealed by HTTP. Method, URL, Cookie as well as the body section represent the practical attacker surface. \\
+
+In case of the body section, multiple data formats exist. These are called MIME-types and state the kind of transfered data. Some of these are particularly relevant for the payload encoding and therefore the crafting of an attacker request. The three most common body data formats for application parameterization are explained in the following paragraphs.\\
+
+\textbf{application/json} \\
+This type indicates a string following the JSON syntax. These strings can be parsed by server or client and result in an object of the employed programming language. Objects exist of properties that can be multi-layered by referencing other objects. \\
+
+\textbf{application/xml} \\
+This type indicates a XML file. Similar to JSON, the file can be parsed by server or client and result in an object of the employed programming language. The XML format differs between properties and child elements and allow multi-layered structures\\
+
+\textbf{application/x-www-form-urlencoded} \\
+This type indicates a string containing key-value pairs, that is encoded according to the query-string structure of an URL. Web forms use this encoding by default. Most application layers allow the automatic extraction of the received key-value pairs into an object.
 
 % implied by selected aplplication plfatforms, but theoretically any appplication layer protocl or even lower-level protocols prossible
 % focused on HTTP/HTTPS as attacker surface, but other protocols possible
