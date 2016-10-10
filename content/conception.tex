@@ -132,7 +132,7 @@ The database layer constitutes a key aspect for the investigation of NoSQL injec
   10. &  Riak KV & Key-value store & 32. & $\scriptstyle\searrow$ \\
   \bottomrule
  \end{tabular}
- \caption{Ranking of databases according to their popularity.}
+ \caption{Ranking of databases according to their popularity}
  \label{tab:db_ranking}
 \end{table}
 
@@ -153,6 +153,37 @@ The second ranking non-relational database Apache Cassandra and the fourth ranki
 
 
 \subsection{Selected Application Platforms}
+Next to the underlying database, a series of application platforms have to be selected regarding the common and the extended attacker model. An optimal choice would be application layers that are most frequently deploy in combination with the selected NoSQL databases. Unfortunately, representative statistics for suchlike cases are not available. Another option is the analysis of open-source applications with regard to the used programming language. GitHub's open repositories provide a broad range of projects, that allow an evaluation of a programming languages' popularity. Exactly this information was gathered and published by a GitHub engineer and builds the basis for the application layer selection for this thesis. The top ranking programming languages of more than a million analyzed public repositories are summarized in table \ref{tab:language_ranking}.
+
+\begin{table}[h] 
+ \centering
+ \begin{tabular}{clrr}
+  \textbf{Rank} & \textbf{Repository Language} & \textbf{Active Repositories} & \textbf{Total Commits} \\ \hline
+  \rowcolor{light-gray} 1. &  JavaScript     & 323,938 & 3,461,415 \\
+  2. &  Java   & 222,852 & 2,323,315 \\
+  \rowcolor{light-gray} 3. &  Python  & 164,852 & 1,654,226 \\
+  4. &  CSS       & 164,585 & 1,810,013 \\
+  \rowcolor{light-gray}5. &  PHP      & 138,771 & 1,391,467 \\
+  \rowcolor{light-gray}6. &  Ruby  & 132,848 & 1,106,259 \\
+   7. &  C\scriptsize\raisebox{.5ex}{++} & 86,505 & 1,013,761 \\
+  8. &  C & 73,075 & 804,339 \\
+  9. &  Shell   & 65,670 & 592,046 \\
+  10. &  C\scriptsize\raisebox{.5ex}{\#} & 56,062 & 558,332 \\
+  \bottomrule
+ \end{tabular}
+ \caption{Ranking of programming languages according to the number of public repositories on GitHub in 2014}
+ \label{tab:language_ranking}
+\end{table}
+Listed are the ten most used repository languages of public projects along with the number of active repositories and the total of push commits. The reasons for the selection of the highlighted programming languages and the corresponding application layers are listed below.
+
+\begin{description}
+\item [NodeJS] represents the server-side execution environment of JavaScript. As shown in the ranking, JavaScript is by far the most used language in the analyzed open-source projects. The language is used within browsers on the client-side as well as for server-side applications. Many non-relational databases even allow direct scripting with this language. Therefore, JavaScript or respectively the server-side NodeJS is selected for further investigation.
+\item [Python] is the third highest ranking programming language and known for its fast and easy prototyping abilities. Common use-cases represent server-side scripting and web development. Its characteristics make Python an essential application layer for the scope of this work.
+\item [PHP] is the most widespread server-side application layer of web applications. That is reflected with the fifth place in the popularity ranking of programming languages. Since the typical deployment of PHP resembles the presented attacker models, the language is taken into account for the scope of this work.
+\item [Ruby] is nearly as popular as PHP regarding the number of active repositories. In combination with the Rails framework, Ruby represents an established application layer for web applications. On this account Ruby is selected as the fourth application layer language for NoSQL injection investigation.
+\end{description}
+
+With the selected four application layers a broad realm for our attacker models is covered. The languages are part of many examples used for the introduction NoSQL databases. Despite its high ranking, Java is not considered for further investigation. This decision is based on the high number of Android repositories, that are not suitable for the presented attacker models. CSS was omitted, since it is no typical application language and only offers styling capabilities for websites.
 
 % focus on typical web stack application layers
 % mostly dynamically typed
@@ -160,6 +191,15 @@ The second ranking non-relational database Apache Cassandra and the fourth ranki
 
 
 \subsection{Selected Application Layer Protocols}
+
+Through the selection of databases and application platforms, the applicable communications protocols are already entailed. The attacker models enable an attacker to send arbitrary manipulated requests. An important restriction at this point is, that the request has to be interpreted and the contained payload processed by the application or database layer. Therefore, protocol-breaking request are mostly discarded. Manipulation of requests is for this reason restricted to designated parts in practice. Theoretically any application layer protocol or even lower-level ones can be used for cross-layer communication. For the selected technology stacks, HTTP and HTTPS represents the relevant protocols regarding the attacker surface. The following list explains the components, that are predestinated for attacker manipulation.
+
+\textbf{HTTP}
+\textbf{HTTPS}
+
+\textbf{JSON}
+\textbf{URL Encoded}
+\textbf{XML}
 
 % implied by selected aplplication plfatforms, but theoretically any appplication layer protocl or even lower-level protocols prossible
 % focused on HTTP/HTTPS as attacker surface, but other protocols possible
@@ -169,7 +209,3 @@ The second ranking non-relational database Apache Cassandra and the fourth ranki
 % Body (JSON, XML, x-www-form-urlencoded), Header (Cookies), URL (Querystring, Path)
 % type of system architecture to attack
 % ACTUAL definition of Attacker surface
-
-
-\textbf{HTTP}
-\textbf{HTTPS}
