@@ -30,6 +30,23 @@ https://example.org/login?user=patrick&password[%24gt]=
 {'user': 'patrick', 'password': {'&gt':''}}
 \end{lstlisting}
 
+\begin{tabular}{lll}
+\hline
+\multicolumn{3}{ c }{\textbf{Query Selector Injection}} \\
+\hline
+Database & MongoDB &  \\ \hline
+Attacker Model & Common Attacker Model & \\ \hline
+\multirow{4}{*}{Application Layers} & PHP & by default \\
+ & NodeJS & QS module with default database driver \\
+ & Python & Django framework with default database driver \\
+ & Ruby & Rails framework with default database driver \\ \hline
+\multirow{2}{*}{Attacker Surface} & URL Query-string & \cmark \\
+ & Body - JSON & \cmark \\ \hline
+\multirow{2}{*}{Strikers} & ST & Alan Smith \\
+ & ST & Mark Viduka \\
+\hline
+\end{tabular}
+
 \subsection{Expanding Array Injection}
 
 \begin{lstlisting}[caption={Example for vulnerable MongoDB - NodeJS application}, label={lst:PHPArrayInjection}]

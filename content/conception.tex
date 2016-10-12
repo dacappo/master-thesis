@@ -3,7 +3,7 @@ This section outlines the concept of NoSQL injection and how it derives from con
 
 \section{From SQL to NoSQL Injection}
 \label{sec:fromSQLtoNoSQLinjection}
-Injection attacks on relational databases represent the major web application vulnerability of the last decade. Thereby, the three tier architecture composed of client, server and database plays an important role. Since data obtained from the client can be arbitrary manipulated, input validation and sanitizing represent important principles for the the server-side. Otherwise, unvalidated input may find its way into sensitive operations, that cause injection vulnerabilities. In case unvalidated data is used to build database queries, an attacker is able to alter the SQL statement's structure. Suchlike vulnerabilities represent serious threats, especially due to the direct data access in combination with the Touring completeness of the injected SQL context.\\ 
+Injection attacks on relational databases represent the major web application vulnerability of the last decade \cite{OWASP:2013b}. Thereby, the three tier architecture composed of client, server and database plays an important role. Since data obtained from the client can be arbitrary manipulated, input validation and sanitizing represent important principles for the the server-side. Otherwise, unvalidated input may find its way into sensitive operations, that cause injection vulnerabilities. In case unvalidated data is used to build database queries, an attacker is able to alter the SQL statement's structure. Suchlike vulnerabilities represent serious threats, especially due to the direct data access in combination with the Touring completeness of the injected SQL context.\\ 
 
 This situation changed with the emerging generation of NoSQL databases. A variety of new query techniques was introduced next to SQL. For many databases, JSON-based or parameterized function calls replaced the conventional SQL approach. These simplified methods lead to a more straightforward database access and enabled unstructured data models. All the same, program logic moved from the database to the application layer due to functional limitations of the queries. Complex operations, such as data constraints or checks, that were previously executed directly on the database with SQL, have to be implemented within the application layer. Bypassing these logical constraints in order to achieve a certain database behavior constitutes an important aspect in the context of NoSQL injection. \\ 
 
@@ -109,12 +109,9 @@ The previously defined attacker models are held generic by not involving involve
 
 \subsection{Selected Databases}
 
-The database layer constitutes a key aspect for the investigation of NoSQL injection. In order to provide a comprehensive exploration of the topic, the prevalence of the databases represents an important factor. The underlying data structures as well as query techniques have to be considered for a diverse selection, too. Especially databases, that implement concepts differing strongly form the well explored relational approach represent suitable candidates. As a basis for the selection, a ranking rating the popularity of databases was used. An extract of the top ranking non-relational databases is shown in table \ref{tab:db_ranking}.
+The database layer constitutes a key aspect for the investigation of NoSQL injection. In order to provide a comprehensive exploration of the topic, the prevalence of the databases represents an important factor. The underlying data structures as well as query techniques have to be considered for a diverse selection, too. Especially databases, that implement concepts differing strongly form the well explored relational approach represent suitable candidates. As a basis for the selection, a ranking rating the popularity of databases was used. An extract of the top ranking non-relational databases is shown in table \ref{tab:db_ranking} \cite{Solid2016}.
 
-% focused on non-relational databaes, therefore most widespread NoSQl databases selected
-% DB-rankings show importances of databases
-% select concepts, that differ strongly from relational databses - skip equal approaches based on SQL-like query languages
-% differn types in scope of this work
+
 \definecolor{light-gray}{rgb}{0.92,0.92,0.92}
 \begin{table}[h] 
  \centering
@@ -153,7 +150,7 @@ The second ranking non-relational database Apache Cassandra and the fourth ranki
 
 
 \subsection{Selected Application Platforms}
-Next to the underlying database, a series of application platforms have to be selected regarding the common and the extended attacker model. An optimal choice would be application layers that are most frequently deploy in combination with the selected NoSQL databases. Unfortunately, representative statistics for suchlike cases are not available. Another option is the analysis of open-source applications with regard to the used programming language. GitHub's open repositories provide a broad range of projects, that allow an evaluation of a programming languages' popularity. Exactly this information was gathered and published by a GitHub engineer and builds the basis for the application layer selection for this thesis. The top ranking programming languages of more than a million analyzed public repositories are summarized in table \ref{tab:language_ranking}.
+Next to the underlying database, a series of application platforms have to be selected regarding the common and the extended attacker model. An optimal choice would be application layers that are most frequently deploy in combination with the selected NoSQL databases. Unfortunately, representative statistics for suchlike cases are not available. Another option is the analysis of open-source applications with regard to the used programming language. GitHub's open repositories provide a broad range of projects, that allow an evaluation of a programming languages' popularity. Exactly this information was gathered and published by a GitHub engineer and builds the basis for the application layer selection for this thesis. The top ranking programming languages of more than a million analyzed public repositories are summarized in table \ref{tab:language_ranking} \cite{Zapponi2014}.
 
 \begin{table}[h] 
  \centering
@@ -185,10 +182,6 @@ Listed are the ten most used repository languages of public projects along with 
 
 With the selected four application layers a broad realm for our attacker models is covered. The languages are part of many examples used for the introduction NoSQL databases. Despite its high ranking, Java is not considered for further investigation. This decision is based on the high number of Android repositories, that are not suitable for the presented attacker models. CSS was omitted, since it is no typical application language and only offers styling capabilities for websites.
 
-% focus on typical web stack application layers
-% mostly dynamically typed
-% therefore Node.js, PHP, Ruby and Python selected for scope of this thesis
-
 
 \subsection{Selected Application Layer Protocols}
 
@@ -200,7 +193,7 @@ The HTTP protocol implements several methods indication the server-side operatio
 \textbf{HTTPS}\\
 HTTPS embodies a secured version of the HTTP protocol with transport level encryption. The actual format as well as the attacker surface is fairly equal to the one revealed by HTTP. Method, URL, Cookie as well as the body section represent the practical attacker surface. \\
 
-In case of the body section, multiple data formats exist. These are called MIME-types and state the kind of transfered data. Some of these are particularly relevant for the payload encoding and therefore the crafting of an attacker request. The three most common body data formats for application parameterization are explained in the following paragraphs.\\
+In case of the body section, multiple data formats exist \cite{Freed1996a}. These are called MIME-types and state the kind of transfered data. Some of these are particularly relevant for the payload encoding and therefore the crafting of an attacker request. The three most common body data formats for application parameterization are explained in the following paragraphs \cite{Freed2016}.\\
 
 \textbf{application/json} \\
 This type indicates a string following the JSON syntax. These strings can be parsed by server or client and result in an object of the employed programming language. Objects exist of properties that can be multi-layered by referencing other objects. \\
@@ -210,12 +203,3 @@ This type indicates a XML file. Similar to JSON, the file can be parsed by serve
 
 \textbf{application/x-www-form-urlencoded} \\
 This type indicates a string containing key-value pairs, that is encoded according to the query-string structure of an URL. Web forms use this encoding by default. Most application layers allow the automatic extraction of the received key-value pairs into an object.
-
-% implied by selected aplplication plfatforms, but theoretically any appplication layer protocl or even lower-level protocols prossible
-% focused on HTTP/HTTPS as attacker surface, but other protocols possible
-% control over entire request, in case of HTTP HEADER + BODY and the HTTP-Method
-% Which HTTP methods are relevant (CRUD)
-% parameters for application server interesting, these usually are used for server-side processing
-% Body (JSON, XML, x-www-form-urlencoded), Header (Cookies), URL (Querystring, Path)
-% type of system architecture to attack
-% ACTUAL definition of Attacker surface
