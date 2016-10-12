@@ -100,15 +100,17 @@
 % -------------------------------------------------------------------------------------------
 % Design von Listings
 % -------------------------------------------------------------------------------------------
+\definecolor{lighter-gray}{RGB}{244,244,244}
 \lstset{
-  frame=top,frame=bottom,
+  %frame=top,frame=bottom,
+  backgroundcolor = \color{lighter-gray},
   basicstyle=\ttfamily\footnotesize,    % the size of the fonts that are used for the code
   stepnumber=1,                           % the step between two line-numbers. If it is 1 each line will be numbered
   numbersep=10pt,                         % how far the line-numbers are from the code
   tabsize=2,                              % tab size in blank spaces
   extendedchars=true,                     %
   breaklines=true,                        % sets automatic line breaking
-  captionpos=t,                           % sets the caption-position to top
+  captionpos=b,                           % sets the caption-position to top
   stringstyle=\color{blue}\ttfamily, % Farbe der String
   showspaces=false,           % Leerzeichen anzeigen ?
   showtabs=false,             % Tabs anzeigen ?
@@ -126,6 +128,7 @@
 \DeclareCaptionFormat{listing}{\vskip1pt#1#2#3}
 \captionsetup[lstlisting]{format=listing,singlelinecheck=false, margin=0pt, font={small,sf},labelsep=space,labelfont=bf}
 \captionsetup[figure]{format=listing,singlelinecheck=false, margin=0pt, font={small,sf},labelsep=space,labelfont=bf, justification=centering}
+\captionsetup[table]{format=listing,singlelinecheck=false, margin=0pt, font={small,sf},labelsep=space,labelfont=bf, justification=centering}
 
 \lstdefinelanguage{JavaScript}{
   keywords={typeof, new, true, false, catch, function, return, null, catch, switch, var, if, in, while, do, else, case, break},
