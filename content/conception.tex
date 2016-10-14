@@ -184,6 +184,7 @@ With the selected four application layers a broad realm for our attacker models 
 
 
 \subsection{Selected Application Layer Protocols}
+\label{sec:selectedAppLayerProtocols}
 
 Through the selection of databases and application platforms, the applicable communications protocols are already entailed. The attacker models enable an attacker to send arbitrary manipulated requests. An important restriction at this point is, that the request has to be interpreted and the contained payload processed by the application or database layer. Therefore, protocol-breaking request are mostly discarded. Manipulation of requests is for this reason restricted to designated parts in practice. Theoretically any application layer protocol or even lower-level ones can be used for cross-layer communication. For the selected technology stacks, HTTP and HTTPS represents the relevant protocols regarding the attacker surface. The following list explains the components, that are predestinated for attacker manipulation. \\
 
@@ -219,8 +220,30 @@ In addition to putting semantics into the value a parameter, also the data type 
 \textbf{Object Structure Encoded} \\
 On top the given value and type encoding, semantics can also be defined by a parameter's object structure. This is enabled by parameters composed of data types, such as objects and arrays, that in turn can contain further parameters. Thereby, nested objects structures are passed as a parameter to the database layer and operations are triggered depending on this structures. An attacker can influence the query's behavior by altering the parameter's object structure.\\
 
-These are the three major means to encode semantics into a query. Consequently, an attacker has to take influence at least one of the three semantic encodings in order to compromise the targeted security goals.
+These are the three major means of non-relational databases to encode semantics into a query. Consequently, an attacker has to take influence on at least one of the three semantic encodings in order to compromise the targeted security goals.
 
 \section{Analysis of Attacker Surface}
-How the gap between attacker surface and influence on the given 
+Based on the outlined approaches to alter a query's semantic, preceding steps of the attacker models has to be considered. The direct attacker model allows, as the naming implies, direct manipulation of the passed query parameters. In case of the common and the extend attacker model, the gap between attacker surface and query has to be bridged. Therefore, we take a deeper look at the application layer processing, its parameterization through parts of the HTTP request and how this can influence a query's semantic. For a successful attack, data has to flow from the attacker controlled request into a query parameter. As outlined within section \ref{sec:selectedAppLayerProtocols}, especially the parts of a request designated for server-side application parameterization, become relevant at this point. For a successful attack, these request parameters have to facilitate value, type or object structure changes within the application layer. The following paragraphs analyze the injection possibilities of the selected request parameters for each of the investigated application platforms.\\
+
+\textbf{Request URL}\\
+\textbf{Request Header}\\
+\textbf{Request Body}\\
+
+\begin{table}[h]
+  \centering 
+  \begin{tabular}{llcccl}
+  \multirow{2}{*}{\textbf{Source}} & \multirow{2}{*}{\textbf{Format}} & \multicolumn{3}{c}{\textbf{Encoding}} \\
+    & & \textbf{Value} & \textbf{Type} & \textbf{Structure} \\ \hline
+  \multirow{2}{*}{URL}
+    & Path & \cmark & \xmark & \xmark \\
+    & \cellcolor{light-gray}Query string & \cellcolor{light-gray}\cmark & \cellcolor{light-gray}\cmark & \cellcolor{light-gray}\cmark \\ \hline
+  \multirow{3}{*}{Body}
+    & \cellcolor{light-gray}application/json & \cellcolor{light-gray}\cmark & \cellcolor{light-gray}\cmark & \cellcolor{light-gray}\cmark \\
+    & \cellcolor{light-gray}application/x-www-form-urlencoded & \cellcolor{light-gray}\cmark & \cellcolor{light-gray}\cmark & \cellcolor{light-gray}\cmark \\ 
+    & application/xml & \cmark & (\cmark) & (\cmark) \\ \hline
+    Header & Cookie & \cmark & \xmark & \xmark \\ \hline
+  \end{tabular}
+  \caption{Interpretation of request data through application layer processing across the investigated platforms}
+  \label{tab:language_ranking}
+\end{table}
 
