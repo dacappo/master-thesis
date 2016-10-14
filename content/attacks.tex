@@ -34,13 +34,13 @@ https://example.org/login?user=patrick&password[%24gt]=
 \hline
 \multicolumn{3}{ c }{\textbf{Query Selector Injection}} \\
 \hline
-Database & MongoDB &  \\ \hline
 Attacker Model & Common Attacker Model & \\ \hline
+Database & MongoDB &  \\ \hline
 \multirow{4}{*}{Application Layers} & PHP & by default \\
  & NodeJS & QS module with default database driver \\
  & Python & Django framework with default database driver \\
  & Ruby & Rails framework with default database driver \\ \hline
-\multirow{2}{*}{Attacker Surface} & URL Query-string & \cmark \\
+\multirow{2}{*}{Dependencies} & URL Query-string & \cmark \\
  & Body - JSON & \cmark \\ \hline
 \multirow{2}{*}{Strikers} & ST & Alan Smith \\
  & ST & Mark Viduka \\
