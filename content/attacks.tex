@@ -1,101 +1,181 @@
 \chapter{NoSQL Injection Attacks}
-
-%explain why attack vectors are presented as HTTP GET request - harder, than HTTP POST
+This chapter gives an overview of the in scope of this thesis found NoSQL injection attacks. Each of the presented attacks is accompanied by a vulnerable code example as well as a suitable attack vector. With regard to the attacker surface parameters analyzed in section \ref{sec:analysisOfQueryTechniques}, the vectors focus on query string and JSON encoded payloads. The chapter is structured in one section per investigated database.
 
 \section{MongoDB Document Store}
+Within this section, the newly discovered injection attacks against the non-relational MongoDB database are outlined.
 
 \subsection{Query Selector Injection}
+This attack is based on the Common Attacker Model and is directed against the selection parameter of queries. MongoDB employs BSON, an extended JSON format, to define the selected documents affected by the query. Complex selection operations, such as \textit{greater than} or \textit{not equal}, are implemented with the help of a set of special query selectors. These are formatted as objects and replace the actual value within the query criteria as demonstrated in listing \ref{lst:MongoQuerySelectors}. 
 
-\begin{lstlisting}[caption={Vulnerable PHP example for query selector injection on MongoDB}, label={lst:PHPArrayInjection}]
+\begin{lstlisting}[caption={Example for MongoDB's query selectors}, label={lst:MongoQuerySelectors}]
+find({'password' : 'secure'});      // Password property equals "secure"
+find({'password' : {'$ne': '0'}});  // Password property not equals "0"
+\end{lstlisting}
+
+The injection attack presented by Sullivan \cite{Sullivan:2011} showed, that query selectors in combination with PHP applications can be utilized for injection attacks. Listing \ref{lst:PHPQuerySelectorInjection} shows the according vulnerable code of an login implementation. \\
+
+\begin{lstlisting}[caption={Vulnerable PHP example for query selector injection on MongoDB}, label={lst:PHPQuerySelectorInjection}]
 $collection->find(array('user' => $_GET['user'], 'password' => $_GET['password']));
 \end{lstlisting}
 
-\begin{lstlisting}[caption={Vulnerable NodeJS example for query selector injection on MongoDB}, label={lst:PHPArrayInjection}]
-db.collection('users').find({"user": req.query.user, "password": req.query.password});
-\end{lstlisting}
+The code checks for documents, that match the passed user and password values from the query string. Here comes the automatic query string parsing of PHP into play. This feature enables the injection of a Query Selector instead of an actual password with the help of the extended query string syntax. An passed selector like \textit{no equals} will nearly always evaluate to true. With the manipulated request shown in \ref{lst:QuerySelectorInjectionVector}, the login check can be reliably bypassed. \\
 
-\begin{lstlisting}[caption={Vulnerable Ruby example for query selector injection on MongoDB}, label={lst:PHPArrayInjection}]
-db['users'].find({:user => req.params['user'], :password => req.params['password']})
-\end{lstlisting}
-
-\begin{lstlisting}[caption={Vulnerable Python example for query selector injection on MongoDB}, label={lst:PHPArrayInjection}]
-db.users.find({"user": request.GET['user'], "password": request.GET['password']})
-\end{lstlisting}
-
-\begin{lstlisting}[caption={Attack vector on MongoDB for query selector injection via HTTP GET}, label={lst:PHPArrayInjection}]
+\begin{lstlisting}[caption={Attack vector on MongoDB for query selector injection via the query string parameter}, label={lst:QuerySelectorInjectionVector}]
 https://example.org/login?user=patrick&password[%24gt]=
 \end{lstlisting}
 
-\begin{lstlisting}[caption={Resulting query of query selector injection}, label={lst:PHPArrayParam}]
+Pektov \cite{Petkov:2014a} demonstrated a vulnerable login implementation running on NodeJS's \textit{Express} web server following the same approach. The application code given in listing \ref{lst:NodeQuerySelectorInjection} can also be attacked with the request presented in listing \ref{lst:QuerySelectorInjectionVector} . \\
+
+\begin{lstlisting}[caption={Vulnerable NodeJS example for query selector injection on MongoDB}, label={lst:NodeQuerySelectorInjection}]
+db.collection('users').find({"user": req.query.user, "password": req.query.password});
+\end{lstlisting}
+
+So are there even any new findings for this class of attack? The previous publications presented the query selector injection as a distinct issue occurring only for PHP and Node applications, since its based a non-standardized application layer behavior. As explained in section \ref{sec:analysisOfQueryTechniques}, the query string parsing is a convenience functionality present across all investigated application platforms. The examples given in listing \ref{lst:RubyQuerySelectorInjection} for Ruby as well as listing \ref{lst:PythonQuerySelectorInjection} reveal, that query selector injection is an issue appearing across platforms. \\
+
+\begin{lstlisting}[caption={Vulnerable Ruby example for query selector injection on MongoDB}, label={lst:RubyQuerySelectorInjection}]
+db['users'].find({:user => req.params['user'], :password => req.params['password']})
+\end{lstlisting}
+
+\begin{lstlisting}[caption={Vulnerable Python example for query selector injection on MongoDB}, label={lst:PythonQuerySelectorInjection}]
+db.users.find({"user": request.GET['user'], "password": request.GET['password']})
+\end{lstlisting}
+
+In all of the four cases, the default and by MongoDB recommended database driver was deployed. The attack vector from listing \ref{lst:QuerySelectorInjectionVector} leads in each of the presented login checks to the query criteria shown in listing \ref{lst:QuerySelectorCriteria}. \\
+
+\begin{lstlisting}[caption={Resulting query of query selector injection}, label={lst:QuerySelectorCriteria}]
 {'user': 'patrick', 'password': {'&gt':''}}
 \end{lstlisting}
 
-\begin{tabular}{lll}
-\hline
-\multicolumn{3}{ c }{\textbf{Query Selector Injection}} \\
-\hline
-Attacker Model & Common Attacker Model & \\ \hline
-Database & MongoDB &  \\ \hline
-\multirow{4}{*}{Application Layers} & PHP & by default \\
- & NodeJS & QS module with default database driver \\
- & Python & Django framework with default database driver \\
- & Ruby & Rails framework with default database driver \\ \hline
-\multirow{2}{*}{Dependencies} & URL Query-string & \cmark \\
- & Body - JSON & \cmark \\ \hline
-\multirow{2}{*}{Strikers} & ST & Alan Smith \\
- & ST & Mark Viduka \\
-\hline
-\end{tabular}
+A login can therefore be bypassed in each investigated case, but this kind of attack is not restricted to login applications. Nearly all parameterized selection criteria can be influenced by the injection of query selectors. This includes all read, update and delete calls making use of the BSON selection format. Furthermore, the attacker surface analysis from section \ref{sec:analysisOfQueryTechniques} suggests, that the URL query string is by far not the only part of the attacker surface allowing this kind of attack. When the application processes other request parameters, the payload can also be placed in form data encoded as well as JSON request bodies. These circumstances exhibit a way more significant surface for query selector injection as previously indicated. \\
+
+\begin{table}[h] 
+ \centering
+ \begin{tabular}{lll}
+  \textbf{Command} & \textbf{Arguments} \\ \hline
+  db.collection.deleteOne()         & \textbf{filter} options \\
+  db.collection.deleteMany()        & \textbf{filter} options \\
+  db.collection.find()              & \textbf{query} projection \\
+  db.collection.findAndModify()     & \textbf{query} options \\
+  db.collection.findOne()           & \textbf{query} projection \\
+  db.collection.findOneAndDelete()  & \textbf{filter} options \\
+  db.collection.findOneAndReplace() & \textbf{filter} replacement options \\
+  db.collection.findOneAndUpdate()  & \textbf{filter} update options \\
+  db.collection.replaceOne()        & \textbf{filter} replacement options \\
+  db.collection.remove()            & \textbf{query} option \\
+  db.collection.update()            & \textbf{query} update options \\
+  db.collection.updateOne()         & \textbf{filter} update options \\
+  db.collection.updateMany()        & \textbf{filter} update options \\
+  \bottomrule 
+ \end{tabular}
+ \caption{MongoDB commands affected by query selector injection}
+ \label{tab:redis_commands_affected}
+\end{table}
+
+
 
 \subsection{Expanding Array Injection}
+The expanding array injection is based on the common attacker model and exploits a special behavior of a query's selection criteria. When a requires a property to be equal to a value and the stored document contains an array in place of the property, all values of the array are used to find a match. This feature, as the attack name implies, is called automatic array expanding. An attacker can manipulate inserted documents in order to achieve matches subsequent selective criteria. The creation of an user as shown in listing \ref{lst:NodeJSCreateUser} represents an example for such an vulnerability. \\
 
-\begin{lstlisting}[caption={Example for vulnerable MongoDB - NodeJS application}, label={lst:PHPArrayInjection}]
+\begin{lstlisting}[caption={Example for vulnerable MongoDB - NodeJS application}, label={lst:NodeJSCreateUser}]
 if (req.query.user !== "admin") {
   db.collection('users').insert({"user": req.query.user, "password": req.query.password});
 }
 \end{lstlisting}
 
-\begin{lstlisting}[caption={Example for vulnerable MongoDB - NodeJS application}, label={lst:PHPArrayInjection}]
-db.collection('users').find({"user": req.query.user, "password": req.query.password});
-\end{lstlisting}
+The given code allows the insertion of new users into the database, with the exception of \textit{admin} as a username. This security check can be bypassed, by injecting an array of usernames instead of a simple string. A suitable attack vector based on query string encoding is given with listing \ref{lst:ExpandingArrayInjection}.\\
 
-\begin{lstlisting}[caption={MongoDB injection with NodeJS's query string module}, label={lst:PHPArrayInjection}]
+\begin{lstlisting}[caption={MongoDB injection with NodeJS's query string module}, label={lst:ExpandingArrayInjection}]
 https://example.org/register?user[]=patrick&user[]=admin&password=1234;
 \end{lstlisting}
 
-\begin{lstlisting}[caption={Injected query parameter for MongoDB - NodeJS injection}, label={lst:PHPArrayParam}]
+The given request creates an array typed \textit{user} property that leads to the bypass of the if-clause. In the next step, the query is executed and the provided data results into the document presented in listing \ref{lst:ExpandingArrayInjectionDocument} stored within the user collection.\\
+
+\begin{lstlisting}[caption={Injected query parameter for MongoDB - NodeJS injection}, label={lst:ExpandingArrayInjectionDocument}]
 {'user': ['patrick', 'admin'], 'password': 1234}
 \end{lstlisting}
 
-\begin{lstlisting}[caption={MongoDB injection with NodeJS's query string module}, label={lst:PHPArrayInjection}]
+At this point, the array expanding functionality becomes important. An attacker can now use the normal authentication with username and password as shown in listing \ref{lst:NodeJSArrayExpandingLogin} to login. This works for both of the users inserted with the initial request. \\
+
+\begin{lstlisting}[caption={Example for vulnerable MongoDB - NodeJS application}, label={lst:NodeJSArrayExpandingLogin}]
+db.collection('users').find({"user": req.query.user, "password": req.query.password});
+\end{lstlisting}
+
+The request for the login, does have to be manipulated. An attacker can now login as an amdin with a usual authentication request as shown in listing {lst:ArrayExpandingAdminLogin}.\\
+
+\begin{lstlisting}[caption={MongoDB injection with NodeJS's query string module}, label={lst:ArrayExpandingAdminLogin}]
 https://example.org/login?user=admin&password=1234;
 \end{lstlisting}
 
-\subsection{Script Injection}
+MongoDb will search for a document with the user property set to \textit{admin} and the password property set to \textit{1234}. Through the expansion the the beforehand injected document or respectively the user property, a matching document is found and the admin login is successful.\\
 
+The presented login application is of course not the only example, where the expanding array feature of MongoDB allow injection attacks. Every insert operation with data originating from the three parameters, that allow type manipulation represents a potential vulnerability. It enables an attacker to break the confidentiality of the underlying data, which leads to unintended matches for further requests. The attack was exemplified for the NodeJS, but is relevant for all of the investigated application layers. 
 
-
+\begin{table}[h] 
+ \centering
+ \begin{tabular}{lll}
+  \textbf{Command} & \textbf{Arguments} \\ \hline
+  db.collection.insert()            & document ... \\
+  db.collection.insertOne()         & document \\ 
+  db.collection.update()            & \textbf{query} update options \\
+  db.collection.updateOne()         & \textbf{filter} update options \\
+  db.collection.updateMany()        & \textbf{filter} update options \\
+  db.collection.replaceOne()        & \textbf{filter} replacement options \\\hline
+  db.collection.deleteOne()         & \textbf{filter} options \\
+  db.collection.deleteMany()        & \textbf{filter} options \\
+  db.collection.find()              & \textbf{query} projection \\
+  db.collection.findAndModify()     & \textbf{query} options \\
+  db.collection.findOne()           & \textbf{query} projection \\
+  db.collection.findOneAndDelete()  & \textbf{filter} options \\
+  db.collection.findOneAndReplace() & \textbf{filter} replacement options \\
+  db.collection.findOneAndUpdate()  & \textbf{filter} update options \\
+  db.collection.remove()            & \textbf{query} option \\
+  \bottomrule 
+ \end{tabular}
+ \caption{MongoDB commands affected by expanding array injection}
+ \label{tab:redis_commands_affected}
+\end{table}
 
 \section{Redis Key-Value Store}
-\subsection{Parameter Overwrite Injection}
+This section covers the injection attacks against Redis, that were found in scope of this thesis.
 
-\begin{lstlisting}[caption={Vulnerable NodeJS example for parameter overwrite injection on Redis}, label={lst:PHPArrayInjection}]
+\subsection{Parameter Overwrite Injection}
+The parameter overwrite injection against Redis is based on the common attacker model. It requires NodeJS as an application platform in combination with the most used Redis driver. In order to understand this attack, it is essential to know how parameters can be accessed to the this particular database driver. The regular way allows to pass each parameter as distinct argument. An alternative way allows to pass all parameters within a single array as the first argument of the function call. With this knowledge and the control of the first argument, an attacker is able to overwrite the following arguments of an driver function call. An example application, where this becomes critical is shown in listing \ref{lst:parameterOverwriteApp}. \\
+
+\begin{lstlisting}[caption={Vulnerable NodeJS example for parameter overwrite injection on Redis}, label={lst:parameterOverwriteApp}]
 RedisClient.expireat(req.query.key, new Date("November 8, 2026 11:13:00").getTime());
 \end{lstlisting}
 
-\begin{lstlisting}[caption={Attack vector on Redis for query selector injection via HTTP GET}, label={lst:PHPArrayInjection}]
+This code makes use of the \textit{expireat} functionality to set the data for the deletion of an entry. In this particular case, the expire date of the entry behind the passed key is set to a date far in the future. The user can therefore only extend the life of an entry behind an arbitrary key, but not really influence the stored data in a negative way. This situation changes, when the second parameter can be overwritten. A conceivable attack could set the expire data to a time in the past. An request, that triggers exactly this operation is shown in listing \ref{lst:parameterOverwriteAtt}. \\
+
+\begin{lstlisting}[caption={Attack vector on Redis for query selector injection via HTTP GET}, label={lst:parameterOverwriteAtt}]
 https://example.org/expire?key[]=foo&key[]=1117542887
 \end{lstlisting}
 
+Given the the query string parameters, the resulting array will be passed as the first argument to the database call. The following parameter, containing the future time will be overwritten. Instead the injected timestamp passed with with the array in the first argument will be used. Since this timestamp lays in the past, the stored data behind the provided key will be deleted. This enables an attacker to delete arbitrary entries of the database! Similar to the presented attack on \textit{expireat}, there exist multiple other affected database commands. An excerpt of commands, that are vulnerable for parameter overwrite injection are listed within table \ref{tab:redis_commands_affected}. \\
 
-\subsection{Lua Script Injection}
-\begin{lstlisting}[caption={Vulnerable PHP example for Lua script injection on Redis}, label={lst:PHPArrayInjection}]
-$redis->eval("return redis.call('get', '$key')", 0);
-\end{lstlisting}
+\begin{table}[h] 
+ \centering
+ \begin{tabular}{lll}
+  \textbf{Command} & \textbf{Arguments} & \textbf{Injection Description} \\ \hline
+  Append  & key value       & Append a value to an arbitrary key\\
+  DecrBy  & key decrement   & Decrement the integer value of a selected key \\
+  Del     & key [key ...]   & Delete multiple selected keys at once \\
+  Exists  & key [key ...]   & Check existence of multiple keys at once \\
+  Expire  & key second      & Delete arbitrary key \\
+  ExpireAt& key timestamp & Delete arbitrary key \\
+  GetRange& key start end & Get entire content of key \\
+  GetSet  & key value & Overwrite value of selected key \\
+  IncrBy  & key increment & Increment the integer value of a selected key \\
+  Move    & key db & Set destination database \\
+  Rename  & key newkey & Set new key \\
+  Set     & key value [expire] & Set arbitrary key-value data \\
+  \bottomrule 
+ \end{tabular}
+ \caption{Redis commands affected by parameter overwrite injection}
+ \label{tab:redis_commands_affected}
+\end{table}
 
-\begin{lstlisting}[caption={Attack vector on Redis for query selector injection via HTTP GET}, label={lst:PHPArrayInjection}]
-https://example.org/lua.php?key=')%20or%20redis.call('set'%2C%20'foo'%2C%20'bar')%20--
-\end{lstlisting}
+The investigation revealed, that many of the commands allow parameter overwrites and therefore corruption on of the underlying data. When the first key argument is controlled by an attacker, all following can be overwritten. These vulnerabilities enable an attacker to perform unintended insert, update or delete operations.
 
 \section{CouchDB Document Store}
 

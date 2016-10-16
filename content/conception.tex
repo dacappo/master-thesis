@@ -209,6 +209,7 @@ This type indicates a string containing key-value pairs, that is encoded accordi
 Before concrete injection vectors can be created, the employed query techniques of non-relational databases have to be examined. This chapter analysis possibilities to change the behavior of queries with user-controlled data. Therefore, the actual query interface is considered as well as the capabilities offered by the attacker surface.
 
 \section{Analysis of Query Techniques}
+\label{sec:analysisOfQueryTechniques}
 In order to achieve behavioral changes of queries, their design has to be examined. The design involves some way to encode semantics and the semantics in turn define the resulting operations within the database layer. Unfortunately, there exists a variety of query techniques with different designs used for non-relational databases. Each technique works differently, but the basic means to specify a query's semantics can be broken down to a few approaches. In an attacker's perspective, a query can be seen as a set of parameters passed to the database layer. Therefore, the ways parameters encode semantic have to be analyzed. Basically, there exist three ways the semantic encoding for query parameters is accomplished for non-relational databases.\\
 
 \textbf{Value Encoded} \\
@@ -223,16 +224,41 @@ On top the given value and type encoding, semantics can also be defined by a par
 These are the three major means of non-relational databases to encode semantics into a query. Consequently, an attacker has to take influence on at least one of the three semantic encodings in order to compromise the targeted security goals.
 
 \section{Analysis of Attacker Surface}
-Based on the outlined approaches to alter a query's semantic, preceding steps of the attacker models has to be considered. The direct attacker model allows, as the naming implies, direct manipulation of the passed query parameters. In case of the common and the extend attacker model, the gap between attacker surface and query has to be bridged. Therefore, we take a deeper look at the application layer processing, its parameterization through parts of the HTTP request and how this can influence a query's semantic. For a successful attack, data has to flow from the attacker controlled request into a query parameter. As outlined within section \ref{sec:selectedAppLayerProtocols}, especially the parts of a request designated for server-side application parameterization, become relevant at this point. For a successful attack, these request parameters have to facilitate value, type or object structure changes within the application layer. The following paragraphs analyze the injection possibilities of the selected request parameters for each of the investigated application platforms.\\
+Based on the outlined approaches to alter query semantics, preceding steps of the attacker models have to be considered. The direct attacker model allows, as the naming implies, direct manipulation of the sent query parameters. In case of the common and the extend attacker model, the gap between attacker surface and query has to be bridged. Therefore, we take a deeper look at the application layer processing, its parameterization through parts of the HTTP request and how this can influence a query's semantic. Basically, we are searching for data flows originating from the attacker controlled request into a query invocation. As outlined within section \ref{sec:selectedAppLayerProtocols}, not all parts of a request are relevant in practice. Designated request parts are used for server-side application parameterization. These parts, known as request parameters, represent the sources of the required data flows. An attacker has to influence value, type or object structure of these request parameters before they reach the query invocation. Since requests and therefore the contained parameters are transfered to the application server as strings, only the value is manipulable without further processing. For type or object structure injection, some kind of interpretation has performed by the application layer. The following paragraphs analyze the injection possibilities of the selected request parameters for each of the investigated application platforms. \\
 
-\textbf{Request URL}\\
-\textbf{Request Header}\\
-\textbf{Request Body}\\
+\textbf{Request URL - Path}\\
+The URL determines the requested resource or called application and is composed of multiple sections. Two of these sections can be used for server-side application parameterization. The first one is the path declaration, that should actually define the directory of the requested file, but is often misused to pass string parameters. Its value is composed of strings separated by slashes. Since the path declaration is not further processed by any of the selected application layers, only the string contents can be adapted. This parameter is therefore limited to value manipulation of strings. In many cases, an adjusted path will result in rejected requests since the resource can no longer be found.\\ 
+
+\textbf{Request URL - Query String}\\
+The second section of the URL, named query string, is much more common for application parameterization. The query string declaration is designed to pass key-value parameters to the server. By the official URL definition, this parameter is restricted to string values. One of the first published injection attacks on non-relational databases demonstrated, that PHP supports an extended query string syntax for object and array parameters \cite{Sullivan:2011}. The query string is parsed by default and the resulting objects are provided to the application. NodeJS does not include such functionality by default, but one of its packages does as another publication showed \cite{Petkov:2014a}. The article emphasized, that the concerned \textit{qs module} provides the same query string functionality and is used as a part of the major web server \textit{Express}. Listing \ref{lst:sqsyntax} gives an example for query strings that pass objects or respectively arrays to both platforms. \\
+
+\begin{lstlisting}[caption={Examples for extended query string syntax}, label={lst:sqsyntax}]
+a[]=foo&a[]=bar // results in array ["foo", "bar"]
+a[foo]=bar      // results in object {foo : "bar"}
+\end{lstlisting}
+
+Further investigation in scope of this work showed, that the these features are much more widespread and powerful than revealed by previous publications. The object and array encoding syntax is supported by all major web servers across the selected application layers. On NodeJS the \textit{Express} web server is by far not the only one including the \textit{qs module}. Nearly every major web server implementation or REST client includes the \textit{qs module} and therefore supports the extended query string syntax. In addition, Ruby implements the same feature with the \textit{Rails} framework as well as Python does with its \textit{Django} framework. Thus, all notable web server implementations of the selected application platforms include this feature. Further, the syntax even allows the passing of nested objects and arrays as a parameter. Due to this non-standardized convenience functionality, the query string parameter enables an attacker to inject all necessary query string encodings. \\
+
+\textbf{Request Header - Cookies}\\
+Within the header of each request a cookie parameter can be set. This cookie header is normally used for session handling between server and client or the tracking of your browser history, but can also be filled with any other data. Basically, the cookie parameter is a string that includes key-value pairs separated by semicolons. Depending on the application layer and applied framework, the entire cookie string or a parsed version is provided. Passing of objects, arrays or other types than strings is not natively supported on any of the observed platforms. Cookie strings therefore allow string value manipulation. \\
+
+The request body is only used for specific HTTP methods, that transfer entire resources. Depending on the resource type, the format of the body content differs. In the context of NoSQL injection, three of these content types become particularly. \\
+
+\textbf{Request Body - JSON}\\
+As a standard data exchange format, JSON is also used as a data type for request bodies. JSON is specially relevant in the context of non-relational databases, because it is also an important storage format. By default, a JSON body is passed as a string to the application. In most cases, libraries are applied to parse the string into an equivalent object of the present language. This allows the encoding of values, types and object structures within the request body. \\
+
+\textbf{Request Body - XML}\\
+XML represents another standard data exchange format, that can be applied to the body of a request. Similar to JSON, the XML is passed as a string to the application, but in most cases parsed by dedicated libraries. The resulting object of the present language describes the nodes and attributes of the XML document. This preset structure allows free manipulation of values, but data types and object structure are restricted by the node and attribute structure. In practice, this makes it hard to inject proper object structures.\\
+
+\textbf{Request Body - Form Data}\\
+As the name applies, form data normally originates from web page forms. The format makes use of URL encoding or more specifically query string encoding. By definition, it allows simple key-value pairs. Since in most cases the same preprocessing as for normal query strings is applied, the extended syntax can be applied for this body format. This allows the definition of values, types as well as object structures that are parsed into the according application layer language.\\
+
+Across all investigated platforms, the parameters allow similar injection capabilities for the three semantic encoding styles. The results are summarized int table \ref{tab:request_parameter}.
 
 \begin{table}[h]
   \centering 
   \begin{tabular}{llcccl}
-  \multirow{2}{*}{\textbf{Source}} & \multirow{2}{*}{\textbf{Format}} & \multicolumn{3}{c}{\textbf{Encoding}} \\
+  \multirow{2}{*}{\textbf{Parameter}} & \multirow{2}{*}{\textbf{Format}} & \multicolumn{3}{c}{\textbf{Encoding}} \\
     & & \textbf{Value} & \textbf{Type} & \textbf{Structure} \\ \hline
   \multirow{2}{*}{URL}
     & Path & \cmark & \xmark & \xmark \\
@@ -244,6 +270,8 @@ Based on the outlined approaches to alter a query's semantic, preceding steps of
     Header & Cookie & \cmark & \xmark & \xmark \\ \hline
   \end{tabular}
   \caption{Interpretation of request data through application layer processing across the investigated platforms}
-  \label{tab:language_ranking}
+  \label{tab:request_parameter}
 \end{table}
+
+Highlighted are the three parameter formats, that enable an attacker to inject manipulated values, types and object structures into the application layer. Especially convenience functionalities for the query string and from data that are not officially standardized offer great opportunities for NoSQL injection vectors.
 
