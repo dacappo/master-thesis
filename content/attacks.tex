@@ -1,8 +1,8 @@
 \chapter{NoSQL Injection Attacks}
 This chapter gives an overview of the in scope of this thesis found NoSQL injection attacks. Each of the presented attacks is accompanied by a vulnerable code example as well as a suitable attack vector. With regard to the attacker surface parameters analyzed in section \ref{sec:analysisOfQueryTechniques}, the vectors focus on query string and JSON encoded payloads. The chapter is structured in one section per investigated database.
 
-\section{MongoDB Document Store}
-Within this section, the newly discovered injection attacks against the non-relational MongoDB database are outlined.
+\section{MongoDB}
+Within this section, the newly discovered injection attacks against the document store MongoDB are outlined.
 
 \subsection{Query Selector Injection}
 This attack is based on the Common Attacker Model and is directed against the selection parameter of queries. MongoDB employs BSON, an extended JSON format, to define the selected documents affected by the query. Complex selection operations, such as \textit{greater than} or \textit{not equal}, are implemented with the help of a set of special query selectors. These are formatted as objects and replace the actual value within the query criteria as demonstrated in listing \ref{lst:MongoQuerySelectors}. 
@@ -48,30 +48,30 @@ In all of the four cases, the default and by MongoDB recommended database driver
 
 A login can therefore be bypassed in each investigated case, but this kind of attack is not restricted to login applications. Nearly all parameterized selection criteria can be influenced by the injection of query selectors. This includes all read, update and delete calls making use of the BSON selection format. Furthermore, the attacker surface analysis from section \ref{sec:analysisOfQueryTechniques} suggests, that the URL query string is by far not the only part of the attacker surface allowing this kind of attack. When the application processes other request parameters, the payload can also be placed in form data encoded as well as JSON request bodies. These circumstances exhibit a way more significant surface for query selector injection as previously indicated. \\
 
-\begin{table}[h] 
+
+\begin{table}[h]
+ \sffamily
  \centering
  \begin{tabular}{lll}
   \textbf{Command} & \textbf{Arguments} \\ \hline
-  db.collection.deleteOne()         & \textbf{filter} options \\
-  db.collection.deleteMany()        & \textbf{filter} options \\
-  db.collection.find()              & \textbf{query} projection \\
-  db.collection.findAndModify()     & \textbf{query} options \\
-  db.collection.findOne()           & \textbf{query} projection \\
-  db.collection.findOneAndDelete()  & \textbf{filter} options \\
-  db.collection.findOneAndReplace() & \textbf{filter} replacement options \\
-  db.collection.findOneAndUpdate()  & \textbf{filter} update options \\
-  db.collection.replaceOne()        & \textbf{filter} replacement options \\
-  db.collection.remove()            & \textbf{query} option \\
-  db.collection.update()            & \textbf{query} update options \\
-  db.collection.updateOne()         & \textbf{filter} update options \\
-  db.collection.updateMany()        & \textbf{filter} update options \\
+  db.collection.deleteOne         & \textbf{filter} options \\
+  db.collection.deleteMany        & \textbf{filter} options \\
+  db.collection.find              & \textbf{query} projection \\
+  db.collection.findAndModify     & \textbf{query} options \\
+  db.collection.findOne           & \textbf{query} projection \\
+  db.collection.findOneAndDelete  & \textbf{filter} options \\
+  db.collection.findOneAndReplace & \textbf{filter} replacement options \\
+  db.collection.findOneAndUpdate  & \textbf{filter} update options \\
+  db.collection.replaceOne        & \textbf{filter} replacement options \\
+  db.collection.remove            & \textbf{query} option \\
+  db.collection.update            & \textbf{query} update options \\
+  db.collection.updateOne         & \textbf{filter} update options \\
+  db.collection.updateMany        & \textbf{filter} update options \\
   \bottomrule 
  \end{tabular}
  \caption{MongoDB commands affected by query selector injection}
  \label{tab:redis_commands_affected}
 \end{table}
-
-
 
 \subsection{Expanding Array Injection}
 The expanding array injection is based on the common attacker model and exploits a special behavior of a query's selection criteria. When a requires a property to be equal to a value and the stored document contains an array in place of the property, all values of the array are used to find a match. This feature, as the attack name implies, is called automatic array expanding. An attacker can manipulate inserted documents in order to achieve matches subsequent selective criteria. The creation of an user as shown in listing \ref{lst:NodeJSCreateUser} represents an example for such an vulnerability. \\
@@ -106,37 +106,40 @@ The request for the login, does have to be manipulated. An attacker can now logi
 https://example.org/login?user=admin&password=1234;
 \end{lstlisting}
 
-MongoDb will search for a document with the user property set to \textit{admin} and the password property set to \textit{1234}. Through the expansion the the beforehand injected document or respectively the user property, a matching document is found and the admin login is successful.\\
+MongoDb will search for a document with the user property set to \emph{admin} and the password property set to \emph{1234}. Through the expansion the the beforehand injected document or respectively the user property, a matching document is found and the admin login is successful.\\
 
 The presented login application is of course not the only example, where the expanding array feature of MongoDB allow injection attacks. Every insert operation with data originating from the three parameters, that allow type manipulation represents a potential vulnerability. It enables an attacker to break the confidentiality of the underlying data, which leads to unintended matches for further requests. The attack was exemplified for the NodeJS, but is relevant for all of the investigated application layers. 
 
-\begin{table}[h] 
+\definecolor{dark-blue}{RGB}{0, 35, 71}
+\definecolor{dark-red}{RGB}{120, 0, 0}
+\begin{table}[h]
+ \sffamily
  \centering
- \begin{tabular}{lll}
+ \begin{tabular}{lllll}
   \textbf{Command} & \textbf{Arguments} \\ \hline
-  db.collection.insert()            & document ... \\
-  db.collection.insertOne()         & document \\ 
-  db.collection.update()            & \textbf{query} update options \\
-  db.collection.updateOne()         & \textbf{filter} update options \\
-  db.collection.updateMany()        & \textbf{filter} update options \\
-  db.collection.replaceOne()        & \textbf{filter} replacement options \\\hline
-  db.collection.deleteOne()         & \textbf{filter} options \\
-  db.collection.deleteMany()        & \textbf{filter} options \\
-  db.collection.find()              & \textbf{query} projection \\
-  db.collection.findAndModify()     & \textbf{query} options \\
-  db.collection.findOne()           & \textbf{query} projection \\
-  db.collection.findOneAndDelete()  & \textbf{filter} options \\
-  db.collection.findOneAndReplace() & \textbf{filter} replacement options \\
-  db.collection.findOneAndUpdate()  & \textbf{filter} update options \\
-  db.collection.remove()            & \textbf{query} option \\
+  db.collection.insert            & \multicolumn{3}{l}{\textcolor{dark-red}{\textbf{document}} | [ \textcolor{dark-red}{\textbf{document ... }} ] } \\
+  db.collection.insertOne         & \textcolor{dark-red}{\textbf{document}} \\ 
+  db.collection.update            & \textcolor{dark-blue}{\textbf{query}} \textcolor{dark-red}{\textbf{update}} options \\
+  db.collection.updateOne         & \textcolor{dark-blue}{\textbf{filter}} \textcolor{dark-red}{\textbf{update}} options \\
+  db.collection.updateMany        & \textcolor{dark-blue}{\textbf{filter}} \textcolor{dark-red}{\textbf{update}} options \\
+  db.collection.replaceOne        & \textcolor{dark-blue}{\textbf{filter}} \textcolor{dark-red}{\textbf{replacement}} options \\\hline
+  db.collection.deleteOne         & \textcolor{dark-blue}{\textbf{filter}} options \\
+  db.collection.deleteMany        & \textcolor{dark-blue}{\textbf{filter}} options \\
+  db.collection.find              & \textcolor{dark-blue}{\textbf{query}} projection \\
+  db.collection.findAndModify     & \textcolor{dark-blue}{\textbf{query}} options \\
+  db.collection.findOne           & \textcolor{dark-blue}{\textbf{query}} projection \\
+  db.collection.findOneAndDelete  & \textcolor{dark-blue}{\textbf{filter}} options \\
+  db.collection.findOneAndReplace & \textcolor{dark-blue}{\textbf{filter}} replacement options \\
+  db.collection.findOneAndUpdate  & \textcolor{dark-blue}{\textbf{filter}} update options \\
+  db.collection.remove            & \textcolor{dark-blue}{\textbf{query}}  option \\
   \bottomrule 
  \end{tabular}
  \caption{MongoDB commands affected by expanding array injection}
  \label{tab:redis_commands_affected}
 \end{table}
 
-\section{Redis Key-Value Store}
-This section covers the injection attacks against Redis, that were found in scope of this thesis.
+\section{Redis}
+This section covers the injection attacks against the key-value store Redis, that were found in scope of this thesis.
 
 \subsection{Parameter Overwrite Injection}
 The parameter overwrite injection against Redis is based on the common attacker model. It requires NodeJS as an application platform in combination with the most used Redis driver. In order to understand this attack, it is essential to know how parameters can be accessed to the this particular database driver. The regular way allows to pass each parameter as distinct argument. An alternative way allows to pass all parameters within a single array as the first argument of the function call. With this knowledge and the control of the first argument, an attacker is able to overwrite the following arguments of an driver function call. An example application, where this becomes critical is shown in listing \ref{lst:parameterOverwriteApp}. \\
@@ -153,7 +156,8 @@ https://example.org/expire?key[]=foo&key[]=1117542887
 
 Given the the query string parameters, the resulting array will be passed as the first argument to the database call. The following parameter, containing the future time will be overwritten. Instead the injected timestamp passed with with the array in the first argument will be used. Since this timestamp lays in the past, the stored data behind the provided key will be deleted. This enables an attacker to delete arbitrary entries of the database! Similar to the presented attack on \textit{expireat}, there exist multiple other affected database commands. An excerpt of commands, that are vulnerable for parameter overwrite injection are listed within table \ref{tab:redis_commands_affected}. \\
 
-\begin{table}[h] 
+\begin{table}[h]
+ \sffamily
  \centering
  \begin{tabular}{lll}
   \textbf{Command} & \textbf{Arguments} & \textbf{Injection Description} \\ \hline
@@ -177,7 +181,8 @@ Given the the query string parameters, the resulting array will be passed as the
 
 The investigation revealed, that many of the commands allow parameter overwrites and therefore corruption on of the underlying data. When the first key argument is controlled by an attacker, all following can be overwritten. These vulnerabilities enable an attacker to perform unintended insert, update or delete operations.
 
-\section{CouchDB Document Store}
+\section{CouchDB}
+Within this section, the discovered injection attacks against the document store CouchDB are outlined.
 
 \subsection{Special Key Injection}
 
@@ -228,5 +233,6 @@ getDocument(req.query.key, handleResult);
 https://example.org/get?key=_design/credentials/_view/user_password
 \end{lstlisting}
 
-\section{Memcached Key-Value Cache}
+\section{Memcached}
+This section covers the injection attacks against the key-value cache Memcached, that were found in scope of this thesis.
 \subsection{Array Key Injection}

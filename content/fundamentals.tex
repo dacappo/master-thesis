@@ -8,10 +8,11 @@ Within this section, the prevalent protocols and paradigms for data exchange bet
 \subsection{HTTP}
 The Hypertext Transfer Protocol (HTTP) represents an application-layer protocol for the transfer of connected multimedia documents \cite{Berners-Lee1996}. Initially, HTTP was created regarding web-server to web-browser communication, but today the protocol is applied for various purposes \cite{Fielding:1999}. As a stateless protocol following a client-server model, HTTP itself does not retain any state between requests. While the protocol is often applied as a part of the TCP/IP stack, it is also applicable with other reliable and error-checked protocols on the transport layer. A required header block and an optional body block build the basic structure of each request and response. Depending on the intended kind of operation, different methods for requests exist. Table \ref{tab:http_methods} gives an overview of the available HTTP methods and their characteristics \cite{Fielding:1999}.\\
 
-\begin{table}[h] 
+\begin{table}[h]
+ \sffamily
  \centering
  \begin{tabular}{llccc}
-  \textbf{\begin{tabular}{@{}c@{}}HTTP \\ method\end{tabular}} & \textbf{Description} & \textbf{\begin{tabular}{@{}c@{}}Request \\ body\end{tabular}} & \textbf{\begin{tabular}{@{}c@{}}Response \\ body\end{tabular}} & \textbf{Idempotent} \\ \hline
+  \textbf{\begin{tabular}{@{}c@{}}HTTP \\ Method\end{tabular}} & \textbf{Description} & \textbf{\begin{tabular}{@{}c@{}}Request \\ Body\end{tabular}} & \textbf{\begin{tabular}{@{}c@{}}Response \\ Body\end{tabular}} & \textbf{Idempotent} \\ \hline
   GET     & Retrieve specified resource & \xmark & \cmark & \cmark \\
   HEAD    & Retrieve specified resource headers & \xmark & \xmark & \cmark \\
   POST    & Create specified resource & \cmark & \cmark & \xmark \\

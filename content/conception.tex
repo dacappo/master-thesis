@@ -113,7 +113,8 @@ The database layer constitutes a key aspect for the investigation of NoSQL injec
 
 
 \definecolor{light-gray}{rgb}{0.92,0.92,0.92}
-\begin{table}[h] 
+\begin{table}[h]
+ \sffamily 
  \centering
  \begin{tabular}{cllcc}
   \textbf{NoSQL Rank} & \textbf{Database} & \textbf{Type} & \textbf{Overall Rank} & \textbf{Trend} \\ \hline
@@ -152,7 +153,8 @@ The second ranking non-relational database Apache Cassandra and the fourth ranki
 \subsection{Selected Application Platforms}
 Next to the underlying database, a series of application platforms have to be selected regarding the common and the extended attacker model. An optimal choice would be application layers that are most frequently deploy in combination with the selected NoSQL databases. Unfortunately, representative statistics for suchlike cases are not available. Another option is the analysis of open-source applications with regard to the used programming language. GitHub's open repositories provide a broad range of projects, that allow an evaluation of a programming languages' popularity. Exactly this information was gathered and published by a GitHub engineer and builds the basis for the application layer selection for this thesis. The top ranking programming languages of more than a million analyzed public repositories are summarized in table \ref{tab:language_ranking} \cite{Zapponi2014}.
 
-\begin{table}[h] 
+\begin{table}[h]
+ \sffamily 
  \centering
  \begin{tabular}{clrr}
   \textbf{Rank} & \textbf{Repository Language} & \textbf{Active Repositories} & \textbf{Total Commits} \\ \hline
@@ -256,6 +258,7 @@ As the name applies, form data normally originates from web page forms. The form
 Across all investigated platforms, the parameters allow similar injection capabilities for the three semantic encoding styles. The results are summarized int table \ref{tab:request_parameter}.
 
 \begin{table}[h]
+  \sffamily
   \centering 
   \begin{tabular}{llcccl}
   \multirow{2}{*}{\textbf{Parameter}} & \multirow{2}{*}{\textbf{Format}} & \multicolumn{3}{c}{\textbf{Encoding}} \\
