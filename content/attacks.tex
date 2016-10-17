@@ -1,5 +1,5 @@
 \chapter{NoSQL Injection Attacks}
-This chapter gives an overview of the in scope of this thesis found NoSQL injection attacks. Each of the presented attacks is accompanied by a vulnerable code example as well as a suitable attack vector. With regard to the attacker surface parameters analyzed in section \ref{sec:analysisOfQueryTechniques}, the vectors focus on query string and JSON encoded payloads. The chapter is structured in one section per investigated database.
+This chapter gives an overview of the in scope of this thesis found NoSQL injection attacks. Each of the presented attacks is accompanied by a vulnerable code example as well as a suitable attack vector. With regard to the attacker surface parameters analyzed in section \ref{sec:analysisOfQueryTechniques}, the vectors focus on query string and JSON encoded payloads. At this point it needs to be told, that the presented code snippets are created for demonstration purposes and should not be deployed in practice. The chapter is structured in one section per investigated database.
 
 \section{MongoDB}
 Within this section, the newly discovered injection attacks against the document store MongoDB are outlined.
@@ -24,7 +24,7 @@ The code checks for documents, that match the passed user and password values fr
 https://example.org/login?user=patrick&password[%24gt]=
 \end{lstlisting}
 
-Pektov \cite{Petkov:2014a} demonstrated a vulnerable login implementation running on NodeJS's \emph{Express} web server following the same approach. The application code given in listing \ref{lst:NodeQuerySelectorInjection} can also be attacked with the request presented in listing \ref{lst:QuerySelectorInjectionVector} . \\
+Pektov \cite{Petkov:2014a} demonstrated a vulnerable login implementation running on NodeJS's Express web server following the same approach. The application code given in listing \ref{lst:NodeQuerySelectorInjection} can also be attacked with the request presented in listing \ref{lst:QuerySelectorInjectionVector} . \\
 
 \begin{lstlisting}[caption={Vulnerable NodeJS example for query selector injection on MongoDB}, label={lst:NodeQuerySelectorInjection}]
 db.collection('users').find({"user": req.query.user, "password": req.query.password});
@@ -182,21 +182,53 @@ The investigation revealed, that many of the commands allow parameter overwrites
 \section{CouchDB}
 Within this section, the discovered injection attacks against the document store CouchDB are outlined.
 
-\subsection{Special Key Injection}
+\subsection{Find Selector Injection}
 
-\begin{lstlisting}[caption={Vulnerable NodeJS example for special key injection on CouchDB}, label={lst:PHPArrayInjection}]
+\subsection{Special Key Injection}
+The special key injection against CouchDB rests upon the common attacker model. In order to understand this attack, it is vital to be aware of CouchDB' storage concept. All data needed for its operation is treated as a document. This concerns application data as well as meta data of the existing collections. Security settings, operation history and data views are stored as documents within each collection. The only difference in comparison to normal documents is the prefixed underscore of the id. Meta data documents are accessible for every user with reading access on the collection. Special documents like those can be used to bypass application layer checks. Listing \ref{lst:SpecialKeyInjectionNodeJS} displays an authentication check vulnerable to special key injection. \\
+
+\begin{lstlisting}[caption={Vulnerable NodeJS example for special key injection on CouchDB}, label={lst:SpecialKeyInjectionNodeJS}]
 function checkUser(user, password, callback) {
   nano.use('users').get(user, (err, res)=> {
-    callback(res.password === paasword);
+    callback(res.password === password);
   });
 }
 
 checkUser(req.query.user, req.query.password, handleResult);
 \end{lstlisting}
 
-\begin{lstlisting}[caption={Attack vector on CouchDB for speical key injection via HTTP GET}, label={lst:PHPArrayInjection}]
+The snippet implements a \emph{checkUser} function, that receives a user and password argument. Since CouchDB's concept does not feature selection criteria, documents are retrieved by their id. Other properties of the stored documents, such as the password, cannot be filtered directly. In the presented case, the user property represents the document key and is used to query the stored record from the database. Password matching between the retrieved document and the passed argument is accomplished by the application layer. The result of the password matching is returned by the callback. \\
+
+An attacker is able to pass this authentication check with the help of the stored meta data documents. The request presented in listing \ref{lst:SpecialKeyInjectionAttack} leads to a successful authentication.
+ 
+\begin{lstlisting}[caption={Attack vector on CouchDB for speical key injection via HTTP GET}, label={lst:SpecialKeyInjectionAttack}]
 https://example.org/login?user=_all_docs
 \end{lstlisting}
+
+\begin{table}[h]
+ \sffamily
+ \centering
+ \begin{tabular}{lll}
+  \textbf{Key} & \textbf{Content} \\ \hline
+  \_all\_docs             & \\
+  \_bulk\_docs            & key decrement \\
+  \_design                & key decrement \\
+  \_find                  & key [key ...] \\
+  \_index                 & key [key ...] \\
+  \_explain               & key second \\
+  \_changes               & key timestamp \\
+  \_compact               & key start end \\
+  \_ensure\_full\_commit  & key value \\
+  \_security              & key increment \\
+  \_purge                 & key db \\
+  \_missing\_revs          & key newkey \\
+  \_revs\_diff            & key value [expire] \\
+  \_revs\_limit           & key value [expire] \\
+  \bottomrule 
+ \end{tabular}
+ \caption{Redis commands affected by parameter overwrite injection}
+ \label{tab:redis_commands_affected}
+\end{table}
 
 \subsection{Array Key Injection}
 
