@@ -5,7 +5,7 @@ This chapter gives an overview of the in scope of this thesis found NoSQL inject
 Within this section, the newly discovered injection attacks against the document store MongoDB are outlined.
 
 \subsection{Query Selector Injection}
-This attack is based on the Common Attacker Model and is directed against the selection parameter of queries. MongoDB employs BSON, an extended JSON format, to define the selected documents affected by the query. Complex selection operations, such as \textit{greater than} or \textit{not equal}, are implemented with the help of a set of special query selectors. These are formatted as objects and replace the actual value within the query criteria as demonstrated in listing \ref{lst:MongoQuerySelectors}. 
+This attack is based on the Common Attacker Model and is directed against the selection parameter of queries. MongoDB employs BSON, an extended JSON format, to define the selected documents affected by the query. Complex selection operations, such as \emph{greater than} or \emph{not equal}, are implemented with the help of a set of special query selectors. These are formatted as objects and replace the actual value within the query criteria as demonstrated in listing \ref{lst:MongoQuerySelectors}. 
 
 \begin{lstlisting}[caption={Example for MongoDB's query selectors}, label={lst:MongoQuerySelectors}]
 find({'password' : 'secure'});      // Password property equals "secure"
@@ -18,13 +18,13 @@ The injection attack presented by Sullivan \cite{Sullivan:2011} showed, that que
 $collection->find(array('user' => $_GET['user'], 'password' => $_GET['password']));
 \end{lstlisting}
 
-The code checks for documents, that match the passed user and password values from the query string. Here comes the automatic query string parsing of PHP into play. This feature enables the injection of a Query Selector instead of an actual password with the help of the extended query string syntax. An passed selector like \textit{no equals} will nearly always evaluate to true. With the manipulated request shown in \ref{lst:QuerySelectorInjectionVector}, the login check can be reliably bypassed. \\
+The code checks for documents, that match the passed user and password values from the query string. Here comes the automatic query string parsing of PHP into play. This feature enables the injection of a Query Selector instead of an actual password with the help of the extended query string syntax. An passed selector like \emph{no equals} will nearly always evaluate to true. With the manipulated request shown in \ref{lst:QuerySelectorInjectionVector}, the login check can be reliably bypassed. \\
 
 \begin{lstlisting}[caption={Attack vector on MongoDB for query selector injection via the query string parameter}, label={lst:QuerySelectorInjectionVector}]
 https://example.org/login?user=patrick&password[%24gt]=
 \end{lstlisting}
 
-Pektov \cite{Petkov:2014a} demonstrated a vulnerable login implementation running on NodeJS's \textit{Express} web server following the same approach. The application code given in listing \ref{lst:NodeQuerySelectorInjection} can also be attacked with the request presented in listing \ref{lst:QuerySelectorInjectionVector} . \\
+Pektov \cite{Petkov:2014a} demonstrated a vulnerable login implementation running on NodeJS's \emph{Express} web server following the same approach. The application code given in listing \ref{lst:NodeQuerySelectorInjection} can also be attacked with the request presented in listing \ref{lst:QuerySelectorInjectionVector} . \\
 
 \begin{lstlisting}[caption={Vulnerable NodeJS example for query selector injection on MongoDB}, label={lst:NodeQuerySelectorInjection}]
 db.collection('users').find({"user": req.query.user, "password": req.query.password});
@@ -82,13 +82,13 @@ if (req.query.user !== "admin") {
 }
 \end{lstlisting}
 
-The given code allows the insertion of new users into the database, with the exception of \textit{admin} as a username. This security check can be bypassed, by injecting an array of usernames instead of a simple string. A suitable attack vector based on query string encoding is given with listing \ref{lst:ExpandingArrayInjection}.\\
+The given code allows the insertion of new users into the database, with the exception of \emph{admin} as a username. This security check can be bypassed, by injecting an array of usernames instead of a simple string. A suitable attack vector based on query string encoding is given with listing \ref{lst:ExpandingArrayInjection}.\\
 
 \begin{lstlisting}[caption={MongoDB injection with NodeJS's query string module}, label={lst:ExpandingArrayInjection}]
 https://example.org/register?user[]=patrick&user[]=admin&password=1234;
 \end{lstlisting}
 
-The given request creates an array typed \textit{user} property that leads to the bypass of the if-clause. In the next step, the query is executed and the provided data results into the document presented in listing \ref{lst:ExpandingArrayInjectionDocument} stored within the user collection.\\
+The given request creates an array-typed \emph{user} property that leads to the bypass of the if-clause. In the next step, the query is executed and the provided data results into the document presented in listing \ref{lst:ExpandingArrayInjectionDocument} stored within the user collection.\\
 
 \begin{lstlisting}[caption={Injected query parameter for MongoDB - NodeJS injection}, label={lst:ExpandingArrayInjectionDocument}]
 {'user': ['patrick', 'admin'], 'password': 1234}
@@ -110,8 +110,6 @@ MongoDb will search for a document with the user property set to \emph{admin} an
 
 The presented login application is of course not the only example, where the expanding array feature of MongoDB allow injection attacks. Every insert operation with data originating from the three parameters, that allow type manipulation represents a potential vulnerability. It enables an attacker to break the confidentiality of the underlying data, which leads to unintended matches for further requests. The attack was exemplified for the NodeJS, but is relevant for all of the investigated application layers. 
 
-\definecolor{dark-blue}{RGB}{0, 35, 71}
-\definecolor{dark-red}{RGB}{120, 0, 0}
 \begin{table}[h]
  \sffamily
  \centering
@@ -148,13 +146,13 @@ The parameter overwrite injection against Redis is based on the common attacker 
 RedisClient.expireat(req.query.key, new Date("November 8, 2026 11:13:00").getTime());
 \end{lstlisting}
 
-This code makes use of the \textit{expireat} functionality to set the data for the deletion of an entry. In this particular case, the expire date of the entry behind the passed key is set to a date far in the future. The user can therefore only extend the life of an entry behind an arbitrary key, but not really influence the stored data in a negative way. This situation changes, when the second parameter can be overwritten. A conceivable attack could set the expire data to a time in the past. An request, that triggers exactly this operation is shown in listing \ref{lst:parameterOverwriteAtt}. \\
+This code makes use of the \emph{expireat} functionality to set the data for the deletion of an entry. In this particular case, the expire date of the entry behind the passed key is set to a date far in the future. The user can therefore only extend the life of an entry behind an arbitrary key, but not really influence the stored data in a negative way. This situation changes, when the second parameter can be overwritten. A conceivable attack could set the expire data to a time in the past. An request, that triggers exactly this operation is shown in listing \ref{lst:parameterOverwriteAtt}. \\
 
 \begin{lstlisting}[caption={Attack vector on Redis for query selector injection via HTTP GET}, label={lst:parameterOverwriteAtt}]
 https://example.org/expire?key[]=foo&key[]=1117542887
 \end{lstlisting}
 
-Given the the query string parameters, the resulting array will be passed as the first argument to the database call. The following parameter, containing the future time will be overwritten. Instead the injected timestamp passed with with the array in the first argument will be used. Since this timestamp lays in the past, the stored data behind the provided key will be deleted. This enables an attacker to delete arbitrary entries of the database! Similar to the presented attack on \textit{expireat}, there exist multiple other affected database commands. An excerpt of commands, that are vulnerable for parameter overwrite injection are listed within table \ref{tab:redis_commands_affected}. \\
+Given the the query string parameters, the resulting array will be passed as the first argument to the database call. The following parameter, containing the future time will be overwritten. Instead the injected timestamp passed with with the array in the first argument will be used. Since this timestamp lays in the past, the stored data behind the provided key will be deleted. This enables an attacker to delete arbitrary entries of the database! Similar to the presented attack on \emph{expireat}, there exist multiple other affected database commands. An excerpt of commands, that are vulnerable for parameter overwrite injection are listed within table \ref{tab:redis_commands_affected}. \\
 
 \begin{table}[h]
  \sffamily
