@@ -5,7 +5,7 @@ This chapter gives an overview of the in scope of this thesis found NoSQL inject
 Within this section, the newly discovered injection attacks against the document store MongoDB are outlined.
 
 \subsection{Query Selector Injection}
-This attack is based on the Common Attacker Model and is directed against the selection parameter of queries. MongoDB employs BSON, an extended JSON format, to define the selected documents affected by the query. Complex selection operations, such as \emph{greater than} or \emph{not equal}, are implemented with the help of a set of special query selectors. These are formatted as objects and replace the actual value within the query criteria as demonstrated in listing \ref{lst:MongoQuerySelectors}. 
+This attack is based on the common attacker model and is directed against the selection parameter of queries. MongoDB employs BSON, an extended JSON format, to define the selected documents affected by the query. Complex selection operations, such as \emph{greater than} or \emph{not equal}, are implemented with the help of a set of special query selectors. These are formatted as objects and replace the actual value within the query criteria as demonstrated in listing \ref{lst:MongoQuerySelectors}. 
 
 \begin{lstlisting}[caption={Example for MongoDB's query selectors}, label={lst:MongoQuerySelectors}]
 find({'password' : 'secure'});      // Password property equals "secure"
@@ -183,13 +183,33 @@ The investigation revealed, that many of the commands allow parameter overwrites
 Within this section, the discovered injection attacks against the document store CouchDB are outlined.
 
 \subsection{Find Selector Injection}
+This attack is based on the common attacker model and directed against the find operation of CouchDB. The database facilitates two techniques to retrieve data. One is to reference the required document by its key. When selection criteria for other properties is needed, documents are queried with JSON-like selection criteria and the special \emph{\_find} document. This document is available for every database collection and resolves the passed selection criteria. The find selector injection focuses on manipulation of the provided selection criteria. Similar to MonogDB, complex criteria, like \emph{greater than} and \emph{not equals}, is encoded by query selector objects. These can be misused by object structure injection. The example given by listing \ref{lst:FindSelectorInjectionNodeJS} implements an credentials check and is vulnerable for find selector injection. \\
+
+\begin{lstlisting}[caption={Vulnerable NodeJS example for find selector injection on CouchDB}, label={lst:FindSelectorInjectionNodeJS}, language=JavaScript]
+function checkCredentials(user, password, callback) {
+  var options = {'selector': {'user': user, 'password': password}};
+  couch.use('users').get('_find', options, (err, res) => {
+    callback(res.docs.length === 1 ? true : false);
+  });
+}
+
+checkUser(req.query.user, req.query.password, handleResult);
+\end{lstlisting}
+
+A function is implemented, that returns true or false depending on the success of the credentials check. The provided user and password value become part of the selector object, that is in turn contained within the options. Couch selects the user collection and performs a get operation with the help of the \emph{\_find} document and the composed options. Only when exactly one document is found that matches the selection criteria, the callback returns true. The described function is called with values provided by the request. Through object structure injection, the attack shown in listing \ref{lst:FindSelectorInjectionAttack} can be conducted.
+
+\begin{lstlisting}[caption={Attack vector on CouchDB for speical key injection via HTTP GET}, label={lst:FindSelectorInjectionAttack}]
+https://example.org/login?user=patrick&password[%24ne]=1
+\end{lstlisting}
+
+The payload contained within the query string of the URL leads to an object instead of a string typed password property. This object will replace the provided password value with a \emph{not equals} selector object within the query options. Therefore, the password check will reliably evaluate to true and the credentials check is bypassed.
 
 \subsection{Special Key Injection}
 The special key injection against CouchDB rests upon the common attacker model. In order to understand this attack, it is vital to be aware of CouchDB' storage concept. All data needed for its operation is treated as a document. This concerns application data as well as meta data of the existing collections. Security settings, operation history and data views are stored as documents within each collection. The only difference in comparison to normal documents is the prefixed underscore of the id. Meta data documents are accessible for every user with reading access on the collection. Special documents like those can be used to bypass application layer checks. Listing \ref{lst:SpecialKeyInjectionNodeJS} displays an authentication check vulnerable to special key injection. \\
 
 \begin{lstlisting}[caption={Vulnerable NodeJS example for special key injection on CouchDB}, label={lst:SpecialKeyInjectionNodeJS}]
 function checkUser(user, password, callback) {
-  nano.use('users').get(user, (err, res)=> {
+  couch.use('users').get(user, (err, res)=> {
     callback(res.password === password);
   });
 }
@@ -221,7 +241,7 @@ https://example.org/login?user=_all_docs
   \_ensure\_full\_commit  & key value \\
   \_security              & key increment \\
   \_purge                 & key db \\
-  \_missing\_revs          & key newkey \\
+  \_missing\_revs         & key newkey \\
   \_revs\_diff            & key value [expire] \\
   \_revs\_limit           & key value [expire] \\
   \bottomrule 
@@ -237,7 +257,7 @@ function getDocument(key, callback) {
   if (key === "secret" || key[0] === "_") {
     callback("No access!");
   } else {
-    nano.use('table').get(key, callback);
+    couch.use('table').get(key, callback);
   }
 }
 
@@ -253,7 +273,7 @@ https://example.org?key[]=_all_docs
 
 \begin{lstlisting}[caption={Vulnerable NodeJS example for URL traversal injection on CouchDB}, label={lst:PHPArrayInjection}]
 function getDocument(key, callback) {
-  nano.use('table').get(key, callback);
+  couch.use('table').get(key, callback);
 }
 
 getDocument(req.query.key, handleResult);
