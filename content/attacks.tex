@@ -189,20 +189,50 @@ This attack is based on the common attacker model and directed against the find 
 function checkCredentials(user, password, callback) {
   var options = {'selector': {'user': user, 'password': password}};
   couch.use('users').get('_find', options, (err, res) => {
-    callback(res.docs.length === 1 ? true : false);
+    callback(res.docs.length === 1);
   });
 }
 
 checkUser(req.query.user, req.query.password, handleResult);
 \end{lstlisting}
 
-A function is implemented, that returns true or false depending on the success of the credentials check. The provided user and password value become part of the selector object, that is in turn contained within the options. Couch selects the user collection and performs a get operation with the help of the \emph{\_find} document and the composed options. Only when exactly one document is found that matches the selection criteria, the callback returns true. The described function is called with values provided by the request. Through object structure injection, the attack shown in listing \ref{lst:FindSelectorInjectionAttack} can be conducted.
+A function is implemented, that returns true or false depending on the success of the credentials check. The provided user and password value become part of the selector object, that is in turn contained within the options. Couch selects the user collection and performs a get operation with the help of the \emph{\_find} document and the composed options. Only when exactly one document is found that matches the selection criteria, the callback returns true. The described function is called with values provided by the request. Through object structure injection, the attack shown in listing \ref{lst:FindSelectorInjectionAttack} can be conducted. \\
 
 \begin{lstlisting}[caption={Attack vector on CouchDB for speical key injection via HTTP GET}, label={lst:FindSelectorInjectionAttack}]
 https://example.org/login?user=patrick&password[%24ne]=1
 \end{lstlisting}
 
-The payload contained within the query string of the URL leads to an object instead of a string typed password property. This object will replace the provided password value with a \emph{not equals} selector object within the query options. Therefore, the password check will reliably evaluate to true and the credentials check is bypassed.
+The payload contained within the query string of the URL leads to an object instead of a string typed password property. This object will replace the provided password value with a \emph{not equals} selector object within the query options. Therefore, the password check will reliably evaluate to true and the credentials check is bypassed. \\
+
+\begin{table}[h]
+ \sffamily
+ \centering
+ \begin{tabular}{ll}
+  \textbf{Operator} & \textbf{Description} \\ \hline
+  \$lt      & less than argument\\
+  \$lte     & less than or equal to argument \\
+  \$eq      & equal to argument \\
+  \$ne      & not equal to argument \\
+  \$gte     & greater than or equal to the argument \\
+  \$gt      & greater than argument \\
+  \$exists  & field exists \\
+  \$type    & type equals \\
+  \$in      & contained in list \\
+  \$nin     & not contained in list \\
+  \$size    & length equal \\
+  \$mod     & modulus equals remainder \\
+  \$regex   & regular expression \\
+  \$and     & all contained selectors match \\
+  \$or      & any of the contained selectors matches \\
+  \$not     & selector does not match \\
+  \$nor     & no contained selector matches \\
+  \$all     & contains all elements of argument list \\ 
+  \$elemMatch & at least one of the contained selectors matches \\
+  \bottomrule 
+ \end{tabular}
+ \caption{CouchDB's selector operations utilized for find selector injection}
+ \label{tab:couchdb_affected_selectors}
+\end{table}
 
 \subsection{Special Key Injection}
 The special key injection against CouchDB rests upon the common attacker model. In order to understand this attack, it is vital to be aware of CouchDB' storage concept. All data needed for its operation is treated as a document. This concerns application data as well as meta data of the existing collections. Security settings, operation history and data views are stored as documents within each collection. The only difference in comparison to normal documents is the prefixed underscore of the id. Meta data documents are accessible for every user with reading access on the collection. Special documents like those can be used to bypass application layer checks. Listing \ref{lst:SpecialKeyInjectionNodeJS} displays an authentication check vulnerable to special key injection. \\
@@ -225,30 +255,36 @@ An attacker is able to pass this authentication check with the help of the store
 https://example.org/login?user=_all_docs
 \end{lstlisting}
 
+With the provided user value, a special document is requested instead of of normal record. The database returns the \emph{\_all\_docs} document, that contains meta information about the collection. Important at that point is, that the special document does not contain a password property and is therefore undefined. Since the attack vector does not define a password value, the resulting argument is also undefined. Thus, two undefined values are compared for equality. JavaScript as well as Python, Ruby and PHP evaluate such a comparison to true and pass it to the callback. As a result, the credentials check is successfully bypassed.\\
+
+CouchDB implements a group of these special documents for different purposes. Not all of these documents have the same access authorization level. Each of the special documents can be accessed by designated HTTP methods, as shown by table \ref{tab:couch_special_documents}. \\
+
 \begin{table}[h]
  \sffamily
  \centering
- \begin{tabular}{lll}
-  \textbf{Key} & \textbf{Content} \\ \hline
-  \_all\_docs             & \\
-  \_bulk\_docs            & key decrement \\
-  \_design                & key decrement \\
-  \_find                  & key [key ...] \\
-  \_index                 & key [key ...] \\
-  \_explain               & key second \\
-  \_changes               & key timestamp \\
-  \_compact               & key start end \\
-  \_ensure\_full\_commit  & key value \\
-  \_security              & key increment \\
-  \_purge                 & key db \\
-  \_missing\_revs         & key newkey \\
-  \_revs\_diff            & key value [expire] \\
-  \_revs\_limit           & key value [expire] \\
+ \begin{tabular}{llcccc}
+  \textbf{Key} & \textbf{Description} & \textbf{GET} & \textbf{POST} & \textbf{PUT} & \textbf{DEL} \\ \hline
+  \_all\_docs             & Return multiple documents of a database   & \cmark & \cmark & \xmark & \xmark \\
+  \_bulk\_docs            & Create and update multiple documents      & \xmark & \cmark & \xmark & \xmark \\
+  \_design                & Create or return views of database        & \cmark & \cmark & \xmark & \xmark \\
+  \_find                  & Find documents with selection criteria    & \xmark & \cmark & \xmark & \xmark \\
+  \_index                 & Get or create index                       & \cmark & \cmark & \xmark & \cmark \\
+  \_explain               & Explain database structure                & \xmark & \cmark & \xmark & \xmark \\
+  \_changes               & List of changes in the database           & \cmark & \cmark & \xmark & \xmark \\
+  \_compact               & Run compression of database               & \xmark & \cmark & \xmark & \xmark \\
+  \_ensure\_full\_commit  & Commits changes to disk                   & \xmark & \cmark & \xmark & \xmark \\
+  \_security              & Return or set security object of database & \cmark & \xmark & \cmark & \xmark \\
+  \_purge                 & Remove references to deleted documents    & \xmark & \cmark & \xmark & \xmark \\
+  \_missing\_revs         & Return not stored revisions               & \xmark & \cmark & \xmark & \xmark \\
+  \_revs\_diff            & Returns diff to stored revisions          & \xmark & \cmark & \xmark & \xmark \\
+  \_revs\_limit           & Returns current revision limit            & \cmark & \xmark & \cmark & \xmark \\
   \bottomrule 
  \end{tabular}
- \caption{Redis commands affected by parameter overwrite injection}
- \label{tab:redis_commands_affected}
+ \caption{CouchDB special documents with description and applicable HTTP methods}
+ \label{tab:couch_special_documents}
 \end{table}
+
+Depending on the operational purpose of the special document, designated HTTP methods are enabled. This has to be considered for attacks, since the injected special document needs to support the applied HTTP method of the exploited query. In case of the shown injection example, the HTTP GET method had to be supported. A major advantage of an attacker is, that even the lowest authorization level is allowed to GET special documents. Special key injection against queries using other HTTP methods require a higher authorization level of the underlying database user. A well configured application server and database should prevent higher authorization levels for special documents. \\
 
 \subsection{Array Key Injection}
 
