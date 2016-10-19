@@ -257,34 +257,34 @@ https://example.org/login?user=_all_docs
 
 With the provided user value, a special document is requested instead of of normal record. The database returns the \emph{\_all\_docs} document, that contains meta information about the collection. Important at that point is, that the special document does not contain a password property and is therefore undefined. Since the attack vector does not define a password value, the resulting argument is also undefined. Thus, two undefined values are compared for equality. JavaScript as well as Python, Ruby and PHP evaluate such a comparison to true and pass it to the callback. As a result, the credentials check is successfully bypassed.\\
 
-CouchDB implements a group of these special documents for different purposes. Not all of these documents have the same access authorization level. Each of the special documents can be accessed by designated HTTP methods, as shown by table \ref{tab:couch_special_documents}. \\
+CouchDB implements a group of these special documents for different purposes. Not all of these documents have the same access authorization level. Each of the special documents can be accessed by designated HTTP methods, as shown for a subset by table \ref{tab:couch_special_documents}. \\
 
 \begin{table}[h]
  \sffamily
  \centering
  \begin{tabular}{llcccc}
   \textbf{Key} & \textbf{Description} & \textbf{GET} & \textbf{POST} & \textbf{PUT} & \textbf{DEL} \\ \hline
-  \_all\_docs             & Return multiple documents of a database   & \cmark & \cmark & \xmark & \xmark \\
+  \rowcolor{light-gray}\_all\_docs             & Return multiple documents of a database   & \cmark & \cmark & \xmark & \xmark \\
   \_bulk\_docs            & Create and update multiple documents      & \xmark & \cmark & \xmark & \xmark \\
-  \_design                & Create or return views of database        & \cmark & \cmark & \xmark & \xmark \\
+  \rowcolor{light-gray}\_design                & Create or return views of database        & \cmark & \cmark & \xmark & \xmark \\
   \_find                  & Find documents with selection criteria    & \xmark & \cmark & \xmark & \xmark \\
-  \_index                 & Get or create index                       & \cmark & \cmark & \xmark & \cmark \\
+  \rowcolor{light-gray}\_index                 & Get or create index                       & \cmark & \cmark & \xmark & \cmark \\
   \_explain               & Explain database structure                & \xmark & \cmark & \xmark & \xmark \\
-  \_changes               & List of changes in the database           & \cmark & \cmark & \xmark & \xmark \\
+  \rowcolor{light-gray}\_changes               & List of changes in the database           & \cmark & \cmark & \xmark & \xmark \\
   \_compact               & Run compression of database               & \xmark & \cmark & \xmark & \xmark \\
   \_ensure\_full\_commit  & Commits changes to disk                   & \xmark & \cmark & \xmark & \xmark \\
-  \_security              & Return or set security object of database & \cmark & \xmark & \cmark & \xmark \\
+  \rowcolor{light-gray}\_security              & Return or set security object of database & \cmark & \xmark & \cmark & \xmark \\
   \_purge                 & Remove references to deleted documents    & \xmark & \cmark & \xmark & \xmark \\
   \_missing\_revs         & Return not stored revisions               & \xmark & \cmark & \xmark & \xmark \\
   \_revs\_diff            & Returns diff to stored revisions          & \xmark & \cmark & \xmark & \xmark \\
-  \_revs\_limit           & Returns current revision limit            & \cmark & \xmark & \cmark & \xmark \\
+  \rowcolor{light-gray}\_revs\_limit           & Returns current revision limit            & \cmark & \xmark & \cmark & \xmark \\
   \bottomrule 
  \end{tabular}
  \caption{CouchDB special documents with description and applicable HTTP methods}
  \label{tab:couch_special_documents}
 \end{table}
 
-Depending on the operational purpose of the special document, designated HTTP methods are enabled. This has to be considered for attacks, since the injected special document needs to support the applied HTTP method of the exploited query. In case of the shown injection example, the HTTP GET method had to be supported. A major advantage of an attacker is, that even the lowest authorization level is allowed to GET special documents. Special key injection against queries using other HTTP methods require a higher authorization level of the underlying database user. A well configured application server and database should prevent higher authorization levels for special documents. \\
+Depending on the operational purpose of the special document, designated HTTP methods are enabled. This has to be considered for attacks, since the injected special document needs to support the applied HTTP method of the exploited query. In case of the shown injection example, the HTTP GET method had to be supported. A major advantage of an attacker is, that even the lowest authorization level is allowed to GET special documents. Special key injection against queries using other HTTP methods require a higher authorization level of the underlying database user. A correctly configured application server and database should prevent higher authorization levels for normal database operations. \\
 
 \subsection{Array Key Injection}
 
