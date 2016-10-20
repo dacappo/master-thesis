@@ -325,9 +325,14 @@ function getDocument(key, callback) {
 getDocument(req.query.key, handleResult);
 \end{lstlisting}
 
-\begin{lstlisting}[caption={Attack vectors on CouchDB for URL traversal injection via HTTP GET}, label={lst:PHPArrayInjection}]
+The shown example implements a function, that retrieves documents by the according key. In the underlying request, the key becomes the first element of the URL's path section. This circumstance allows path traversal by key injection, when the slash sign is not escaped. At this point, the special documents come into play again. Accessing one of these special documents, would not break a security goal of the given application. The path traversal injection in combination with special \emph{\_design} documents allow access on other database views. This should not be possible with the \emph{get} operation of the CouchDB driver, since a dedicated function for separated view access is provided. The URL traversal injection therefore allows an attack reading access on all defined views of a collection. This vulnerability caused by incorrect argument escaping, can be found in the Nano driver for NodeJS. Listing \ref{lst:couch_url_traversal_injection_vector} shows an exemplary attack vector for the presented application. \\
+
+
+\begin{lstlisting}[caption={Attack vectors on CouchDB for URL traversal injection via HTTP GET}, label={lst:couch_url_traversal_injection_vector}]
 https://example.org/get?key=_design/credentials/_view/user_password
 \end{lstlisting}
+
+To retrieve data of another view, the key value is forged to access the \emph{credentials} design document with the \emph{user\_password} view. The attack is subject to the assumption, that a view leaks sensitive information. In this case, all password values can be accessed that may not be part of the default document view. \\
 
 
 \subsection{Data Import Injection}
