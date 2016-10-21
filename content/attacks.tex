@@ -73,7 +73,7 @@ A login can therefore be bypassed in each investigated case, but this kind of at
  \label{tab:mongo_commands_affected}
 \end{table}
 
-Considered are collection functions, that employ ether a \emph{filter} or \emph{query} parameter. Both facilitate the same JSON-like selection format. The affected functions encompass read, update and delete operations. Furthermore, the attacker surface analysis from section \ref{sec:analysisOfQueryTechniques} suggests, that the URL query string is by far not the only part of the attacker surface allowing this kind of attack. When the application processes other request parameters, the payload can also be placed in form data encoded as well as JSON request bodies. These circumstances exhibit a way more significant surface for query selector injection as previously indicated. \\
+Considered are collection functions, that employ either a \emph{filter} or \emph{query} parameter. Both facilitate the same JSON-like selection format. The affected functions encompass read, update and delete operations. Furthermore, the attacker surface analysis from section \ref{sec:analysisOfQueryTechniques} suggests, that the URL query string is by far not the only part of the attacker surface allowing this kind of attack. When the application processes other request parameters, the payload can also be placed in form data encoded as well as JSON request bodies. These circumstances exhibit a way more significant surface for query selector injection as previously indicated. \\
 
 \subsection{Expanding Array Injection}
 The expanding array injection is based on the common attacker model and exploits a special behavior of a query's selection criteria. When a requires a property to be equal to a value and the stored document contains an array in place of the property, all values of the array are used to find a match. This feature, as the attack name implies, is called automatic array expanding. An attacker can manipulate inserted documents in order to achieve matches subsequent selective criteria. The creation of an user as shown in listing \ref{lst:NodeJSCreateUser} represents an example for such an vulnerability. \\
@@ -122,7 +122,7 @@ The presented login application is of course not the only example, where the exp
   db.collection.update            & \textcolor{dark-blue}{\textbf{query}} \textcolor{dark-red}{\textbf{update}} options \\
   db.collection.updateOne         & \textcolor{dark-blue}{\textbf{filter}} \textcolor{dark-red}{\textbf{update}} options \\
   db.collection.updateMany        & \textcolor{dark-blue}{\textbf{filter}} \textcolor{dark-red}{\textbf{update}} options \\
-  db.collection.replaceOne        & \textcolor{dark-blue}{\textbf{filter}} \textcolor{dark-red}{\textbf{replacement}} options \\\hline
+  db.collection.replaceOne        & \textcolor{dark-blue}{\textbf{filter}} \textcolor{dark-red}{\textbf{replacement}} options \\\hdashline
   db.collection.deleteOne         & \textcolor{dark-blue}{\textbf{filter}} options \\
   db.collection.deleteMany        & \textcolor{dark-blue}{\textbf{filter}} options \\
   db.collection.find              & \textcolor{dark-blue}{\textbf{query}} projection \\
@@ -336,6 +336,28 @@ To retrieve data of another view, the key value is forged to access the \emph{cr
 
 
 \subsection{Data Import Injection}
+This attack is based on the extended attacker model and directed against data imports from external sources. \\
+
+\begin{lstlisting}[caption={Vulnerable NodeJS example for data import injection on CouchDB}, label={lst:couchdb_data_import_injection_app}, language=JavaScript]
+function import(data) {
+  data.forEach((doc) => {
+    couch.use('mixedData').insert(doc);
+  });
+}
+
+import(externalSource.getData());
+\end{lstlisting}
+
+\begin{lstlisting}[caption={Attack vectors on CouchDB for data import injection}, label={lst:couchdb_data_import_injection_inject}, language=JavaScript]
+{
+  "_id" : "_design/example",
+  "views" : {
+    "attacker" : {
+      "map" : "function(doc){ emit(doc._id, doc)}"
+    }
+  }
+}
+\end{lstlisting}
 
 \section{Memcached}
 This section covers the injection attacks against the key-value cache Memcached, that were found in scope of this thesis.
