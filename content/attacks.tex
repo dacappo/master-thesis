@@ -40,11 +40,23 @@ db['users'].find({:user => req.params['user'], :password => req.params['password
 db.users.find({"user": request.GET['user'], "password": request.GET['password']})
 \end{lstlisting}
 
-In all of the four cases, the default and by MongoDB recommended database driver was deployed. The attack vector from listing \ref{lst:QuerySelectorInjectionVector} leads in each of the presented login checks to the query criteria shown in listing \ref{lst:QuerySelectorCriteria}. \\
-
-\begin{lstlisting}[caption={Resulting query of query selector injection}, label={lst:QuerySelectorCriteria}]
-{'user': 'patrick', 'password': {'&gt':''}}
+In all of the four cases, the default and by MongoDB recommended database driver was deployed. The attack vector from listing \ref{lst:QuerySelectorInjectionVector} leads in each of the presented login checks to the query criteria shown in listing \ref{lst:QuerySelectorInjectionResult}. \\
+\begin{minipage}{.97\textwidth}
+\begin{minipage}[t]{.49\textwidth}
+\begin{lstlisting}[caption={Resulting query of normal request}, label={lst:QuerySelectorNormalResult}]
+{'user': 'patrick', 
+ 'password': '1234'}
 \end{lstlisting}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{.49\textwidth}
+\begin{lstlisting}[caption={Resulting query of query selector injection}, label={lst:QuerySelectorInjectionResult}]
+{'user': 'patrick',
+ 'password': {'&gt':''}}
+\end{lstlisting}
+\end{minipage}
+\end{minipage}
+
 
 A login can therefore be bypassed in each investigated case, but this kind of attack is not restricted to login applications. Nearly all parameterized selection criteria can be influenced by the injection of query selectors. This includes all read, update and delete calls making use of the BSON selection format. Affected functions of the MongoDB API are listed in table \ref{tab:mongo_commands_affected}.\\
 

@@ -97,10 +97,14 @@
 \renewcommand{\nomname}{List of Abbreviations}
 \renewcommand{\lstlistlistingname}{List of Listings}
 
+% Define additional colors
+\definecolor{lighter-gray}{RGB}{247,247,247}
+\definecolor{dark-blue}{RGB}{0, 35, 71}
+\definecolor{dark-red}{RGB}{120, 0, 0}
+
 % -------------------------------------------------------------------------------------------
 % Design von Listings
 % -------------------------------------------------------------------------------------------
-\definecolor{lighter-gray}{RGB}{244,244,244}
 \lstset{
   %frame=top,frame=bottom,
   backgroundcolor = \color{lighter-gray},
@@ -122,14 +126,20 @@
   showstringspaces=false,
   numbers=left,
   numberstyle=\tiny,
-  upquote=true
+  upquote=true,
+  linewidth=.97\textwidth
 }
 
+% Declare the \emph formatting
+\DeclareTextFontCommand{\emph}{\ttfamily\small}
+
+% Declare the caption formattings
 \DeclareCaptionFormat{listing}{\vskip1pt#1#2#3}
 \captionsetup[lstlisting]{format=listing,singlelinecheck=false, margin=0pt, font={small,sf},labelsep=space,labelfont=bf}
 \captionsetup[figure]{format=listing,singlelinecheck=false, margin=0pt, font={small,sf},labelsep=space,labelfont=bf, justification=centering}
 \captionsetup[table]{format=listing,singlelinecheck=false, margin=0pt, font={small,sf},labelsep=space,labelfont=bf, justification=centering}
 
+% Declare the listing language JavaScript
 \lstdefinelanguage{JavaScript}{
   keywords={typeof, new, true, false, catch, function, return, null, catch, switch, var, if, in, while, do, else, case, break},
   keywordstyle=\color{js_blue}\bfseries,
@@ -144,6 +154,13 @@
   morestring=[b]',
   morestring=[b]"
 }
+
+% ------------------------------ Use with \hdashline  ------------------------------------------
+\usepackage{array}
+\usepackage{arydshln}
+\setlength\dashlinedash{0.3pt}
+\setlength\dashlinegap{1.5pt}
+\setlength\arrayrulewidth{0.3pt}
 
 % -------------------------------------------------------------------------------------------
 % Definition of Abbreviation-file 
