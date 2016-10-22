@@ -28,7 +28,7 @@ The Hypertext Transfer Protocol (HTTP) represents an application-layer protocol 
  \label{tab:http_methods}
 \end{table}
 
-Basically, the first six methods implement create, read, update and delete operations for resources on the server. Thereby, a URI in the header specifies the resource, that the operation should be applied to. In case of create or update operations, the optional body block in the request contains the new resource data. Since no new data is needed for resource retrieving and deleting methods, they work solely with the request header block. All operations, apart form the HEAD request, deliver the result of the operation within the response's body block. Idempotents indicates, whether the behavior of a method stays the same for multiple consecutive requests. Especially update operations do not feature idempotent characteristics. The last three methods represent helper functions for connection inspection and TCP tunneling. An example for a request, that retrieves a specified resource form the server, is given in listing \ref{lst:http_request} \cite{MDN:2016}.
+Basically, the first six methods implement create, read, update and delete operations for resources on the server. Thereby, a URI in the header specifies the resource, that the operation should be applied to. In case of create or update operations, the optional body block in the request contains the new resource data. Since no new data is needed for resource retrieving and deleting methods, they work solely with the request header block. All operations, apart form the HEAD request, deliver the result of the operation within the response's body block. Idempotents indicates, whether the behavior of a method stays the same for multiple consecutive requests. Especially update operations do not feature idempotent characteristics. The last three methods represent helper functions for connection inspection and TCP tunneling. An example for a request, that retrieves a specified resource form the server, is given in listing \ref{lst:http_request} \cite{MDN:2016}. \\
 
 \begin{lstlisting}[caption={Example for HTTP GET request}, label={lst:http_request}]
 GET /index.html HTTP/1.1
@@ -36,9 +36,9 @@ Host: example.org
 Accept-Language: en
 \end{lstlisting}
 
-The first line of the request header is composed of the HTTP method, followed by resource identifier and completed with the version of the used protocol. In the given example a  GET request is used in order to retrieve the \textit{index.html} file. Afterwards, the host of the server is defined by the domain name. Accepted types of files, char-sets, encodings, languages and many more settings can be defined as additional headers. In case the requested resource exists and no error appears during request processing, the server sends a response as exemplified in listing \ref{lst:http_response} \cite{MDN:2016}.
+The first line of the request header is composed of the HTTP method, followed by resource identifier and completed with the version of the used protocol. In the given example a  GET request is used in order to retrieve the \textit{index.html} file. Afterwards, the host of the server is defined by the domain name. Accepted types of files, char-sets, encodings, languages and many more settings can be defined as additional headers. In case the requested resource exists and no error appears during request processing, the server sends a response as exemplified in listing \ref{lst:http_response} \cite{MDN:2016}. \\
 
-\begin{lstlisting}[caption={Example for HTTP GET response}, label={lst:http_request_post}]
+\begin{lstlisting}[caption={Example for HTTP GET response}, label={lst:http_response}]
 HTTP/1.1 200 OK
 Date: Sat, 09 Sep 2016 14:28:02 GMT
 Server: Apache
