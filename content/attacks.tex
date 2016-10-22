@@ -407,16 +407,28 @@ The given code implements a function to retrieve cached values from Memcached by
 
 To bypass the preliminary data checks, similarities between string and arrays in dynamic typed languages, such as NodeJS, PHP, Python and Ruby, are used. An actually protected key string is passed within an array through the extended query string syntax. The resulting array bypasses the \emph{indexOf} check, because the exact \emph{auth\_} string is not an element within the injected array. Afterwards, the array is passed as the key argument to the query. Memcached expects a string value instead of an array, and therefore extracts the first contained string. As a result the protected dataset is returned.\\
 
+Since this attack reveals a secondary way to preform particular queries, a missing type check of request parameters enables the bypassing of application layer checks. All functionalities, that can be called on string as well as on array values has to be taken into account. An overview of shared functionalities between string and array values is given in table \ref{tab:mecached_affected_functions}.
+
 \begin{table}[h]
  \sffamily
  \centering
- \begin{tabular}{lll}
-  \textbf{Function} & \textbf{String} & \textbf{Array}\\ \hline
-  [i]               & Return i-th char of string     & Return i-th element of array \\
-  indexOf(str)   & Index of str within the string & Index of the element with the value str \\
+ \begin{tabular}{lllcccc}
+  \textbf{Function} & \textbf{String} & \textbf{Array} & \textbf{NodeJS} & \textbf{PHP} & \textbf{Python} & \textbf{Ruby} \\ \hline
+  [i]            & Return i$^{th}$ char             & Return i$^{th}$ element  & \cmark & \cmark & \cmark & \cmark \\
+  index(str)     & Char index of str                & Array index of str                & \xmark & \xmark & \cmark & \xmark \\
+  indexOf(str)   & Char index of str                & Array index of str                & \cmark & \xmark & \xmark & \xmark \\
+  str in         & Contained in string              & Contained in array                & \xmark & \xmark & \cmark & \xmark \\
+  length         & Length of string                 & Length of array                   & \cmark & \xmark & \cmark & \cmark \\
+  len(param)     & Length of string                 & Length of array                   & \xmark & \xmark & \cmark & \xmark \\
+  sizeOf(param)  & Length of string                 & Length of array                   & \xmark & \cmark & \xmark & \xmark \\ \hline
  \end{tabular}
  \caption{Affected string and array functions for Memcached array key injection}
  \label{tab:mecached_affected_functions}
 \end{table}
+
+Listed are functions and properties with the according functionalities on strings an arrays. The investigated application layers partially employ different naming conventions for the same functionality. As the excerpt shows, the similarity between strings and arrays exists on every platform. Therefore, the array key injection can bypass checks on every platform. \\
+
+\textbf{Attack Summary} \\
+
 
 % other way round - array expected but string injected
