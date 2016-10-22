@@ -348,17 +348,19 @@ To retrieve data of another view, the key value is forged to access the \emph{cr
 
 
 \subsection{Data Import Injection}
-This attack is based on the extended attacker model and directed against data imports from external sources. \\
+This attack is based on the extended attacker model and directed against data imports from external sources. As explained before, the new generation of NoSQL databases lead to more diverse system landscapes. This entailed more frequent data exchanges between systems. The widespread support for unstructured data may let data transfers seem an easy task for non-relational databases. In fact, data exchange between systems is critical with regard to injection attacks. Any external data source has to be carefully checked for the context of the destination database. Listing \ref{lst:couchdb_data_import_injection_app} shows an data import process for CouchDB, that leaves context checks disregarded.\\
 
 \begin{lstlisting}[caption={Vulnerable NodeJS example for data import injection on CouchDB}, label={lst:couchdb_data_import_injection_app}, language=JavaScript]
-function import(data) {
+function importData(data) {
   data.forEach((doc) => {
     couch.use('mixedData').insert(doc);
   });
 }
 
-import(externalSource.getData());
+importData(externalSource.getData());
 \end{lstlisting}
+
+Basically, the given code retrieves some data from an external source and passes it to an import function. This function takes the data and inserts all contained documents into the \emph{mixedData} collection of CouchDB. In principle, this collection can be used for a variety of different data sources. If an attacker is able to influence only parts of the external data, this unvalidated import processing opens up a serious vulnerability. In order to exploit this flaw, a document as presented within listing \ref{lst:couchdb_data_import_injection_inject} has to be inserted into the external data source.
 
 \begin{lstlisting}[caption={Attack vectors on CouchDB for data import injection}, label={lst:couchdb_data_import_injection_inject}, language=JavaScript]
 {
@@ -371,6 +373,50 @@ import(externalSource.getData());
 }
 \end{lstlisting}
 
+The shown data represents a design document within CouchDB. In probably any other context, the shown document is harmless. An attacker inserts this document into the external data source, such as a text file or another non-relational database. As soon as data from this source is imported by CouchDB, the special structure is detected and a new \emph{attacker} view is applied. This implies the execution of the \emph{map} function on all contained documents. At this point, the results of the view can not be retrieved by the attacker, but high processing load can be caused through the injected \emph{map} function. This impairs other queries and therefore the availability of the stored data. \\
+
+On top of this, the documents imported at this stage can be used in combination with the URL traversal attack. This combination allows an attacker access the beforehand injected view resulting in data leakage. In general reading access on the existing views of a collection becomes problematic with the data import injection in mind. \\
+
+\textbf{Attack Summary} \\
+Of the investigated databases, CouchDB is the only one affected by data import injection. In general, all non-relational databases storing functional data in the same scope as normal data are potentially vulnerable. The main problem of this attack is the context change, that takes place through data import. Harmless and valid data in one data storage reaches a special meaning in the context of CouchDB. This situation also extends the possibilities for subsequent injection attacks. Given the condition of additional attacker defined data within the targeted database, the confidentiality of otherwise secure data can be compromised. In case of CouchDB, the import processing of design documents requires collection admin authorization, but no database wide administration rights. All selected request parameters can be used for the subsequent injection, since the attacker controlled data often simplifies attack vectors. The attack works across all investigated application platforms and with common drivers as well as direct REST interface access. 
+
 \section{Memcached}
 This section covers the injection attacks against the key-value cache Memcached, that were found in scope of this thesis.
 \subsection{Array Key Injection}
+This attack is based on the common attacker model and directed against internal query parameter conversions. By default, Memcached does not separate its data through collections. All cached data is stored within a single scope. Access control has therefore to be considered in the application layer. In order to circumvent such preliminary parameter checks, an attack is searching for alternative ways to trigger unintended database queries. An example for an application, that is vulnerable for array key injection shown in listing \ref{lst:memcached_array_key_injection_app}.\\
+
+\begin{lstlisting}[caption={Vulnerable NodeJS example for array key injection against Memcached}, label={lst:memcached_array_key_injection_app}, language=JavaScript]
+function getCachedValue(key) {
+  if (key.indexOf('auth_') === 0){
+    callback("Invalid key!");
+  } else {
+    memcached.get(key, (err, body)=>{
+      callback(err || body);
+    });
+  }
+}
+
+getCachedValue(req.query.key, handleResult);
+\end{lstlisting}
+
+The given code implements a function to retrieve cached values from Memcached by the according key. Since sensitive data is mixed with normal data, the key is checked before the actual database query is run. In this scenario, the key of sensitive data is prefixed with \emph{\_auth} and should not be accessible in scope of this function. All other data does not require any authorization checks and is freely readable. An example for the sensitive data could be session cookies or credentials. An attacker is able to bypass the prefix check of the function by exploiting the automatic type conversion of Memcached parameters. The request shown in listing \ref{lst:memcached_array_key_injection_vector} successfully passes the checks and retrieves sensitive data. \\
+
+\begin{lstlisting}[caption={Attack vectors on Memcached for array key injection via HTTP GET}, label={lst:memcached_array_key_injection_vector}]
+"https://exmaple.org?key[]=auth_patrick"
+\end{lstlisting}
+
+To bypass the preliminary data checks, similarities between string and arrays in dynamic typed languages, such as NodeJS, PHP, Python and Ruby, are used. An actually protected key string is passed within an array through the extended query string syntax. The resulting array bypasses the \emph{indexOf} check, because the exact \emph{auth\_} string is not an element within the injected array. Afterwards, the array is passed as the key argument to the query. Memcached expects a string value instead of an array, and therefore extracts the first contained string. As a result the protected dataset is returned.\\
+
+\begin{table}[h]
+ \sffamily
+ \centering
+ \begin{tabular}{lll}
+  \textbf{Function} & \textbf{String} & \textbf{Array}\\ \hline
+  [i]               & Return i-th char of string     & Return i-th element of array \\
+  indexOf(str)   & Index of str within the string & Index of the element with the value str \\
+ \end{tabular}
+ \caption{Affected string and array functions for Memcached array key injection}
+ \label{tab:mecached_affected_functions}
+\end{table}
+
+% other way round - array expected but string injected
