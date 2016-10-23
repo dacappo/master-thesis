@@ -60,7 +60,6 @@ In all of the four cases, the default and by MongoDB recommended database driver
 
 A login can therefore be bypassed in each investigated case, but this kind of attack is not restricted to login applications. Nearly all parameterized selection criteria can be influenced by the injection of query selectors. This includes all read, update and delete calls making use of the BSON selection format. Affected functions of the MongoDB API are listed in table \ref{tab:mongo_commands_affected}.\\
 
-
 \begin{table}[h]
  \sffamily
  \centering
@@ -86,6 +85,9 @@ A login can therefore be bypassed in each investigated case, but this kind of at
 \end{table}
 
 Considered are collection functions, that employ either a \emph{filter} or \emph{query} parameter. Both facilitate the same JSON-like selection format. The affected functions encompass read, update and delete operations. Furthermore, the attacker surface analysis from section \ref{sec:analysisOfQueryTechniques} suggests, that the URL query string is by far not the only part of the attacker surface allowing this kind of attack. When the application processes other request parameters, the payload can also be placed in form data encoded as well as JSON request bodies. These circumstances exhibit a way more significant surface for query selector injection as previously indicated. \\
+
+\textbf{Attack Summary} \\
+MongoDB's flexible query scheme in combination with the query selector objects make it vulnerable for this kind of injection attack. In general, all non-relational databases employing JSON-like query structures with object structure encoding are potentially vulnerable. The main problem of this attack is the realization of complex query operations. Equality selections can be simply encoded within a JSON-like structure, but for operations as \emph{greater than} a special syntax is required. Thereby each equality check can be replaced by complex query operators, when the object structure is under control of an attack. With object structure encoding request parameters of the attacker surface can be used for this kind of injection. The attack works across all investigated application platforms and with common drivers as well as direct REST interface access. 
 
 \subsection{Expanding Array Injection}
 The expanding array injection is based on the common attacker model and exploits a special behavior of a query's selection criteria. When a requires a property to be equal to a value and the stored document contains an array in place of the property, all values of the array are used to find a match. This feature, as the attack name implies, is called automatic array expanding. An attacker can manipulate inserted documents in order to achieve matches subsequent selective criteria. The creation of an user as shown in listing \ref{lst:NodeJSCreateUser} represents an example for such an vulnerability. \\
@@ -120,7 +122,7 @@ The request for the login, does have to be manipulated. An attacker can now logi
 https://example.org/login?user=admin&password=1234;
 \end{lstlisting}
 
-MongoDb will search for a document with the user property set to \emph{admin} and the password property set to \emph{1234}. Through the expansion the the beforehand injected document or respectively the user property, a matching document is found and the admin login is successful.\\
+MongoDB will search for a document with the user property set to \emph{admin} and the password property set to \emph{1234}. Through the expansion the the beforehand injected document or respectively the user property, a matching document is found and the admin login is successful.\\
 
 The presented login application is of course not the only example, where the expanding array feature of MongoDB allow injection attacks. Every insert operation with data originating from the three parameters, that allow type manipulation represents a potential vulnerability. It enables an attacker to break the confidentiality of the underlying data, which leads to unintended matches for further requests. The attack was exemplified for the NodeJS, but is relevant for all of the investigated application layers. \\
 
@@ -150,7 +152,8 @@ The presented login application is of course not the only example, where the exp
  \label{tab:mongo_commands_affected_expanding_array}
 \end{table}
 
-The presented login application is of course not the only example, where the expanding array feature of MongoDB allow injection attacks. Every insert operation with data originating from the three parameters, that allow type manipulation represents a potential vulnerability. It enables an attacker to break the confidentiality of the underlying data, which leads to unintended matches for further requests. The attack was exemplified for the NodeJS, but is relevant for all of the investigated application layers. \\
+\textbf{Attack Summary} \\
+MongoDB's feature for automatic array expansion of stored documents allows this kind of attack. In general, all non-relational databases employing automatic structure resolving or changes are potentially vulnerable. The main problem of this attack is that all stored arrays are expanded by default, but the behavior is neither typical nor expected in this context. When attacker is able to injection an array instead of a normal value, all following selection operations will expand the arrays content for the search and therefore change their behavior. All object structure encoding request parameters of the attacker surface can be deploy for array the expanding array injection. The attack works across all investigated application platforms and with common drivers as well as direct REST interface access. 
 
 \section{Redis}
 This section covers the injection attacks against the key-value store Redis, that were found in scope of this thesis.
@@ -193,7 +196,10 @@ Given the the query string parameters, the resulting array will be passed as the
  \label{tab:redis_commands_affected}
 \end{table}
 
-The investigation revealed, that many of the commands allow parameter overwrites and therefore corruption on of the underlying data. When the first key argument is controlled by an attacker, all following can be overwritten. These vulnerabilities enable an attacker to perform unintended insert, update or delete operations.
+The investigation revealed, that many of the commands allow parameter overwrites and therefore corruption on of the underlying data. When the first key argument is controlled by an attacker, all following can be overwritten. These vulnerabilities enable an attacker to perform unintended insert, update or delete operations. \\
+
+\textbf{Attack Summary} \\
+Of the investigated databases, Redis in combination with NodeJS is the only technology stack affected by this attack. In general, all non-relational databases employing overloaded interface functions are potentially vulnerable. The main problem of this attack is, that the database driver allows two ways to pass arguments to the query. When attacker is in control of the first parameter, the argument format can be influenced and the following arguments are overwritten. All object structure encoding request parameters of the attacker surface can be deploy for parameter overwrite injection. The attack works on NodeJS in combination with the recommended Redis driver. 
 
 \section{CouchDB}
 Within this section, the discovered injection attacks against the document store CouchDB are outlined.
@@ -250,6 +256,9 @@ The payload contained within the query string of the URL leads to an object inst
  \label{tab:couchdb_affected_selectors}
 \end{table}
 
+\textbf{Attack Summary} \\
+Similar to MongoDB, selection queries based on JSON structures allow this kind of attack. As described before, all non-relational databases extending this JSON structure with special objects for complex queries is potentially vulnerable. The main problem of this attack is, that objects with certain properties are treated special in order to enable complex document selections. When attacker is able to injection such objects instead of a normal value, other documents are selected for further query processing. All object structure encoding request parameters of the attacker surface can be deploy for find selector injection. The attack works across all investigated application platforms and with common drivers as well as direct REST interface access. 
+
 \subsection{Special Key Injection}
 The special key injection against CouchDB rests upon the common attacker model. In order to understand this attack, it is vital to be aware of CouchDB' storage concept. All data needed for its operation is treated as a document. This concerns application data as well as meta data of the existing collections. Security settings, operation history and data views are stored as documents within each collection. The only difference in comparison to normal documents is the prefixed underscore of the id. Meta data documents are accessible for every user with reading access on the collection. Special documents like those can be used to bypass application layer checks. Listing \ref{lst:SpecialKeyInjectionNodeJS} displays an authentication check vulnerable to special key injection. \\
 
@@ -302,6 +311,9 @@ CouchDB implements a group of these special documents for different purposes. No
 
 Depending on the operational purpose of the special document, designated HTTP methods are enabled. This has to be considered for attacks, since the injected special document needs to support the applied HTTP method of the exploited query. In case of the shown injection example, the HTTP GET method had to be supported. A major advantage of an attacker is, that even the lowest authorization level is allowed to GET special documents. Special key injection against queries using other HTTP methods require a higher authorization level of the underlying database user. A correctly configured application server and database should prevent higher authorization levels for normal database operations. \\
 
+\textbf{Attack Summary} \\
+CouchDB's approach of handling all data as stored documents enables this kind of attack. In-general, all non-relational databases storing additional information in the same context as normal application data are vulnerable. The main problem of this attack is, that meta information of the collections is stored as documents within each collection. The authorization model allows reading access on this data for all users. Some applications may not pay regard to that and only expect application data. An attacker can use these special documents to retrieve documents with unexpected structures and therefore influence application layer logic. All object structure encoding request parameters of the attacker surface can be deploy for find selector injection. The attack works across all investigated application platforms and with common drivers as well as direct REST interface access. 
+
 \subsection{Array Value Injection}
 This attack is based on the common attacker model and directed against preliminary data validation. CouchDB implements protective measures for its special documents, but user defined documents have to be protected otherwise. Data checks within the application layer represent a solution for data protection. Inputs leading to illegitimate operations can be filtered beforehand in order to prevent query execution. At this point it is essential to filter all inputs giving a rise to the protected operation. Reliable filtering is hard to guarantee, when conditionals are handled differently on the application and database layer. Listing \ref{lst:couch_array_key_injection} gives an example for document protection, that can be bypassed by array value injection.\\
 
@@ -324,7 +336,10 @@ https://example.org?key[]=secretDoc
 https://example.org?key[]=_all_docs
 \end{lstlisting}
 
-Basically, the attacks wrap an array around the passed key value. This achieves a different treatment of the parameter in the application and database layer. The filters use type safe condition evaluation. Therefore, the first attack vector injects an array which is not equal to the \emph{secretDoc} string. The second attack vector bypasses check, since the first element of the array does not equal the underscore char. Within the database layer, arrays containing just one element are resolved to the contained value. In both cases, the sensitive documents are returned. For this kind of vulnerability, similarities between string and array objects in the NodeJS, PHP, Ruby and Python environment become critical.   
+Basically, the attacks wrap an array around the passed key value. This achieves a different treatment of the parameter in the application and database layer. The filters use type safe condition evaluation. Therefore, the first attack vector injects an array which is not equal to the \emph{secretDoc} string. The second attack vector bypasses check, since the first element of the array does not equal the underscore char. Within the database layer, arrays containing just one element are resolved to the contained value. In both cases, the sensitive documents are returned. For this kind of vulnerability, similarities between string and array objects in the NodeJS, PHP, Ruby and Python environment become critical. \\
+
+\textbf{Attack Summary} \\
+Automatic type conversion of query parameters within the database layer enables this kind of attack. In general, all non-relational databases employing parameter automatic conversion or extraction within the database layer are potentially vulnerable. The main problem of this attack is, that a value contained within an single element array is automatically casted implicitly. When attacker is able to inject a value within an array instead of the plain value, the database operation stays the same, but the application code may handle the parameter differently. All object structure encoding request parameters of the attacker surface can be deploy for array value injection. The attack works across all investigated application platforms and with common drivers as well as direct REST interface access. 
 
 \subsection{URL Traversal Injection}
 The URL traversal injection against CouchDB rests upon the common attacker model. This attack relies on CouchDb's REST interface, that is used for any communication between application and database layer. REST uses URLs to identify the targeted documents. Some query parameters, such as the key, are used to build these URLs. Based on this, the key has influence on the structure of the URL. Applications as shown in listing \ref{lst:couchdb_url_traversal_injection_app} are vulnerable for URL traversal injection. \\
@@ -346,6 +361,8 @@ https://example.org/get?key=_design/credentials/_view/user_password
 
 To retrieve data of another view, the key value is forged to access the \emph{credentials} design document with the \emph{user\_password} view. The attack is subject to the assumption, that a view leaks sensitive information. In this case, all password values can be accessed that may not be part of the default document view. \\
 
+\textbf{Attack Summary} \\
+Of the investigated databases, CouchDB is the only one affected by URL traversal injection. In general, all non-relational databases with RESTful interfaces and flawed parameter escaping can be concerned. The main problem of this attack is incorrect or even missing escaping of parameters, that become part of the query URL. All parts following the unescaped parameter can be overwritten. This situation becomes harmful, when unintended operations can be triggered through changes of the query URL structure. When the REST interface is used without database drivers, the escaping has to be ensured by the application code. Drivers, as used in the displayed example, should escape parameters for the URL context. All select request parameters of the attack surface can be used for the traversal injection, since its based on string encoded semantic. The attack works for NodeJS in combination with the Nano driver. XHR based database access is vulnerable for this kind of attack across all platforms, when parameters are not sanitized for the URL context. 
 
 \subsection{Data Import Injection}
 This attack is based on the extended attacker model and directed against data imports from external sources. As explained before, the new generation of NoSQL databases lead to more diverse system landscapes. This entailed more frequent data exchanges between systems. The widespread support for unstructured data may let data transfers seem an easy task for non-relational databases. In fact, data exchange between systems is critical with regard to injection attacks. Any external data source has to be carefully checked for the context of the destination database. Listing \ref{lst:couchdb_data_import_injection_app} shows an data import process for CouchDB, that leaves context checks disregarded.\\
@@ -431,6 +448,6 @@ Since this attack reveals a secondary way to preform particular queries, a missi
 Listed are functions and properties with the according functionalities on strings an arrays. The investigated application layers partially employ different naming conventions for the same functionality. As the excerpt shows, the similarity between strings and arrays exists on every platform. Therefore, the array key injection can bypass checks on every platform. \\
 
 \textbf{Attack Summary} \\
-Of the investigated databases, Memcached is similar like CouchDB affected by array key injection. In general, all non-relational databases with automatic conversion of query parameters are potentially vulnerable. The main problem of this attack is, that different parameters lead to the same query behavior. Since the concept of Memcached requires application layer authorization checks, all possible parameters leading to a forbidden queries has to be considered. The exposed issue, that array parameter allow the same queries as string parameters is not officially documented. Therefore, array parameters are often not in considered in application layer checks and bypasses are possible. Request parameters for this attack have to support object structure control. Query string, JSON bodies as well as form data are therefore relevant parts of the attacker surface. The injection works across all investigated application platforms and with common drivers as well as direct REST interface access. 
+Of the investigated databases, Memcached is similar like CouchDB affected by array key injection. In general, all non-relational databases with automatic conversion of query parameters are potentially vulnerable. The main problem of this attack is, that different parameters lead to the same query behavior. Since the concept of Memcached requires application layer authorization checks, all possible parameters leading to a forbidden queries has to be considered. The exposed issue, that array parameter allow the same queries as string parameters is not officially documented. Therefore, array parameters are often not in considered in application layer checks and bypasses are possible. Request parameters for this attack have to support object structure control. Query string, JSON bodies as well as form data are therefore relevant parts of the attacker surface. The injection works across all investigated application platforms and with common drivers. 
 
 % other way round - array expected but string injected
