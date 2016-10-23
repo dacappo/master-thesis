@@ -1,8 +1,45 @@
 \chapter{Classification of NoSQL Injection Attacks}
-\label{cha:conectpion}
+\label{cha:classification}
+This chapter analyzes the found injection attacks against non-relational databases and classifies them according to the underlying problem.
 
-\section{Altered Object Type Injection}
+\section{Object Structure Defined Semantic}
 
-\section{Function Injection}
+% new way to define semantic for query often applied for nosql queries
+% represents a comprehensible notation for developers and mirrors the underlying data structure
+% same as for every injection attack, the semantic has to protected from injection
+% in this case, types of sensitve parts have to be validated
+% many developers not aware that object sturcture parameters has to be sanatized too
+% felxiblitly also important
+% case differentiation needed between senstive and open conditions
+% reference exmaples
 
-\todo{Further classes of injection attacks}
+\section{Diverging Parameter Handling}
+
+% Basically, this kind of attacks rest upon different handling of data in the applicaiton and database layer
+% no-sql requires application layer checks, that handle the data different than the database
+% makes secure checks hard
+% especially due to automatic format disolving or typ conversion or non-typesafe euqality operatiosn
+% result in multiple parameter combinations that lead to the same database operation
+% filtering of unallowed operations becomes hard, since multiple combinations have to be considered!
+% Often alternative ways are not clearly document and present convenience functionality
+% possible with value changes, but also with type and structure changes
+% reference exmaples
+
+\section{Shared Scope for Data}
+
+% data for different pruposes shares the same scope
+% even data available by default
+% only one type of data expected
+% other data format not considered in applicaiton layer
+% can lead to unexpected data handling and application layer operation
+% exmaple of meta data stored as normal record within tables
+% accessible by every user
+
+\section{Error-prone String Escaping}
+
+% Similar to SQL, each string value has to be escaped for the intended target context
+% this can be SQL, but also a function definiton or REST URL as seen in the previous investiagtion of non-relational databases
+% sanatization for encodeURIComponent as well as encodeJavaScript value LuaScript value
+% list examples
+% this problem is actually solved, but new context arose together with NoSQL
+% issue much more known to developers

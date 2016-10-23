@@ -232,7 +232,7 @@ Based on the outlined approaches to alter query semantics, preceding steps of th
 The URL determines the requested resource or called application and is composed of multiple sections. Two of these sections can be used for server-side application parameterization. The first one is the path declaration, that should actually define the directory of the requested file, but is often misused to pass string parameters. Its value is composed of strings separated by slashes. Since the path declaration is not further processed by any of the selected application layers, only the string contents can be adapted. This parameter is therefore limited to value manipulation of strings. In many cases, an adjusted path will result in rejected requests since the resource can no longer be found.\\ 
 
 \begin{lstlisting}[escapechar=!, caption={Example for GET request}, label={lst:http_request_example}]
-GET !\textbf{/path/to/resource}! HTTP/1.1
+GET !\textbf{/path/to/resource/name/patrick/foo/bar}! HTTP/1.1
 Host: example.org
 \end{lstlisting}
 
@@ -247,7 +247,7 @@ The second section of the URL, named query string, is much more common for appli
 Further investigation in scope of this work showed, that the these features are much more widespread and powerful than revealed by previous publications. The object and array encoding syntax is supported by all major web servers across the selected application layers. On NodeJS the \textit{Express} web server is by far not the only one including the \textit{qs module}. Nearly every major web server implementation or REST client includes the \textit{qs module} and therefore supports the extended query string syntax. In addition, Ruby implements the same feature with the \textit{Rails} framework as well as Python does with its \textit{Django} framework. Thus, all notable web server implementations of the selected application platforms include this feature. Further, the syntax even allows the passing of nested objects and arrays as a parameter. Due to this non-standardized convenience functionality, the query string parameter enables an attacker to inject all necessary query string encodings. \\
 
 \begin{lstlisting}[escapechar=!, caption={Example for GET request}, label={lst:http_request_example}]
-GET /path/to/resource!\textbf{?foo=bar}! HTTP/1.1
+GET /path/to/resource!\textbf{?name=patrick\&foo=bar}! HTTP/1.1
 Host: example.org
 \end{lstlisting}
 
@@ -269,9 +269,9 @@ As a standard data exchange format, JSON is also used as a data type for request
 POST /path/to/resource HTTP/1.1
 Host: example.org
 Content-Type: !\textbf{application/json}!
-Content-Length: 13
+Content-Length: 33
 
-!\textbf{\{"user": "admin", "password": "1234"\}}!
+!\textbf{\{"name": "patrick", "foo": "bar"\}}!
 \end{lstlisting}
 
 \textbf{Request Body - XML}\\
@@ -281,12 +281,12 @@ XML represents another standard data exchange format, that can be applied to the
 POST /path/to/resource HTTP/1.1
 Host: example.org
 Content-Type: !\textbf{application/xml}!
-Content-Length: 13
+Content-Length: 77
 
-<?xml version="1.0" ?>
+!\textbf{<?xml version="1.0" ?>}!
 !\textbf{<data>}!
-  !\textbf{<user>admin</user> }!
-  !\textbf{<password>1234</password>}!
+  !\textbf{<name>patrick</name> }!
+  !\textbf{<foo>bar</foo>}!
 !\textbf{</data>}!
 \end{lstlisting}
 
@@ -297,9 +297,9 @@ As the name applies, form data normally originates from web page forms. The form
 POST /path/to/resource HTTP/1.1
 Host: example.org
 Content-Type: !\textbf{application/x-www-form-urlencoded}!
-Content-Length: 13
+Content-Length: 20
 
-!\textbf{user=admin\&password=1234}!
+!\textbf{name=patrick\&foo=bar}!
 \end{lstlisting}
 
 Across all investigated platforms, the parameters allow similar injection capabilities for the three semantic encoding styles. The results are summarized int table \ref{tab:request_parameter}.
