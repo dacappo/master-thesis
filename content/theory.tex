@@ -1,41 +1,32 @@
 \chapter{Classification of NoSQL Injection Attacks}
 \label{cha:classification}
-This chapter analyzes the found injection attacks against non-relational databases and classifies them according to the underlying problem.
+This chapter presents the injection attack analysis and resulting classification according to the underlying problem. Basically, four major issues were determined, that cause injection vulnerabilities against non-relational databases. These classes are outlined in the following sections with reference to the comprising attacks of the previous chapter.
 
 \section{Object Structure Defined Semantic}
+With the emergence of non-relational databases, JSON became a common format for storing data records. Examples of such databases are the investigated document stores MongoDB and CouchDB. Given this underlying structure, it suggest itself to utilize the same format for query criteria. Since the JSON format only includes a key-value structure, the syntax has to be extended for more complex selection operations. CouchDB and MongoDB achieve this with the implementation of objects with special keys. This results in a new way to define semantics for query criteria. All the same, the JSON-like structure represents a comprehensible notation for developers and mirrors the underlying data. \\ 
 
-% new way to define semantic for query often applied for nosql queries
-% represents a comprehensible notation for developers and mirrors the underlying data structure
-% same as for every injection attack, the semantic has to protected from injection
-% in this case, types of sensitve parts have to be validated
-% many developers not aware that object sturcture parameters has to be sanatized too
-% felxiblitly also important
-% case differentiation needed between senstive and open conditions
-% reference exmaples
+As known from other query languages, the semantic defining elements has to be protected from injection attacks. In case of the JSON-based query criteria, the semantic is encoded in the object structure of parameters. Therefore, type and structure of user-provided values have to be validated. Without suchlike sanitizing, the parameter structure can be changed by injection attacks. Unfortunately, many developers are not aware of the possibility of object structure injection. Only allowing string or integer values is also not an option, since flexibility of parameters is required in some use cases. To combine this, case differentiation between sensitive and benign criteria is needed. This differentiation has to be accomplished by developers, since the danger of injection attacks is connected to the intended use of the query. Authentication or authorization operations are highly sensitive, whereas search operations on public documents are probably harmless. \\
+
+The query selector injection against MongoDB as well as the find selector injection against CouchDB are based upon this issue. Sanitizing of object structures within user-provided parameters for the intended use case would solve this class of attacks.
 
 \section{Diverging Parameter Handling}
+This class of attacks rests upon differences in the handling of parameters between application and database layer. These differences are crucial, since the concept of non-relational databases depends on application layer data checks. Reasons for the differences can be automatic format dissolving or type conversion within the database layer or driver. This leads to alternative parameter combinations, that trigger the same database operation due to the the preliminary conversion. Filtering of disallowed operations becomes hard to ensure, since multiple possibilities exist to trigger them. The diverging handling of parameters is also often not documented and therefore not taken into account within the application layer code. \\ 
 
-% Basically, this kind of attacks rest upon different handling of data in the applicaiton and database layer
-% no-sql requires application layer checks, that handle the data different than the database
-% makes secure checks hard
-% especially due to automatic format disolving or typ conversion or non-typesafe euqality operatiosn
-% result in multiple parameter combinations that lead to the same database operation
-% filtering of unallowed operations becomes hard, since multiple combinations have to be considered!
-% Often alternative ways are not clearly document and present convenience functionality
-% possible with value changes, but also with type and structure changes
-% reference exmaples
+Practical examples for this class of attacks are the expanding array injection against MongoDB, where values of arrays are automatically extracted for comparison. The array value injection against CouchDB as well as the array key injection against Memcached automatically retrieve elements from array structures, when another a string or integer value is required. Since these attacks also rely on data type changes, strict type checks of parameters could solve diverging parameter handling.
 
 \section{Shared Scope for Data}
 
-% data for different pruposes shares the same scope
-% even data available by default
-% only one type of data expected
-% other data format not considered in applicaiton layer
-% can lead to unexpected data handling and application layer operation
-% exmaple of meta data stored as normal record within tables
-% accessible by every user
+Another problem causing injection vulnerabilities of non-relational databases represent shared scopes for data storage. In practice, the scope can be a table or collection and the data can originate from different applications. This also implies different purposes and varied formats of the stored data. To handle this correctly, the application layer logic has to take the variety of formats into account. Unfortunately, many applications expect only their own data format within a database. Other formats can lead to unexpected data handling within the application layer. Meta data stored next to normal data records is a typical example for this problem. \\
+
+Of the investigated databases, CouchDB stores meta data as documents within the corresponding collections. This results in data records, that are accessible for each user on each collection by default. When these meta data records are not considered within the application layer processing, unintended behavior can be triggered through preceding query injection. Indirectly the data import injection against CouchDB is part of this class, since user-controlled JavaScript code is injected via detour into the database.
+
+% conceptional problem!
 
 \section{Error-prone String Escaping}
+
+Last of all, NoSQL databases face an issue already known from its relational counterparts. Similar to SQL, each string value has to be escaped for the intended target context. This does not only apply to SQL, but to all languages used within the database layer. The new generation of non-relational databases employs various scripting languages, that are used to define queries and are executed within the database layer. All user-provided parameters, that become part of such language strings, has to be properly sanitized. That means, all control characters of the targeted context have to be escaped. Otherwise, an attacker is able to manipulate the semantic of the later-on interpreted string. This also applies to strings with dedicated structures, such as URLs. \\
+
+Although, this problem is already known and mitigation techniques exist, the findings of this thesis show is is still a prevalent issue. The targeted contexts changed, but the underlying problem is still the same. URL traversal injections, as found for CouchDB, belong to this class of error-prone string escaping. Other researches discovered multiple of this problems with regard to map-reduce function injection. \\
 
 % Similar to SQL, each string value has to be escaped for the intended target context
 % this can be SQL, but also a function definiton or REST URL as seen in the previous investiagtion of non-relational databases
