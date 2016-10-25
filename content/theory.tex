@@ -25,8 +25,9 @@ The last class of attacks against NoSQL databases encompasses a problem, already
 This class of injection attacks is already known, but applies to a variety of contexts regarding non-relational databases. Mitigation techniques for this kind of problem exist, but the findings of this thesis imply, that missing or error-prone parameter escaping still represents a severe problem. The targeted contexts changed, but the underlying problem is still the same. URL traversal injections, as found for CouchDB, belong to this class of error-prone string escaping. Other studies discovered multiple of this problems with regard to map-reduce function injection. This class compromises string defined semantics and therefore represents the counterpart to the first class, that attacks object structure defined semantics.\\
 
 \section{Classification Overview}
+This section summarizes the previous attack classification and gives an overview of the the underlying design problems. Table \ref{tab:attack_classification_overview} assigns each attack of the previous chapter to a distinct class. \\
 
-\begin{table}[h]
+\begin{table}[!t]
   \sffamily
   \centering 
   \begin{tabular}{lll}
@@ -48,3 +49,5 @@ This class of injection attacks is already known, but applies to a variety of co
   \caption{Classification overview of the found injection attacks according to the underlying problem}
   \label{tab:attack_classification_overview}
 \end{table}
+
+The table shows that the new approach of object structure defined semantic leads to serious problems. Automatic parameter conversion within the database layer leads to diverging parameter handling and injection vulnerabilities across all investigated databases. Shared scopes for data storage are only present in case of CouchDB, but also expose a threat for injection attacks. Even the well known problem of error-prone string escaping represents still a major issue for certain contexts, such as REST URLs.
