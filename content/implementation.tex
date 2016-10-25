@@ -3,7 +3,33 @@ Within this section, a mitigation approach for injection attack against non-rela
 
 \section{Conception}
 
+% first select the underlying problem
+% string escaping already addressed - soltion is available, just not correctly applied
+% object structure escaping instead not covered by any mitigation technique
+% casting is not a soltion for flexible but restricted cases
+% need a pattern for security senstive data calls
+% taint tracking not a solution, since some structural elmenets can be in user control
+
+% so far the pattern has to be set by the developer
+% this can be automatized
+% idea of lerning phase in secure environment and live execution phase
+% pattern can still be adapted manually
+% seucre environment could be tests
+% gives all the advantages and is secure, when patterns are sufficiently learned
+
 \section{Implementation}
+
+% selected technology stack nodeJS + MongoDB - most prevalent combination with demand for flexible object structure sanitizing
+% take a look at current driver
+% slelect affected query functions and parameters
+% add optional security fearture for object strucutre snaitzing
+% implemented as additonal parameter
+% show new function arguments
+% pattern needs to be flexible concerning data types
+% exmaple could be a number or an array of nubmers
+% extended JSON syntax for security pattern
+% exmaple for security patterns
+
 
 \section{Evaluation}
 \label{sec:evaluation}
