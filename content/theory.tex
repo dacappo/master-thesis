@@ -12,7 +12,7 @@ This class of attacks was exposed by the results of the preceding investigation.
 \section{Diverging Parameter Handling}
 This class of attacks rests upon differences in the handling of parameters between application and database layer. These differences are crucial, since the concept of non-relational databases depends on application layer data checks. Reasons for the differences can be automatic format or type conversions within the database layer and driver. Two diverging parameters may be converted to the same value and therefore result in the same database operation. An example could be an array, that is automatically split into its components. This leads to multiple parameter combinations, that trigger the same database operation due to the the preliminary conversion. Before the conversion, the diverging parameters lead to varied behavior of the application layer processing. Prevention of disallowed database operations by application layer checks becomes hard to ensure, since multiple parameter combinations exist for a distinct operation. Such diverging handling of parameters is often not documented and therefore hard to consider within the application layer code. The underlying reason for the problematic conversions can be conceptional issues as well as implementation flaws.\\
 
-The previous investigation exhibited multiple examples that lead to this class of attacks. Practical instances for this class of attacks are the expanding array injection against MongoDB, where elements of stored arrays are automatically extracted for comparison. The array value injection against CouchDB as well as the array key injection against Memcached automatically retrieve elements from arrays, when another value type is required for the operation. The problem has to be solved by proper structure and type sanitizing within the application layer, since these attacks rely on data type conversions.
+The previous investigation exhibited multiple examples that lead to this class of attacks. Practical instances for this class of attacks are the expanding array injection against MongoDB, where elements of stored arrays are automatically extracted for comparison. The array value injection against CouchDB as well as the array key injection against Memcached automatically retrieve elements from arrays, when another value type is required for the operation. Redis's parameter overwrite injection allows two ways to pass arguments and converts them within the database driver. The problem has to be solved by proper structure and type sanitizing within the application layer, since these attacks rely on data type conversions.
 
 \section{Shared Scope for Data}
 Another class of injection attacks of non-relational databases is caused by shared storage scopes for multiple purposes. A storage scope can be a seen as a delimited database section, such as a table or collection. Normally, data from different applications is stored in separate scopes. This situation changes with non-relational databases. The support for unstructured data enables the storage of various data formats within a single scope. This capability may be used of applications or the database itself, to combine varied information within a single scope. An example is the storage of meta information next to normal data records within a single scope. In order to handle this correctly, the application layer has to be aware of the variety of formats. Since the concept of shared storage scopes is relatively new, many applications may only expect a single format within a storage scope. Other formats are therefore not considered within the application layer and may lead to unexpected data processing. Attacks of this class make use of this situation by manipulating queries in order to retrieve or insert unexpected data formats. For known attacks, this class is based on the conceptional design of the underlying database. \\
@@ -22,4 +22,29 @@ The investigation of the selected databases showed, that shared storage scopes a
 \section{Error-prone String Escaping}
 The last class of attacks against NoSQL databases encompasses a problem, already known from its relational counterparts. Concatenation of strings with user-provided parameters has to be approached with caution. As known form SQL, each untrusted string has to be escaped for the intended target context. This rule does not only apply to SQL, but to all strings interpreted within the database layer. The new generation of non-relational databases employs various scripting languages and string parameters, whose parameters have to be properly sanitized. User-controlled data should never be in control of the semantic structure of such strings. Therefore, all control characters of the targeted context have to be escaped. Missing or incomplete escaping enables an attacker to manipulate the semantic of the later-on interpreted string. The described problem applies to all strings with a dedicated structure, that are interpreted within the database layer. \\
 
-This class of injection attacks is already known, but applies to a variety of contexts regarding non-relational databases. Mitigation techniques for this kind of problem exist, but the findings of this thesis imply, that missing or error-prone parameter escaping still represents a severe problem. The targeted contexts changed, but the underlying problem is still the same. URL traversal injections, as found for CouchDB, belong to this class of error-prone string escaping. Other studies discovered multiple of this problems with regard to map-reduce function injection. This class compromises string defined semantics and therefore represents the counterpart to first class, that attacks object structure defined semantics.\\
+This class of injection attacks is already known, but applies to a variety of contexts regarding non-relational databases. Mitigation techniques for this kind of problem exist, but the findings of this thesis imply, that missing or error-prone parameter escaping still represents a severe problem. The targeted contexts changed, but the underlying problem is still the same. URL traversal injections, as found for CouchDB, belong to this class of error-prone string escaping. Other studies discovered multiple of this problems with regard to map-reduce function injection. This class compromises string defined semantics and therefore represents the counterpart to the first class, that attacks object structure defined semantics.\\
+
+\section{Classification Overview}
+
+\begin{table}[h]
+  \sffamily
+  \centering 
+  \begin{tabular}{lll}
+  \textbf{Class} & \textbf{Attack} & \textbf{Database} \\ \hline
+  \multirow{2}{*}{Object Structure Defined Semantic}
+    & Query Selector Injection & MonogDB \\
+    & Find Selector Injection & CouchDB \\ \hdashline
+  \multirow{4}{*}{Diverging Parameter Handling}
+    & Expanding Array Injection & MonogDB \\
+    & Parameter Overwrite Injection & Redis \\
+    & Array Value Injection & CouchDB \\
+    & Array Key Injection & Memcached \\ \hdashline
+  \multirow{2}{*}{Shared Scope for Data}
+    & Special Key Injection & CouchDB \\
+    & Data Import Injection & CouchDB \\ \hdashline
+  \multirow{1}{*}{Error-prone String Escaping}
+    & URL Traversal Injection & CouchDB \\ \hline
+  \end{tabular}
+  \caption{Classification overview of the found injection attacks according to the underlying problem}
+  \label{tab:attack_classification_overview}
+\end{table}
