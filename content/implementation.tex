@@ -2,22 +2,47 @@
 Within this section, a mitigation approach for injection attack against non-relational databases is presented. Based on the previous attack analysis and classification, a new prevention concept is elaborated addressing the major design problems. Further, a feasible way for the implementation of the presented mitigation technique is outlined and empirically evaluated.
 
 \section{Conception}
+In order to create an mitigation concept for NoSQL injection, the exposed design problems have to be considered. The last chapter concludes four major issues, that lead to injection vulnerabilities of non-relational databases. Since error-prone string escaping is a well known and actually problem, the fourth class is not focused. The main issue brought along with non-relational databases is object structure defined semantic. This feature gives a raise to attacks based on error-prone type and structure escaping as well as diverging parameter handling. As exposed by the found attacks, problems of this kind are spread across all investigated databases and application layers. The third class of attacks is bases on shared storage scopes and is only present for CouchDB. This issue can be solved by strict data separation. Therefore, the main goal for attack mitigation is the prevention of type and object structure injection. This addresses two-thirds of the found injection attacks and represents a problem not adequately solved yet. \\
 
-% first select the underlying problem
-% string escaping already addressed - soltion is available, just not correctly applied
-% object structure escaping instead not covered by any mitigation technique
-% casting is not a soltion for flexible but restricted cases
-% need a pattern for security senstive data calls
-% taint tracking not a solution, since some structural elmenets can be in user control
+The first idea regarding the mitigation of type and object structure based injection attacks, may be simple type casting of parameters. Although, this strict method would prevent most attacks, it has major drawbacks. On the one hand, the required type casting is highly dependent on the use case and performed query. With this technique, developers are responsible for attack mitigation by applying suitable type castings for each query parameter. This resembles the idea of manual parameter escaping for SQL statements, which was not reliably applied by developers. A vital argument against type casting, is the flexibility required by many applications. Listing \ref{lst:ExampleFindQueryStringID} and \ref{lst:ExampleFindQuerySpecialID} exemplify a use case, that employs two different types of identifiers. \\
 
-% so far the pattern has to be set by the developer
-% this can be automatized
-% idea of lerning phase in secure environment and live execution phase
-% pattern can still be adapted manually
-% seucre environment could be tests
-% gives all the advantages and is secure, when patterns are sufficiently learned
+\begin{minipage}{.97\textwidth}
+\begin{minipage}[t]{.49\textwidth}
+\begin{lstlisting}[escapechar=!, caption={Example for find query with a string identifier}, label={lst:ExampleFindQueryStringID}]
+db.find({
+  "_id": !\textbf{"56767834"}!
+
+});
+\end{lstlisting}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{.49\textwidth}
+\begin{lstlisting}[escapechar=!, caption={Example for find query with a special object identifier}, label={lst:ExampleFindQuerySpecialID}]
+db.find({
+  "_id": {
+    !\textbf{"\$oid": "54651022bffebc03098b4567"}!
+});
+\end{lstlisting}
+\end{minipage}
+\end{minipage}
+
+The given queries work on a database, that contains documents with varying identifier formats. Some documents use a string based identifier, others employ an object-based identifier. The latter type is used in order to indicate a special format of the stored identifier string. Such differences of data types are typical for non-relational databases, due to their ability to handle unstructured data. The highlighted parts of the code have to be under user control, to allow generic querying of both identifier types. In contrast to the given scenario, such querying becomes arbitrary complex depending on the number of different property types within the database. Type casting for the highlighted parameter can therefore not be applied. In summary, some use cases require structural control of user-provided query parameters. \\
+
+So why not apply type casting of parameters where possible and otherwise grant full flexibility? Regarding the example given with listing \ref{lst:ExampleFindQueryStringID} and \ref{lst:ExampleFindQuerySpecialID}, query selector injection is still an issue. Therefore, the full flexibility has to be restricted a bit. At this point, the mitigation approach of this thesis applies. In order to grant a certain degree of flexibility, but still prevent injection, allowed parameter structures have to be defined for each query. Based on the requirements, this thesis suggest a pattern-based control mechanism for query parameterization. The patterns define a range of allowed query structures and the all others are blocked. This approach applies directly at the connection between application and database layer, within the database driver. Therefore, each input for the query can be reliably filtered without any danger of subsequent manipulation. \\
+
+The presented approach still requires manual pattern definition for each query, but in contrast to type casting at least allows some kind of flexibility for query parameters. This idea can be taken a step further to bring another important advantage. The creation of the applied security patterns can be automatized. Basically, the idea is to learn the patterns in a secure execution environment of the application. In a second step, the application goes live and the pattern validation is activated. This can be seen as a learning and an execution phase. Software tests are normally present for each application and constitute a great means to build the security patterns based on trusted inputs. This approach provides the needed flexibility, does not require high engineering efforts and provides sufficient protection from the found injection attacks.
 
 \section{Implementation}
+
+\begin{lstlisting}[escapechar=!, caption={Proposed security pattern grammar for the the injection mitigation mechanism}, label={lst:http_request_example}]
+SecurityPattern = {} | {"_security_pattern_": Value}
+Object = {} | {Property[, Property ...]}
+Property = Literal : [Value[, Value ...]]
+Value = Array | Object | Type
+Array = [] | [Value ...]
+Type = "Object" | "String" | "Number"
+Literal = (A-Z | a-z | 0-1)!\textsuperscript{*}!
+\end{lstlisting}
 
 % selected technology stack nodeJS + MongoDB - most prevalent combination with demand for flexible object structure sanitizing
 % take a look at current driver
