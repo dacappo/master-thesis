@@ -30,19 +30,37 @@ The given queries work on a database, that contains documents with varying ident
 
 So why not apply type casting of parameters where possible and otherwise grant full flexibility? Regarding the example given with listing \ref{lst:ExampleFindQueryStringID} and \ref{lst:ExampleFindQuerySpecialID}, query selector injection is still an issue. Therefore, the full flexibility has to be restricted a bit. At this point, the mitigation approach of this thesis applies. In order to grant a certain degree of flexibility, but still prevent injection, allowed parameter structures have to be defined for each query. Based on the requirements, this thesis suggest a pattern-based control mechanism for query parameterization. The patterns define a range of allowed query structures and the all others are blocked. This approach applies directly at the connection between application and database layer, within the database driver. Therefore, each input for the query can be reliably filtered without any danger of subsequent manipulation. \\
 
-The presented approach still requires manual pattern definition for each query, but in contrast to type casting at least allows some kind of flexibility for query parameters. This idea can be taken a step further to bring another important advantage. The creation of the applied security patterns can be automatized. Basically, the idea is to learn the patterns in a secure execution environment of the application. In a second step, the application goes live and the pattern validation is activated. This can be seen as a learning and an execution phase. Software tests are normally present for each application and constitute a great means to build the security patterns based on trusted inputs. This approach provides the needed flexibility, does not require high engineering efforts and provides sufficient protection from the found injection attacks.
+The presented approach still requires manual pattern definition for each query, but in contrast to type casting at least allows some kind of flexibility for query parameters. This idea can be taken a step further to bring another important advantage. The creation of the applied security patterns can be automatized. Basically, the idea is to learn the patterns in a secure execution environment of the application. In a second step, the application goes live and the pattern validation is activated. This can be seen as a learning and an execution phase. Software tests are normally present for each application and constitute a great means to build the security patterns based on trusted inputs. By providing such a framework, a solution independent from the underlying technology stack, concrete security patterns and implementation details is given. This approach provides the needed flexibility, does not require high engineering efforts and provides sufficient protection from the found injection attacks.
 
 \section{Implementation}
-The previously described mitigation technique for NoSQL injection attacks has to be transformed into practice. For the exemplary implementation outlined within this section, the most prevalent technology stack was selected. According to the statistics shown in chapter \ref{cha:intro_to_nosql_injection}, MongoDB and NodeJS represent the most widespread technologies relevant in scope of this thesis. This combination also features the most prevalent technology stack with a demand for flexible object structure sanitizing Therefore, the objective comprised the implementation of the presented mitigation technique within the MongoDB driver for NodeJS. 
+The previously described mitigation technique for NoSQL injection attacks has to be transformed into practice. For the exemplary implementation outlined within this section, the most prevalent technology stack was selected. According to the statistics shown in chapter \ref{cha:intro_to_nosql_injection}, MongoDB and NodeJS represent the most widespread technologies relevant in scope of this thesis. This combination also features the most prevalent technology stack with a demand for flexible object structure sanitizing Therefore, the objective comprises the implementation of the presented mitigation technique as a MongoDB driver for NodeJS. \\ 
+
+\begin{figure}[h]
+\centering
+  \includegraphics[width=1\linewidth]{Images/secure_driver}
+  \caption{Architecture for the implementation of the NoSQL injection mitigation concept}
+  \label{fig:architecture_secure_driver}
+\end{figure}
+
 
 \begin{lstlisting}[escapechar=!, caption={Proposed security pattern grammar for the the injection mitigation mechanism}, label={lst:http_request_example}]
-SecurityPattern = {} | {"_security_pattern_": Value}
-Object = {} | {Property[, Property ...]}
-Property = Literal : [Value[, Value ...]]
-Value = Array | Object | Type
-Array = [] | [Value ...]
-Type = "Object" | "String" | "Number"
-Literal = (A-Z | a-z | 0-1)!\textsuperscript{*}!
+<SecurityPattern> ::= {'_security_pattern_': <Option> };
+<Options> ::= <Option> | <Option>, <Options>;
+!\textbf{<Option> ::= [<Values>]}!;
+<Value> ::= <Array> | <Object> | <Type>;
+<Array> ::= [] | [!\textbf{<Options>}!];
+<Object> ::= {} | {<Properties>};
+<Values> ::= <Value> | <Value>, <Values>;
+<Properties> ::= <Property> | <Property>, <Properties>;
+<Property> ::= <Key> : !\textbf{<Option>}!;
+<Type> ::= "String" | "Number";
+<Key> ::= *Arbitrary String*;
+\end{lstlisting}
+
+\begin{lstlisting}[escapechar=!, caption={Security pattern allowing string-based and object-based identifiers as a query parameter}, label={lst:http_request_example}]
+{"_security_pattern_": [{
+  "_id": ["String", {"$oid": ["String"]}]
+}]}
 \end{lstlisting}
 
 % selected technology stack nodeJS + MongoDB - most prevalent combination with demand for flexible object structure sanitizing
