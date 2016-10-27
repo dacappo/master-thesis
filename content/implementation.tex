@@ -33,7 +33,9 @@ So why not apply type casting of parameters where possible and otherwise grant f
 The presented approach still requires manual pattern definition for each query, but in contrast to type casting at least allows some kind of flexibility for query parameters. This idea can be taken a step further to bring another important advantage. The creation of the applied security patterns can be automatized. Basically, the idea is to learn the patterns in a secure execution environment of the application. In a second step, the application goes live and the pattern validation is activated. This can be seen as a learning and an execution phase. Software tests are normally present for each application and constitute a great means to build the security patterns based on trusted inputs. By providing such a framework, a solution independent from the underlying technology stack, concrete security patterns and implementation details is given. This approach provides the needed flexibility, does not require high engineering efforts and provides sufficient protection from the found injection attacks.
 
 \section{Implementation}
-The previously described mitigation technique for NoSQL injection attacks has to be transformed into practice. For the exemplary implementation outlined within this section, the most prevalent technology stack was selected. According to the statistics shown in chapter \ref{cha:intro_to_nosql_injection}, MongoDB and NodeJS represent the most widespread technologies relevant in scope of this thesis. This combination also features the most prevalent technology stack with a demand for flexible object structure sanitizing Therefore, the objective comprises the implementation of the presented mitigation technique as a MongoDB driver for NodeJS. \\ 
+The previously described mitigation technique for NoSQL injection attacks has to be transformed into practice. For the exemplary implementation outlined within this section, the most prevalent technology stack was selected. According to the statistics shown in chapter \ref{cha:intro_to_nosql_injection}, MongoDB and NodeJS represent the most widespread technologies relevant in scope of this thesis. As exposed by the initial investigation, this combination of application and database layer reveals severe weak spots for injection attacks. Therefore, an exemplary implementation of the presented mitigation technique is given for NodeJS applications running on MongoDB. \\ 
+
+To stop object structure and type injections, all affected query parameters have to be sanitized. The most reliable way to accomplish this sanitizing, is an integration of the mitigation technique directly into the database driver. In avoidance of writing an entirely new database driver, the existing MongoDb driver for NodeJS is used and wrapped with an additional layer. The rough architecture and functioning of the implementation is visualized by figure \ref{fig:architecture_secure_driver}. \\
 
 \begin{figure}[h]
 \centering
@@ -42,9 +44,12 @@ The previously described mitigation technique for NoSQL injection attacks has to
   \label{fig:architecture_secure_driver}
 \end{figure}
 
+Basically, the secured driver extends the former interface with optional \emph{pattern} arguments. These follow can be passed after the sensitive argument and define the allowed data types and structures. The shown example extends the find function with an optional security pattern for the \emph{query} argument. When no security pattern is provided by the arguments, the driver can alternatively draw on stored ones. These stored security patterns can be created automatically within a secure execution environment. In order to prevent injection, the extended driver matches the given security pattern with the passed argument. When both are compatible, all arguments except of the security patterns are forwarded to the normal MongoDB driver. Otherwise, a security error is thrown, that indicates a potential injection attack. In case no security pattern is provided, the query parameter are passed without further control to the wrapped driver. This behavior enables a drop-in replacement of the secured driver without breaking any application. Similar to this implementation, drivers for other databases and application layers can be wrapped. \\
+
+At this point, the employed security pattern structure has to be defined. There exist various possible ways to implement the patterns for the presented mitigation approach. This thesis proposes a JSON-based format for straightforward handling across all feasible application layers. Listing \ref{lst:http_request_example} shows the grammar of the security patterns used for the outlined implementation. \\
 
 \begin{lstlisting}[escapechar=!, caption={Proposed security pattern grammar for the the injection mitigation mechanism}, label={lst:http_request_example}]
-<SecurityPattern> ::= {'_security_pattern_': <Option> };
+<SecurityPattern> ::= {'_security_pattern': <Option> };
 <Options> ::= <Option> | <Option>, <Options>;
 !\textbf{<Option> ::= [<Values>]}!;
 <Value> ::= <Array> | <Object> | <Type>;
@@ -57,22 +62,15 @@ The previously described mitigation technique for NoSQL injection attacks has to
 <Key> ::= *Arbitrary String*;
 \end{lstlisting}
 
+The given grammar for the security patterns resembles the one of JSON. On the top level, the \emph{\_security\_pattern} property is fixed, to be able to distinguish normal and pattern arguments. Furthermore, each value of objects and arrays is replaced by an option array as highlighted. This allows the declaration of multiple allowed types and structures and ensures the required flexibility. The options array in turn contains other structures or type definitions. In order to keep the grammar neat, the last rule for arbitrary key strings is shortened. Strings and numbers are indicated with the according string, arrays an objects are represented by the actual JSON elements. Since this may be hard to imagine, a practical example is given within listing \ref{lst:http_request_example}. \\
+
 \begin{lstlisting}[escapechar=!, caption={Security pattern allowing string-based and object-based identifiers as a query parameter}, label={lst:http_request_example}]
 {"_security_pattern_": [{
   "_id": ["String", {"$oid": ["String"]}]
 }]}
 \end{lstlisting}
 
-% selected technology stack nodeJS + MongoDB - most prevalent combination with demand for flexible object structure sanitizing
-% take a look at current driver
-% slelect affected query functions and parameters
-% add optional security fearture for object strucutre snaitzing
-% implemented as additonal parameter
-% show new function arguments
-% pattern needs to be flexible concerning data types
-% exmaple could be a number or an array of nubmers
-% extended JSON syntax for security pattern
-% exmaple for security patterns
+This security pattern is tailored to the motivational example given by listing \ref{lst:ExampleFindQueryStringID} and \ref{lst:ExampleFindQuerySpecialID} in the previous section. Two alternatives are listed for the \emph{\_id} property. Either a string value can be passed or an object containing a string-based property with the key \emph{\$oid}. The pattern can be passed as an additional parameter to the secured MongoDB driver or created with the help of examplary queries. Thereby, the advantage of the options array for automatic pattern learning becomes clear. For each observed query that is not covered by the pattern, an additonal option can be appended to the array. 
 
 
 \section{Evaluation}
