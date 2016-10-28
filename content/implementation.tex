@@ -70,7 +70,7 @@ The given grammar for the security patterns resembles the one of JSON. On the to
 }]}
 \end{lstlisting}
 
-This security pattern is tailored to the motivational example given by listing \ref{lst:ExampleFindQueryStringID} and \ref{lst:ExampleFindQuerySpecialID} in the previous section. Two alternatives are listed for the \emph{\_id} property. Either a string value can be passed or an object containing a string-based property with the key \emph{\$oid}. The pattern can be passed as an additional parameter to the secured MongoDB driver or created with the help of examplary queries. Thereby, the advantage of the options array for automatic pattern learning becomes clear. For each observed query that is not covered by the pattern, an additonal option can be appended to the array. 
+This security pattern is tailored to the motivational example given by listing \ref{lst:ExampleFindQueryStringID} and \ref{lst:ExampleFindQuerySpecialID} in the previous section. Two alternatives are listed for the \emph{\_id} property. Either a string value can be passed or an object containing a string-based property with the key \emph{\$oid}. The pattern can be passed as an additional parameter to the secured MongoDB driver or created with the help of exemplary queries. Thereby, the advantage of the options array for automatic pattern learning becomes clear. For each observed query that is not covered by the pattern, an additional option can be appended to the array. 
 
 
 \section{Evaluation}
@@ -78,7 +78,40 @@ This security pattern is tailored to the motivational example given by listing \
 Within this section, the designed mitigation technique for NoSQL injection is evaluated by means of the outlined implementation. First, the applied methodology is explained and afterwards, the evaluation results regarding compatibility and security are summarized.
 
 \subsection{Methodology}
+In scope of this evaluation, two major aspects of the injection mitigation technique have to be considered. The first one is the compatibility of the implemented solution with existing applications. A mitigation approach, that requires high engineering efforts and code changes to be compatible, would not be viable in practice. The other aspect is the provided security form injection attacks against the underlying database. This security aspect has to be evaluated with regard to the addressed attack classes. \\
+
+In order to give an empirical evaluation, a group of open source applications is selected. These applications have to be built with NodeJS and MongoDB, to allow the integration of the implemented secure driver. To enable the required driver integration, the code of the selected applications have to be openly accessible. Based on this criteria, the following widespread projects were selected for the further evaluation.
+
+\begin{description}
+\item [Agora] This project is developed by the German Softwerkskammer and builds the central platform for their communities. [https://github.com/softwerkskammer/Agora]
+\item [Apostrophe 2] With the goal of an design-driven and flexible content management system, Apostrophe bets on NodeJS and MongoDb for its most current version. [http://apostrophecms.org/]
+\item [Habitica] This project set its objective, to create a productivity enhancing and habit building application with the help of an integrated gamification concept. [https://habitica.com] 
+\item [NodeBB]  The goal of this platform is to deliver a powerful and mobile-ready forum software for the modern web. [https://github.com/NodeBB/NodeBB]
+\item [Pencilblue] This application represents an open source content management system for business class use cases. [https://pencilblue.org/]
+\end{description}
+
+Next to the listed projects, also the original MongoDB driver for NodeJS is considered for the evaluation. The general approach is, to utilize the tests available for each of the applications. In a first step, these test are executed and the number of passed ones is measured. Then, the existing MongoDB driver is replaced with the secured one. The same tests are run again with the changed setup and the number of passed ones is again measured. Thus, the measured ratios of passed test can be compared for each application. With regard to the security aspect, it represents a problem to find an appropriate measurement. The mitigation of real world vulnerabilities would be an feasible approach, but these are not available in scope of this work. Therefore, the guarantees given by the new driver implementation and the coverage of attack classes are evaluated.
 
 \subsection{Compatibility}
+
+\begin{table}[h]
+  \sffamily
+  \centering 
+  \begin{tabular}{llcc}
+  \multirow{2}{*}{\textbf{Application}} & \multirow{2}{*}{\textbf{Type}} & \multicolumn{2}{c}{\textbf{Passed Test Rate}} \\ 
+    & & \textbf{Normal Driver} & \textbf{Secured Driver}  \\ \hline
+  MongoDB driver & Driver & 100\% & 100\% \\
+  Agora & Groupware Platform & 100\% & 100\% \\
+  Apostrophe 2 & Content management system & 100\% & 100\% \\
+  Habitica & Habit building program & 100\% & 100\% \\
+  NodeBB & Forum Software & 100\% & 100\% \\
+  Pencilblue & Content management system & 100\% & 100\% \\ \hline
+  \end{tabular}
+  \caption{Rate of passed tested with normal and secured MongoDB driver}
+  \label{tab:compatbility_eva_overview}
+\end{table}
+
+% without learned pattern, since this is a extra topic. Manuall securing possible without breaking the existing applicaiton
+% the normal driver can therefore replaced by secured driver allowing optional pattern arugments
 
 \subsection{Security}
