@@ -93,6 +93,7 @@ In order to give an empirical evaluation, a group of open source applications is
 Next to the listed projects, also the original MongoDB driver for NodeJS is considered for the evaluation. The general approach is, to utilize the tests available for each of the applications. In a first step, these test are executed and the number of passed ones is measured. Then, the existing MongoDB driver is replaced with the secured one. The same tests are run again with the changed setup and the number of passed ones is again measured. Thus, the measured ratios of passed test can be compared for each application. With regard to the security aspect, it represents a problem to find an appropriate measurement. The mitigation of real world vulnerabilities would be an feasible approach, but these are not available in scope of this work. Therefore, the guarantees given by the new driver implementation and the coverage of attack classes are evaluated.
 
 \subsection{Compatibility}
+The measurement of the passed tests with the normal as well as the secured driver lead to the results, presented within table \ref{tab:compatbility_eva_overview}. 
 
 \begin{table}[h]
   \sffamily
@@ -100,12 +101,12 @@ Next to the listed projects, also the original MongoDB driver for NodeJS is cons
   \begin{tabular}{llcc}
   \multirow{2}{*}{\textbf{Application}} & \multirow{2}{*}{\textbf{Type}} & \multicolumn{2}{c}{\textbf{Passed Test Rate}} \\ 
     & & \textbf{Normal Driver} & \textbf{Secured Driver}  \\ \hline
-  MongoDB driver & Driver & 100\% & 100\% \\
+  MongoDB driver & Database Driver & 100\% & 100\% \\
   Agora & Groupware Platform & 100\% & 100\% \\
-  Apostrophe 2 & Content management system & 100\% & 100\% \\
+  Apostrophe 2 & Content Management System & 100\% & 100\% \\
   Habitica & Habit building program & 100\% & 100\% \\
   NodeBB & Forum Software & 100\% & 100\% \\
-  Pencilblue & Content management system & 100\% & 100\% \\ \hline
+  Pencilblue & Content Management System & 100\% & 100\% \\ \hline
   \end{tabular}
   \caption{Rate of passed tested with normal and secured MongoDB driver}
   \label{tab:compatbility_eva_overview}
@@ -115,3 +116,4 @@ Next to the listed projects, also the original MongoDB driver for NodeJS is cons
 % the normal driver can therefore replaced by secured driver allowing optional pattern arugments
 
 \subsection{Security}
+The security provided by the mitigation technique integrated into the database driver is highly dependent on the underlying security patterns. It has to be emphasized, that the implemented driver does only provide protection, when security patterns are defined. This can happen through the additional query parameters or the approach of automatic pattern learning. Even when the security patterns are provided, the reliability of the mitigation approach still depends on the quality of the patterns. In case of pattern learning, the quality is influenced by the trusted environment. When during the learning phase not each possible query parameter format is covered, the false-positive rate of the execution phase will increase. On the assumption of perfect security patterns, all injection classes depending on object structure and type manipulation can be reliably prevented. Injection classes based on error-prone string escaping or shared data storage are not covered by the mitigation approach.
