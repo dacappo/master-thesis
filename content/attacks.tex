@@ -90,9 +90,9 @@ Considered are collection functions, that employ either a \emph{filter} or \emph
 MongoDB's flexible query scheme in combination with the query selector objects make it vulnerable for this kind of injection attack. In general, all non-relational databases employing JSON-like query structures with object structure encoding are potentially vulnerable. The main problem of this attack is the realization of complex query operations. Equality selections can be simply encoded within a JSON-like structure, but for operations as \emph{greater than} a special syntax is required. Thereby each equality check can be replaced by complex query operators, when the object structure is under control of an attacker. All parameters of the attacker surface that allow object structure encoding can be used for this kind of injection. The attack works across all investigated application platforms and with common drivers as well as direct REST interface access. 
 
 \subsection{Expanding Array Injection}
-The expanding array injection is based on the common attacker model and exploits a special behaviour of a query's selection criteria. When a requires a property to be equal to a value and the stored document contains an array in place of the property, all values of the array are used to find a match. This feature, as the attack name implies, is called automatic array expanding. An attacker can manipulate inserted documents in order to achieve matches subsequent selective criteria. The creation of an user as shown in listing \ref{lst:NodeJSCreateUser} represents an example for such an vulnerability. \\
+The expanding array injection is based on the common attacker model and exploits a special behaviour of a query's selection criteria. When selection criteria requires a property to be equal to a value and the stored document contains an array in place of the property, all values of the array are used to find a match. This feature, as the attack name implies, is called automatic array expanding. An attacker can manipulate inserted documents in order to achieve unintended matches for subsequent queries employing selection criteria. The creation of a user as shown in listing \ref{lst:NodeJSCreateUser} represents an example for such an vulnerability. \\
 
-\begin{lstlisting}[caption={Example for vulnerable MongoDB - NodeJS application}, label={lst:NodeJSCreateUser}]
+\begin{lstlisting}[caption={Vulnerable NodeJS example for expanding array injection on MongoDB}, label={lst:NodeJSCreateUser}]
 if (req.query.user !== "admin") {
   db.collection('users').insert({"user": req.query.user, "password": req.query.password});
 }
@@ -100,29 +100,29 @@ if (req.query.user !== "admin") {
 
 The given code allows the insertion of new users into the database, with the exception of \emph{admin} as a username. This security check can be bypassed, by injecting an array of usernames instead of a simple string. A suitable attack vector based on query-string encoding is given with listing \ref{lst:ExpandingArrayInjection}.\\
 
-\begin{lstlisting}[caption={MongoDB injection with NodeJS's query-string module}, label={lst:ExpandingArrayInjection}]
+\begin{lstlisting}[caption={Attack vector on MongoDB for expanding array injection via the query-string parameter}, label={lst:ExpandingArrayInjection}]
 https://example.org/register?user[]=patrick&user[]=admin&password=1234;
 \end{lstlisting}
 
 The given request creates an array-typed \emph{user} property that leads to the bypass of the if-clause. In the next step, the query is executed and the provided data results into the document presented in listing \ref{lst:ExpandingArrayInjectionDocument} stored within the user collection.\\
 
-\begin{lstlisting}[caption={Injected query parameter for MongoDB - NodeJS injection}, label={lst:ExpandingArrayInjectionDocument}]
+\begin{lstlisting}[caption={Resulting parameter for expanding array injection}, label={lst:ExpandingArrayInjectionDocument}]
 {'user': ['patrick', 'admin'], 'password': 1234}
 \end{lstlisting}
 
 At this point, the array expanding functionality becomes important. An attacker can now use the normal authentication with username and password as shown in listing \ref{lst:NodeJSArrayExpandingLogin} to login. This works for both of the users inserted with the initial request. \\
 
-\begin{lstlisting}[caption={Example for vulnerable MongoDB - NodeJS application}, label={lst:NodeJSArrayExpandingLogin}]
+\begin{lstlisting}[caption={Login example affected by the preceding expanding array injection}, label={lst:NodeJSArrayExpandingLogin}]
 db.collection('users').find({"user": req.query.user, "password": req.query.password});
 \end{lstlisting}
 
-The request for the login, does have to be manipulated. An attacker can now login as an amdin with a usual authentication request as shown in listing {lst:ArrayExpandingAdminLogin}.\\
+The subsequent request for the login does not even have to be manipulated. An attacker can now login as admin with a usual authentication request as shown in listing {lst:ArrayExpandingAdminLogin}.\\
 
-\begin{lstlisting}[caption={MongoDB injection with NodeJS's query-string module}, label={lst:ArrayExpandingAdminLogin}]
+\begin{lstlisting}[caption={Usual login request exploiting the injected user array}, label={lst:ArrayExpandingAdminLogin}]
 https://example.org/login?user=admin&password=1234;
 \end{lstlisting}
 
-MongoDB will search for a document with the user property set to \emph{admin} and the password property set to \emph{1234}. Through the expansion the the beforehand injected document or respectively the user property, a matching document is found and the admin login is successful.\\
+MongoDB will search for a document with the user property set to \emph{admin} and the password property set to \emph{1234}. Through the expansion the beforehand injected document or respectively the user property, a matching document is found and the admin login is successful.\\
 
 The presented login application is of course not the only example, where the expanding array feature of MongoDB allow injection attacks. Every insert operation with data originating from the three parameters, that allow type manipulation represents a potential vulnerability. It enables an attacker to break the confidentiality of the underlying data, which leads to unintended matches for further requests. The attack was exemplified for the NodeJS, but is relevant for all of the investigated application layers. \\
 
@@ -153,7 +153,7 @@ The presented login application is of course not the only example, where the exp
 \end{table}
 
 \textbf{Attack Summary} \\
-MongoDB's feature for automatic array expansion of stored documents allows this kind of attack. In general, all non-relational databases employing automatic structure resolving or changes are potentially vulnerable. The main problem of this attack is that all stored arrays are expanded by default, but the behaviour is neither typical nor expected in this context. When an attacker is able to injection an array instead of a normal value, all following selection operations will expand the arrays content for the search and therefore change their behaviour. All object structure encoding request parameters of the attacker surface can be deploy for array the expanding array injection. The attack works across all investigated application platforms and with common drivers as well as direct REST interface access. 
+MongoDB's feature for automatic array expansion of stored documents allows this kind of attack. In general, all non-relational databases employing automatic structure resolving or changes are potentially vulnerable. The main problem of this attack is that all stored arrays are expanded by default, but the behaviour is neither typical nor expected in this context. When an attacker is able to inject an array instead of a normal value, all following selection operations will expand the arrays content for the search and therefore change their behaviour. All request parameters of the attacker surface enabling object structure manipulation can be deploy for the expanding array injection. The attack works across all investigated application platforms and with common drivers as well as direct REST interface access. 
 
 \section{Redis}
 This section covers the injection attacks against the key-value store Redis, that were found in scope of this thesis.
