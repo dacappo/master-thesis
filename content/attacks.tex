@@ -1,11 +1,11 @@
 \chapter{NoSQL Injection Attacks}
-This chapter gives an overview of the in scope of this thesis found NoSQL injection attacks. Each of the presented attacks is accompanied by a vulnerable code example as well as a suitable attack vector. With regard to the attacker surface parameters analyzed in section \ref{sec:analysisOfQueryTechniques}, the vectors focus on query string and JSON encoded payloads. At this point it needs to be told, that the presented code snippets are created for demonstration purposes and should not be deployed in practice. The chapter is structured in one section per investigated database.
+This chapter gives an overview of the in scope of this thesis found NoSQL injection attacks. Each of the presented attacks is accompanied by a vulnerable code example as well as a suitable attack vector. With regard to the attacker surface parameters analysed in section \ref{sec:analysisOfQueryTechniques}, the vectors focus on query-string, form data and JSON encoded payloads. At this point it needs to be said, that the presented code snippets are created for demonstration purposes and should not be deployed in practice. The chapter is structured in one section per investigated database.
 
 \section{MongoDB}
 Within this section, the newly discovered injection attacks against the document store MongoDB are outlined.
 
 \subsection{Query Selector Injection}
-This attack is based on the common attacker model and is directed against the selection parameter of queries. MongoDB employs BSON, an extended JSON format, to define the selected documents affected by the query. Complex selection operations, such as \emph{greater than} or \emph{not equal}, are implemented with the help of a set of special query selectors. These are formatted as objects and replace the actual value within the query criteria as demonstrated in listing \ref{lst:MongoQuerySelectors}.  \\
+This attack is based on the common attacker model and is directed against the selection parameter of queries. MongoDB employs BSON, an extended JSON format, to define the selected documents taken into account for the query. Complex selection operations, such as \emph{greater than} or \emph{not equal}, are implemented with the help of a set of special query selectors. These are formatted as objects and replace the actual value within the query criteria as demonstrated in listing \ref{lst:MongoQuerySelectors}. \\
 
 \begin{lstlisting}[caption={Example for MongoDB's query selectors}, label={lst:MongoQuerySelectors}]
 find({'password' : 'secure'});      // Password property equals "secure"
@@ -18,19 +18,19 @@ The injection attack presented by Sullivan \cite{Sullivan:2011} showed, that que
 $collection->find(array('user' => $_GET['user'], 'password' => $_GET['password']));
 \end{lstlisting}
 
-The code checks for documents, that match the passed user and password values from the query string. Here comes the automatic query string parsing of PHP into play. This feature enables the injection of a Query Selector instead of an actual password with the help of the extended query string syntax. An passed selector like \emph{no equals} will nearly always evaluate to true. With the manipulated request shown in \ref{lst:QuerySelectorInjectionVector}, the login check can be reliably bypassed. \\
+The code checks for documents, that match the passed user and password values from the query-string. Here comes the automatic query-string parsing of PHP into play. This feature enables the injection of a Query Selector instead of an actual password with the help of the extended query-string syntax. A passed selector like \emph{no equals} will nearly always evaluate to true. With the manipulated request shown in \ref{lst:QuerySelectorInjectionVector}, the login check can be reliably bypassed. \\
 
-\begin{lstlisting}[caption={Attack vector on MongoDB for query selector injection via the query string parameter}, label={lst:QuerySelectorInjectionVector}]
-https://example.org/login?user=patrick&password[%24gt]=
+\begin{lstlisting}[caption={Attack vector on MongoDB for query selector injection via the query-string parameter}, label={lst:QuerySelectorInjectionVector}]
+https://example.org/login?user=patrick&password[%24ne]=
 \end{lstlisting}
 
-Pektov \cite{Petkov:2014a} demonstrated a vulnerable login implementation running on NodeJS's Express web server following the same approach. The application code given in listing \ref{lst:NodeQuerySelectorInjection} can also be attacked with the request presented in listing \ref{lst:QuerySelectorInjectionVector} . \\
+With the help of the extended query syntax a query selector object with the url-espaced key \emph{\$ne} is injected. Pektov \cite{Petkov:2014a} demonstrated a vulnerable login implementation running on NodeJS's Express web server following the same approach. The application code given in listing \ref{lst:NodeQuerySelectorInjection} can also be attacked with the request presented in listing \ref{lst:QuerySelectorInjectionVector} . \\
 
 \begin{lstlisting}[caption={Vulnerable NodeJS example for query selector injection on MongoDB}, label={lst:NodeQuerySelectorInjection}]
 db.collection('users').find({"user": req.query.user, "password": req.query.password});
 \end{lstlisting}
 
-So are there even any new findings for this class of attack? The previous publications presented the query selector injection as a distinct issue occurring only for PHP and Node applications, since its based a non-standardized application layer behavior. As explained in section \ref{sec:analysisOfQueryTechniques}, the query string parsing is a convenience functionality present across all investigated application platforms. The examples given in listing \ref{lst:RubyQuerySelectorInjection} for Ruby as well as listing \ref{lst:PythonQuerySelectorInjection} reveal, that query selector injection is an issue appearing across platforms. \\
+So, are there even any new findings for this class of attack? The previous publications presented the query selector injection as a distinct issue occurring only for PHP and Node applications, since its based a non-standardized application layer behaviour. As explained in section \ref{sec:analysisOfQueryTechniques}, the query-string parsing is a convenience functionality present across all investigated application platforms. The examples given in listing \ref{lst:RubyQuerySelectorInjection} for Ruby as well as listing \ref{lst:PythonQuerySelectorInjection} for Python reveal, that query selector injection is an issue appearing across platforms. \\
 
 \begin{lstlisting}[caption={Vulnerable Ruby example for query selector injection on MongoDB}, label={lst:RubyQuerySelectorInjection}]
 db['users'].find({:user => req.params['user'], :password => req.params['password']})
@@ -40,7 +40,8 @@ db['users'].find({:user => req.params['user'], :password => req.params['password
 db.users.find({"user": request.GET['user'], "password": request.GET['password']})
 \end{lstlisting}
 
-In all of the four cases, the default and by MongoDB recommended database driver was deployed. The attack vector from listing \ref{lst:QuerySelectorInjectionVector} leads in each of the presented login checks to the query criteria shown in listing \ref{lst:QuerySelectorInjectionResult}. \\
+In all of the four cases, the default and by MongoDB recommended database driver was deployed \cite{MongoDB_Drivers2016}. The attack vector from listing \ref{lst:QuerySelectorInjectionVector} leads in each of the presented login checks to the query criteria shown in listing \ref{lst:QuerySelectorInjectionResult} in contrast to the expected criteria shown in listing \ref{lst:QuerySelectorNormalResult}. \\
+
 \begin{minipage}{.97\textwidth}
 \begin{minipage}[t]{.49\textwidth}
 \begin{lstlisting}[caption={Resulting query of normal request}, label={lst:QuerySelectorNormalResult}]
@@ -56,7 +57,6 @@ In all of the four cases, the default and by MongoDB recommended database driver
 \end{lstlisting}
 \end{minipage}
 \end{minipage}
-
 
 A login can therefore be bypassed in each investigated case, but this kind of attack is not restricted to login applications. Nearly all parameterized selection criteria can be influenced by the injection of query selectors. This includes all read, update and delete calls making use of the BSON selection format. Affected functions of the MongoDB API are listed in table \ref{tab:mongo_commands_affected}.\\
 
@@ -84,13 +84,13 @@ A login can therefore be bypassed in each investigated case, but this kind of at
  \label{tab:mongo_commands_affected}
 \end{table}
 
-Considered are collection functions, that employ either a \emph{filter} or \emph{query} parameter. Both facilitate the same JSON-like selection format. The affected functions encompass read, update and delete operations. Furthermore, the attacker surface analysis from section \ref{sec:analysisOfQueryTechniques} suggests, that the URL query string is by far not the only part of the attacker surface allowing this kind of attack. When the application processes other request parameters, the payload can also be placed in form data encoded as well as JSON request bodies. These circumstances exhibit a way more significant surface for query selector injection as previously indicated. \\
+Considered are collection functions, that employ either a \emph{filter} or \emph{query} parameter. Both facilitate the same JSON-like selection format. The affected functions encompass read, update and delete operations. Furthermore, the attacker surface analysis from section \ref{sec:analysisOfQueryTechniques} suggests, that the URL query-string is by far not the only part of the attacker surface allowing this kind of attack. When the application processes other request parameters, the payload can also be placed in form data encoded as well as JSON request bodies. Especially the form data based injection was not taken into account by earlier publications. These circumstances exhibit a way more significant surface for query selector injection as previously indicated. \\
 
 \textbf{Attack Summary} \\
-MongoDB's flexible query scheme in combination with the query selector objects make it vulnerable for this kind of injection attack. In general, all non-relational databases employing JSON-like query structures with object structure encoding are potentially vulnerable. The main problem of this attack is the realization of complex query operations. Equality selections can be simply encoded within a JSON-like structure, but for operations as \emph{greater than} a special syntax is required. Thereby each equality check can be replaced by complex query operators, when the object structure is under control of an attack. With object structure encoding request parameters of the attacker surface can be used for this kind of injection. The attack works across all investigated application platforms and with common drivers as well as direct REST interface access. 
+MongoDB's flexible query scheme in combination with the query selector objects make it vulnerable for this kind of injection attack. In general, all non-relational databases employing JSON-like query structures with object structure encoding are potentially vulnerable. The main problem of this attack is the realization of complex query operations. Equality selections can be simply encoded within a JSON-like structure, but for operations as \emph{greater than} a special syntax is required. Thereby each equality check can be replaced by complex query operators, when the object structure is under control of an attacker. All parameters of the attacker surface that allow object structure encoding can be used for this kind of injection. The attack works across all investigated application platforms and with common drivers as well as direct REST interface access. 
 
 \subsection{Expanding Array Injection}
-The expanding array injection is based on the common attacker model and exploits a special behavior of a query's selection criteria. When a requires a property to be equal to a value and the stored document contains an array in place of the property, all values of the array are used to find a match. This feature, as the attack name implies, is called automatic array expanding. An attacker can manipulate inserted documents in order to achieve matches subsequent selective criteria. The creation of an user as shown in listing \ref{lst:NodeJSCreateUser} represents an example for such an vulnerability. \\
+The expanding array injection is based on the common attacker model and exploits a special behaviour of a query's selection criteria. When a requires a property to be equal to a value and the stored document contains an array in place of the property, all values of the array are used to find a match. This feature, as the attack name implies, is called automatic array expanding. An attacker can manipulate inserted documents in order to achieve matches subsequent selective criteria. The creation of an user as shown in listing \ref{lst:NodeJSCreateUser} represents an example for such an vulnerability. \\
 
 \begin{lstlisting}[caption={Example for vulnerable MongoDB - NodeJS application}, label={lst:NodeJSCreateUser}]
 if (req.query.user !== "admin") {
@@ -98,9 +98,9 @@ if (req.query.user !== "admin") {
 }
 \end{lstlisting}
 
-The given code allows the insertion of new users into the database, with the exception of \emph{admin} as a username. This security check can be bypassed, by injecting an array of usernames instead of a simple string. A suitable attack vector based on query string encoding is given with listing \ref{lst:ExpandingArrayInjection}.\\
+The given code allows the insertion of new users into the database, with the exception of \emph{admin} as a username. This security check can be bypassed, by injecting an array of usernames instead of a simple string. A suitable attack vector based on query-string encoding is given with listing \ref{lst:ExpandingArrayInjection}.\\
 
-\begin{lstlisting}[caption={MongoDB injection with NodeJS's query string module}, label={lst:ExpandingArrayInjection}]
+\begin{lstlisting}[caption={MongoDB injection with NodeJS's query-string module}, label={lst:ExpandingArrayInjection}]
 https://example.org/register?user[]=patrick&user[]=admin&password=1234;
 \end{lstlisting}
 
@@ -118,7 +118,7 @@ db.collection('users').find({"user": req.query.user, "password": req.query.passw
 
 The request for the login, does have to be manipulated. An attacker can now login as an amdin with a usual authentication request as shown in listing {lst:ArrayExpandingAdminLogin}.\\
 
-\begin{lstlisting}[caption={MongoDB injection with NodeJS's query string module}, label={lst:ArrayExpandingAdminLogin}]
+\begin{lstlisting}[caption={MongoDB injection with NodeJS's query-string module}, label={lst:ArrayExpandingAdminLogin}]
 https://example.org/login?user=admin&password=1234;
 \end{lstlisting}
 
@@ -153,7 +153,7 @@ The presented login application is of course not the only example, where the exp
 \end{table}
 
 \textbf{Attack Summary} \\
-MongoDB's feature for automatic array expansion of stored documents allows this kind of attack. In general, all non-relational databases employing automatic structure resolving or changes are potentially vulnerable. The main problem of this attack is that all stored arrays are expanded by default, but the behavior is neither typical nor expected in this context. When attacker is able to injection an array instead of a normal value, all following selection operations will expand the arrays content for the search and therefore change their behavior. All object structure encoding request parameters of the attacker surface can be deploy for array the expanding array injection. The attack works across all investigated application platforms and with common drivers as well as direct REST interface access. 
+MongoDB's feature for automatic array expansion of stored documents allows this kind of attack. In general, all non-relational databases employing automatic structure resolving or changes are potentially vulnerable. The main problem of this attack is that all stored arrays are expanded by default, but the behaviour is neither typical nor expected in this context. When an attacker is able to injection an array instead of a normal value, all following selection operations will expand the arrays content for the search and therefore change their behaviour. All object structure encoding request parameters of the attacker surface can be deploy for array the expanding array injection. The attack works across all investigated application platforms and with common drivers as well as direct REST interface access. 
 
 \section{Redis}
 This section covers the injection attacks against the key-value store Redis, that were found in scope of this thesis.
@@ -171,7 +171,7 @@ This code makes use of the \emph{expireat} functionality to set the data for the
 https://example.org/expire?key[]=foo&key[]=1117542887
 \end{lstlisting}
 
-Given the the query string parameters, the resulting array will be passed as the first argument to the database call. The following parameter, containing the future time will be overwritten. Instead the injected timestamp passed with with the array in the first argument will be used. Since this timestamp lays in the past, the stored data behind the provided key will be deleted. This enables an attacker to delete arbitrary entries of the database! Similar to the presented attack on \emph{expireat}, there exist multiple other affected database commands. An excerpt of commands, that are vulnerable for parameter overwrite injection are listed within table \ref{tab:redis_commands_affected}. \\
+Given the the query-string parameters, the resulting array will be passed as the first argument to the database call. The following parameter, containing the future time will be overwritten. Instead the injected timestamp passed with with the array in the first argument will be used. Since this timestamp lays in the past, the stored data behind the provided key will be deleted. This enables an attacker to delete arbitrary entries of the database! Similar to the presented attack on \emph{expireat}, there exist multiple other affected database commands. An excerpt of commands, that are vulnerable for parameter overwrite injection are listed within table \ref{tab:redis_commands_affected}. \\
 
 \begin{table}[h]
  \sffamily
@@ -224,7 +224,7 @@ A function is implemented, that returns true or false depending on the success o
 https://example.org/login?user=patrick&password[%24ne]=1
 \end{lstlisting}
 
-The payload contained within the query string of the URL leads to an object instead of a string typed password property. This object will replace the provided password value with a \emph{not equals} selector object within the query options. Therefore, the password check will reliably evaluate to true and the credentials check is bypassed. \\
+The payload contained within the query-string of the URL leads to an object instead of a string typed password property. This object will replace the provided password value with a \emph{not equals} selector object within the query options. Therefore, the password check will reliably evaluate to true and the credentials check is bypassed. \\
 
 \begin{table}[h]
  \sffamily
@@ -422,7 +422,7 @@ The given code implements a function to retrieve cached values from Memcached by
 "https://exmaple.org?key[]=auth_patrick"
 \end{lstlisting}
 
-To bypass the preliminary data checks, similarities between string and arrays in dynamic typed languages, such as NodeJS, PHP, Python and Ruby, are used. An actually protected key string is passed within an array through the extended query string syntax. The resulting array bypasses the \emph{indexOf} check, because the exact \emph{auth\_} string is not an element within the injected array. Afterwards, the array is passed as the key argument to the query. Memcached expects a string value instead of an array, and therefore extracts the first contained string. As a result the protected dataset is returned.\\
+To bypass the preliminary data checks, similarities between string and arrays in dynamic typed languages, such as NodeJS, PHP, Python and Ruby, are used. An actually protected key string is passed within an array through the extended query-string syntax. The resulting array bypasses the \emph{indexOf} check, because the exact \emph{auth\_} string is not an element within the injected array. Afterwards, the array is passed as the key argument to the query. Memcached expects a string value instead of an array, and therefore extracts the first contained string. As a result the protected dataset is returned.\\
 
 Since this attack reveals a secondary way to preform particular queries, a missing type check of request parameters enables the bypassing of application layer checks. All functionalities, that can be called on string as well as on array values has to be taken into account. An overview of shared functionalities between string and array values is given in table \ref{tab:mecached_affected_functions}.
 
@@ -448,6 +448,6 @@ Since this attack reveals a secondary way to preform particular queries, a missi
 Listed are functions and properties with the according functionalities on strings an arrays. The investigated application layers partially employ different naming conventions for the same functionality. As the excerpt shows, the similarity between strings and arrays exists on every platform. Therefore, the array key injection can bypass checks on every platform. \\
 
 \textbf{Attack Summary} \\
-Of the investigated databases, Memcached is similar like CouchDB affected by array key injection. In general, all non-relational databases with automatic conversion of query parameters are potentially vulnerable. The main problem of this attack is, that different parameters lead to the same query behavior. Since the concept of Memcached requires application layer authorization checks, all possible parameters leading to a forbidden queries has to be considered. The exposed issue, that array parameter allow the same queries as string parameters is not officially documented. Therefore, array parameters are often not in considered in application layer checks and bypasses are possible. Request parameters for this attack have to support object structure control. Query string, JSON bodies as well as form data are therefore relevant parts of the attacker surface. The injection works across all investigated application platforms and with common drivers. 
+Of the investigated databases, Memcached is similar like CouchDB affected by array key injection. In general, all non-relational databases with automatic conversion of query parameters are potentially vulnerable. The main problem of this attack is, that different parameters lead to the same query behaviour. Since the concept of Memcached requires application layer authorization checks, all possible parameters leading to a forbidden queries has to be considered. The exposed issue, that array parameter allow the same queries as string parameters is not officially documented. Therefore, array parameters are often not in considered in application layer checks and bypasses are possible. Request parameters for this attack have to support object structure control. Query string, JSON bodies as well as form data are therefore relevant parts of the attacker surface. The injection works across all investigated application platforms and with common drivers. 
 
 % other way round - array expected but string injected
