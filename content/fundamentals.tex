@@ -54,8 +54,6 @@ In the first line of the response, the server version of the protocol as well as
 
 There exist various formats for the data contained within the body. The \emph{Content-Type} header states the type of format in order to guarantee correct handling of the appended data. Values of this header follow the Multipurpose Internet Mail Extension (MIME) standard. These are divided into two level declarations and encompass all major data formats. Examples for the widespread types used in the context of HTTP are \emph{text/html}, \emph{application/javascript} or \emph{text/css}.
 
-\subsection{MIME}
-
 \subsection{REST}
 Representational State Transfer (REST) describes a programming paradigm for distributed systems in a stateless client-server environment \cite{Fielding:2000}. It specifies an architectural style, that enforces a consistent system interface design. Therefore, REST represents an alternative to prior approaches, such as SOAP or WDSL. The paradigm separates resource location and the applied method. Functional instructions are therefore not allowed to be included within the URI. A special implementation or protocol is not defined by the paradigm, whereby REST is commonly used in combination with HTTP and HTTPS. In the course of this, the HTTP methods encode the functional instructions and resources have to be uniquely identified by the requested URI. Despite strong conceptual similarities, the usage of HTTP and HTTPS does not imply REST conformance. Methods are often misused for different functionalities and as a result REST conformance is not provided.
 
