@@ -85,11 +85,11 @@ In scope of this evaluation, two major aspects of the injection mitigation techn
 In order to give an empirical evaluation, a group of open source applications is selected. These applications have to be built with NodeJS and MongoDB, to allow the integration of the implemented secure driver. To enable the required driver integration, the code of the selected applications has to be public accessible. Based on this criteria, the following widespread projects were selected for the further evaluation.
 
 \begin{description}
-\item [Agora] This project is developed by the German Softwerkskammer and builds the central platform for their communities. [https://github.com/softwerkskammer/Agora]
-\item [Apostrophe 2] With the goal of an design-driven and flexible content management system, Apostrophe bets on NodeJS and MongoDb for its most current version. [http://apostrophecms.org/]
-\item [Habitica] This project set its objective, to create a productivity enhancing and habit building application with the help of an integrated gamification concept. [https://habitica.com] 
-\item [NodeBB] The goal of this platform is to deliver a powerful and mobile-ready forum software for the modern web. [https://github.com/NodeBB/NodeBB]
-\item [Pencilblue] This application represents an open source content management system for business class use cases. [https://pencilblue.org/]
+\item [Agora] This project is developed by the German Softwerkskammer and builds the central platform for their communities. (https://github.com/softwerkskammer/Agora)
+\item [Apostrophe 2] With the goal of an design-driven and flexible content management system, Apostrophe bets on NodeJS and MongoDb for its most current version. (http://apostrophecms.org/)
+\item [Habitica] This project set its objective, to create a productivity enhancing and habit building application with the help of an integrated gamification concept. (https://habitica.com)
+\item [NodeBB] The goal of this platform is to deliver a powerful and mobile-ready forum software for the modern web. (https://github.com/NodeBB/NodeBB)
+\item [Pencilblue] This application represents an open source content management system for business class use cases. (https://pencilblue.org/)
 \end{description}
 
 Next to the listed projects, also the original MongoDB driver for NodeJS is considered for the evaluation. The general approach is, to utilize the tests available for each of the applications. In a first step, these test are executed and the number of passed ones is measured. Then, the existing MongoDB driver is replaced with the secured one. The same tests are run again with the changed setup and the number of passed ones is again measured. Thus, the measured ratios of passed test can be compared for each application. With regard to the security aspect, it represents a problem to find an appropriate measurement. The mitigation of real world vulnerabilities would be a feasible approach, but these are not available in scope of this work. Therefore, the guarantees given by the new driver implementation and the coverage of attack classes are evaluated.
