@@ -175,7 +175,7 @@ With the selected four application layers a broad realm for our attacker models 
 Through the selection of databases and application platforms, the applicable communications protocols are already entailed. The attacker models enable an attacker to send arbitrary manipulated requests. An important restriction at this point is, that the request has to be interpreted and the contained payload processed by the application or database layer. Therefore, protocol-breaking request are mostly discarded. Manipulation of requests is on account of this restricted to designated parts in practice. Theoretically any application layer protocol or even lower-level ones can be used for cross-layer communication. For the selected technology stacks, HTTP and HTTPS represents the relevant protocols regarding the attacker surface. The following list explains the components, that are predestinated for attacker manipulation. \\
 
 \textbf{HTTP}\\
-The HTTP protocol implements several methods indication the server-side operation type. These methods can be set by the attacker as well as the URI of the addressed resource. Especially, the query string of the URL or even the path are often used for parameterization of the server-side application. Cookies are passed as a header for custom data transfer and are also part of the attacker surface. Depending on the used method type, a request body section is included in the request. The data contained within the body is used to pass data from the client to the server or vice versa and therefore represents another suitable part for malicious modification. \\
+The HTTP protocol implements several methods indication the server-side operation type. These methods can be set by the attacker as well as the URI of the addressed resource. Especially, the query-string of the URL or even the path are often used for parameterization of the server-side application. Cookies are passed as a header for custom data transfer and are also part of the attacker surface. Depending on the used method type, a request body section is included in the request. The data contained within the body is used to pass data from the client to the server or vice versa and therefore represents another suitable part for malicious modification. \\
 
 \textbf{HTTPS}\\
 HTTPS embodies a secured version of the HTTP protocol with transport level encryption. The actual format as well as the attacker surface is fairly equal to the one revealed by HTTP. Method, URL, Cookie as well as the body section represent the practical attacker surface. \\
@@ -223,16 +223,16 @@ Host: example.org
  The path's value is composed of strings separated by slashes. Passed parameters are therefore also enclosed within slashes. Since the path declaration is not further transformed by any of the selected application layers, only the string contents can be adapted. This parameter is therefore limited to value manipulation of strings. In many cases, an adjusted path will result in rejected requests since the resource can no longer be found.
 
 \textbf{Request URL - Query String}\\
-The second section of the URL, named query string, is much more common for application parameterization. The query string declaration is designed to pass key-value parameters to the server. Listing \ref{lst:get_url_query_param} gives an example for a request utilizing URL query-string parameterization. \\
+The second section of the URL, named query-string, is much more common for application parameterization. The query-string declaration is designed to pass key-value parameters to the server. Listing \ref{lst:get_url_query_param} gives an example for a request utilizing URL query-string parameterization. \\
 
 \begin{lstlisting}[escapechar=!, caption={Example for GET request with URL query parameterization}, label={lst:get_url_query_param}]
 GET /path/to/resource!\textbf{?name=patrick\&foo=bar}! HTTP/1.1
 Host: example.org
 \end{lstlisting}
 
-As highlighted, the passed key-value pairs are separated by special characters that help to disassemble the parameters on the server-side. By the official URL definition, this parameter is restricted to string values. One of the first published injection attacks against non-relational databases demonstrated, that PHP supports an extended query string syntax for object and array parameters \cite{Sullivan:2011}. The query string is parsed by default and the resulting objects are provided to the application. NodeJS does not include such functionality by default, but one of its packages does as another publication showed \cite{Petkov:2014a}. The article emphasized, that the concerned \textit{qs module} provides the same query string functionality and is an essential part of the major web server \textit{Express}. Listing \ref{lst:sqsyntax} gives some examples for query strings that pass objects or respectively arrays to both platforms. \\
+As highlighted, the passed key-value pairs are separated by special characters that help to disassemble the parameters on the server-side. By the official URL definition, this parameter is restricted to string values. One of the first published injection attacks against non-relational databases demonstrated, that PHP supports an extended query-string syntax for object and array parameters \cite{Sullivan:2011}. The query-string is parsed by default and the resulting objects are provided to the application. NodeJS does not include such functionality by default, but one of its packages does as another publication showed \cite{Petkov:2014a}. The article emphasized, that the concerned \textit{qs module} provides the same query-string functionality and is an essential part of the major web server \textit{Express}. Listing \ref{lst:sqsyntax} gives some examples for query-strings that pass objects or respectively arrays to both platforms. \\
 
-\begin{lstlisting}[caption={Examples for extended query string syntax}, label={lst:sqsyntax}]
+\begin{lstlisting}[caption={Examples for extended query-string syntax}, label={lst:sqsyntax}]
 ?param=foo                             // results in "param": "foo"
 ?param[]=foo&array[]=bar               // results in "param": ["foo", "bar"]
 ?param[foo]=bar                        // results in "param": {foo : "bar"}
@@ -240,7 +240,7 @@ As highlighted, the passed key-value pairs are separated by special characters t
 ?param[foo][]=bar&object[foo][]=baz    // results in "param": {foo : ["bar", "baz"]}
 \end{lstlisting}
 
-Further investigation in scope of this work revealed, that these features are much more widespread and powerful than shown by previous publications. The object and array encoding syntax is supported by all major web servers across the selected application layers. On NodeJS the \textit{Express} web server is by far not the only one including the \textit{qs module}. Nearly every major web server implementation or REST client includes the \textit{qs module} and therefore supports the extended query string syntax. In addition, Ruby implements the same feature with the \textit{Rails} framework as well as Python does with its \textit{Django} framework. Thus, all notable web server implementations of the selected application platforms include this convenience feature without any underlying standardization. Further, the syntax even allows the passing of nested objects and arrays as a parameter. Due to this non-standardized convenience functionality, the query string parameter enables an attacker to inject all types of query string encodings. \\
+Further investigation in scope of this work revealed, that these features are much more widespread and powerful than shown by previous publications. The object and array encoding syntax is supported by all major web servers across the selected application layers. On NodeJS the \textit{Express} web server is by far not the only one including the \textit{qs module}. Nearly every major web server implementation or REST client includes the \textit{qs module} and therefore supports the extended query-string syntax. In addition, Ruby implements the same feature with the \textit{Rails} framework as well as Python does with its \textit{Django} framework. Thus, all notable web server implementations of the selected application platforms include this convenience feature without any underlying standardization. Further, the syntax even allows the passing of nested objects and arrays as a parameter. Due to this non-standardized convenience functionality, the query-string parameter enables an attacker to inject all types of query-string encodings. \\
 
 \textbf{Request Header - Cookies}\\
 Within the header of each request a cookie parameter can be set. This cookie header is normally used for session handling between server and client or the tracking of your browser history, but can also be filled with any other data. Listing \ref{lst:get_url_cookie_param} gives an example for a request utilizing cookie header parameterization. \\
@@ -288,7 +288,7 @@ Content-Length: 77
 Similar to JSON, the XML is passed as a string to the application, but in most cases parsed by dedicated libraries. The resulting object of the present language describes the nodes and attributes of the XML document. This pre-set structure allows free manipulation of values, but data types and object structure are restricted by the node and attribute structure. In practice, this makes it hard to inject proper object structures. \\
 
 \textbf{Request Body - Form Data}\\
-As the name applies, form data normally originates from web page forms. The format makes use of URL encoding or more specifically query string encoding. Listing \ref{lst:post_form_param} gives an example for a request utilizing form encoded body parameterization. \\
+As the name applies, form data normally originates from web page forms. The format makes use of URL encoding or more specifically query-string encoding. Listing \ref{lst:post_form_param} gives an example for a request utilizing form encoded body parameterization. \\
 
 \begin{lstlisting}[escapechar=!, caption={Example for POST request with form encoded body parameterization}, label={lst:post_form_param}]
 POST /path/to/resource HTTP/1.1
@@ -299,7 +299,7 @@ Content-Length: 20
 !\textbf{name=patrick\&foo=bar}!
 \end{lstlisting}
 
-By definition, form encoding allows simple key-value pairs. As practical tests in scope of this work showed, all investigated platforms employ the same parsing found in the context of URL query-strings. Since the same pre-processing as for normal query strings is applied, the extended syntax can be applied for this form encoded bodies. This allows the definition of values, types as well as object structures that are parsed into the according application layer language. Again, this presents a convenience feature not officially standardized nor clearly documented.\\
+By definition, form encoding allows simple key-value pairs. As practical tests in scope of this work showed, all investigated platforms employ the same parsing found in the context of URL query-strings. Since the same pre-processing as for normal query-strings is applied, the extended syntax can be applied for this form encoded bodies. This allows the definition of values, types as well as object structures that are parsed into the according application layer language. Again, this presents a convenience feature not officially standardized nor clearly documented.\\
 
 Across all investigated platforms, the request parameters allow similar injection capabilities for the three semantic encoding styles. The results are summarized in table \ref{tab:request_parameter}. \\
 
@@ -322,5 +322,5 @@ Across all investigated platforms, the request parameters allow similar injectio
   \label{tab:request_parameter}
 \end{table}
 
-Highlighted are the three parameter formats, that enable an attacker to inject manipulated values, types and object structures into the application layer. Especially convenience functionalities for the query string and from data that are not officially standardized offer great opportunities for NoSQL injection vectors.
+Highlighted are the three parameter formats, that enable an attacker to inject manipulated values, types and object structures into the application layer. Especially convenience functionalities for the query-string and from data that are not officially standardized offer great opportunities for NoSQL injection vectors.
 
