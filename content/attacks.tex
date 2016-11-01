@@ -58,7 +58,7 @@ In all of the four cases, the default and by MongoDB recommended database driver
 \end{minipage}
 \end{minipage}
 
-A login can therefore be bypassed in each investigated case, but this kind of attack is not restricted to login applications. Nearly all parameterized selection criteria can be influenced by the injection of query selectors. This includes all read, update and delete calls making use of the BSON selection format. Affected functions of the MongoDB API are listed in table \ref{tab:mongo_commands_affected}.\\
+A login can therefore be bypassed in each investigated case, but this kind of attack is not restricted to login applications. Nearly all parameterized selection criteria can be influenced by the injection of query selectors. This includes all read, update and delete calls making use of the BSON selection format. Affected functions of the MongoDB API \cite{MongoDB_CollFunc.2016} are listed in table \ref{tab:mongo_commands_affected}.\\
 
 \begin{table}[h]
  \sffamily
@@ -124,7 +124,7 @@ https://example.org/login?user=admin&password=1234;
 
 MongoDB will search for a document with the user property set to \emph{admin} and the password property set to \emph{1234}. Through the expansion the beforehand injected document or respectively the user property, a matching document is found and the admin login is successful.\\
 
-The presented login application is of course not the only example, where the expanding array feature of MongoDB allow injection attacks. Every insert operation with data originating from the three parameters, that allow type manipulation represents a potential vulnerability. It enables an attacker to break the confidentiality of the underlying data, which leads to unintended matches for further requests. The attack was exemplified for the NodeJS, but is relevant for all of the investigated application layers. Table \ref{tab:mongo_commands_affected_expanding_array} gives an overview of the affected database interface functions.\\
+The presented login application is of course not the only example, where the expanding array feature of MongoDB allow injection attacks. Every insert operation with data originating from the three parameters, that allow type manipulation represents a potential vulnerability. It enables an attacker to break the confidentiality of the underlying data, which leads to unintended matches for further requests. The attack was exemplified for the NodeJS, but is relevant for all of the investigated application layers. Table \ref{tab:mongo_commands_affected_expanding_array} gives an overview of the affected database interface functions \cite{MongoDB_CollFunc.2016}.\\
 
 \begin{table}[h]
  \sffamily
@@ -173,7 +173,7 @@ This code makes use of the \emph{expireat} functionality to set the data for the
 https://example.org/expire?key[]=foo&key[]=1117542887
 \end{lstlisting}
 
-Given the query-string parameters, an array will be created and passed as the first argument to the database call. The second parameter, containing a future point of time will be overwritten. Instead the injected timestamp passed within the array in the first argument will be used. Since this timestamp lays in the past, the stored data behind the provided key will be deleted. This enables an attacker to remove arbitrary entries of the database! Similar to the presented attack on \emph{expireat}, there exist multiple other affected database commands. An excerpt of commands, that are vulnerable for parameter overwrite injection are listed within table \ref{tab:redis_commands_affected}. \\
+Given the query-string parameters, an array will be created and passed as the first argument to the database call. The second parameter, containing a future point of time will be overwritten. Instead the injected timestamp passed within the array in the first argument will be used. Since this timestamp lays in the past, the stored data behind the provided key will be deleted. This enables an attacker to remove arbitrary entries of the database! Similar to the presented attack on \emph{expireat}, there exist multiple other affected database commands. An excerpt of commands \cite{Sanfilippo2016}, that are vulnerable for parameter overwrite injection are listed within table \ref{tab:redis_commands_affected}. \\
 
 \begin{table}[h]
  \sffamily
@@ -226,7 +226,7 @@ A function is implemented, that returns true or false depending on the success o
 https://example.org/login?user=patrick&password[%24ne]=1
 \end{lstlisting}
 
-The payload contained within the query-string of the URL leads to an object instead of a string typed password property. This object will replace the provided password value with a \emph{not equals} selector object within the query options. Therefore, the password check will reliably evaluate to true and the credentials check is bypassed. Table \ref{tab:couchdb_affected_selectors} provides an overview of available query selector objects within CouchDB. \\
+The payload contained within the query-string of the URL leads to an object instead of a string typed password property. This object will replace the provided password value with a \emph{not equals} selector object within the query options. Therefore, the password check will reliably evaluate to true and the credentials check is bypassed. Table \ref{tab:couchdb_affected_selectors} provides an overview of available query selector objects within CouchDB \cite{ASF2016a}. \\
 
 \begin{table}[h]
  \sffamily
@@ -286,7 +286,7 @@ https://example.org/login?user=_all_docs
 
 With the provided user value, a special document is requested instead of a normal record. The database returns the \emph{\_all\_docs} document, that contains meta information about the collection. Important at that point is, that the special document does not contain a password property and the according value is therefore undefined. Since the attack vector does not define a password value, the resulting argument is also undefined. Thus, two undefined values are compared for equality. JavaScript as well as Python, Ruby and PHP will evaluate such comparisons to true and pass it to the callback. As a result, the credentials check is successfully bypassed.\\
 
-CouchDB implements a group of these special documents for different purposes. Not all of these documents have the same access authorization level. Each of the special documents can be accessed by designated HTTP methods, as shown for a subset by table \ref{tab:couch_special_documents}. \\
+CouchDB implements a group of these special documents for different purposes \cite{ASF2016}. Not all of these documents have the same access authorization level. Each of the special documents can be accessed by designated HTTP methods, as shown for a subset by table \ref{tab:couch_special_documents}. \\
 
 \begin{table}[h]
  \sffamily
@@ -380,7 +380,7 @@ function importData(data) {
 importData(externalSource.getData());
 \end{lstlisting}
 
-Basically, the given code retrieves some data from an external source and passes it to an import function. This function takes the data and inserts all contained documents into the \emph{mixedData} collection of CouchDB. In principle, this collection can be used for a variety of different data sources. If an attacker is able to influence only parts of the external data, this non-validated import processing opens up a serious vulnerability. In order to exploit this flaw, a document as presented within listing \ref{lst:couchdb_data_import_injection_inject} has to be inserted into the external data source.
+Basically, the given code retrieves some data from an external source and passes it to an import function. This function takes the data and inserts all contained documents into the \emph{mixedData} collection of CouchDB. In principle, this collection can be used for a variety of different data sources. If an attacker is able to influence only parts of the external data, this non-validated import processing opens up a serious vulnerability. In order to exploit this flaw, a document as presented within listing \ref{lst:couchdb_data_import_injection_inject} has to be inserted into the external data source. \\
 
 \begin{lstlisting}[caption={Critical document for data import injection against CouchDB}, label={lst:couchdb_data_import_injection_inject}, language=JavaScript]
 {
@@ -393,7 +393,7 @@ Basically, the given code retrieves some data from an external source and passes
 }
 \end{lstlisting}
 
-The shown data represents a design document within CouchDB. In probably any other context, the shown document is harmless. An attacker inserts this document into the external data source, such as a text file or another non-relational database. As soon as data from this source is imported by CouchDB, the special structure is detected and a new \emph{attacker} view is applied. This implies the execution of the \emph{map} function on all contained documents. At this point, the results of the view cannot be retrieved by the attacker, but high processing load can be caused through the injected \emph{map} function. This impairs other queries and therefore the availability of the stored data. \\
+The shown data represents a design document within CouchDB \cite{Anderson:2010b}. In probably any other context, the shown document is harmless. An attacker inserts this document into the external data source, such as a text file or another non-relational database. As soon as data from this source is imported by CouchDB, the special structure is detected and a new \emph{attacker} view is applied. This implies the execution of the \emph{map} function on all contained documents. At this point, the results of the view cannot be retrieved by the attacker, but high processing load can be caused through the injected \emph{map} function. This impairs other queries and therefore the availability of the stored data. \\
 
 On top of this, the documents imported at this stage can be used in combination with the URL traversal attack. This combination allows an attacker access the beforehand injected view resulting in data leakage. In general, reading access on the existing views of a collection becomes problematic with the data import injection in mind. \\
 
