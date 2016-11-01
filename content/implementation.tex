@@ -46,9 +46,9 @@ To stop object structure and type injections, all affected query parameters have
 
 Basically, the secured driver extends the former interface with optional \emph{pattern} arguments. These follow can be passed after the sensitive argument and define the allowed data types and structures. The shown example extends the find function with an optional security pattern for the \emph{query} argument. When no security pattern is provided by the arguments, the driver can alternatively draw on stored ones. These stored security patterns can be created automatically within a secure execution environment. In order to prevent injection, the extended driver matches the given security pattern with the passed argument. When both are compatible, all arguments except of the security patterns are forwarded to the normal MongoDB driver. Otherwise, a security error is thrown, that indicates a potential injection attack. In case no security pattern is provided, the query parameter are passed without further control to the wrapped driver. This behaviour enables a drop-in replacement of the secured driver without breaking any application. Similar to this implementation, drivers for other databases and application layers can be wrapped. \\
 
-At this point, the employed security pattern structure has to be defined. There exist various possible ways to implement the patterns for the presented mitigation approach. This thesis proposes a JSON-based format for straightforward handling across all feasible application layers. Listing \ref{lst:http_request_example} shows the grammar of the security patterns used for the outlined implementation. \\
+At this point, the employed security pattern structure has to be defined. There exist various possible ways to implement the patterns for the presented mitigation approach. This thesis proposes a JSON-based format for straightforward handling across all feasible application layers. Listing \ref{lst:security_pattern_grammar} shows the grammar of the security patterns used for the outlined implementation. \\
 
-\begin{lstlisting}[escapechar=!, caption={Proposed security pattern grammar for the injection mitigation mechanism}, label={lst:http_request_example}]
+\begin{lstlisting}[escapechar=!, caption={Proposed security pattern grammar for the injection mitigation mechanism}, label={lst:security_pattern_grammar}]
 <SecurityPattern> ::= {'_security_pattern': <Option> };
 <Options> ::= <Option> | <Option>, <Options>;
 !\textbf{<Option> ::= [<Values>]}!;
@@ -62,9 +62,9 @@ At this point, the employed security pattern structure has to be defined. There 
 <Key> ::= *Arbitrary String*;
 \end{lstlisting}
 
-The given grammar for the security patterns resembles the one of JSON. On the top level, the \emph{\_security\_pattern} property is fixed, to be able to distinguish normal and pattern arguments. Furthermore, each value of objects and arrays is replaced by an option array as highlighted. This allows the declaration of multiple allowed types and structures and ensures the required flexibility. The options array in turn contains other structures or type definitions. In order to keep the grammar neat, the last rule for arbitrary key strings is shortened. Strings and numbers are indicated with the according string, arrays an objects are represented by the actual JSON elements. Since this may be hard to imagine, a practical example is given within listing \ref{lst:http_request_example}. \\
+The given grammar for the security patterns resembles the one of JSON. On the top level, the \emph{\_security\_pattern} property is fixed, to be able to distinguish normal and pattern arguments. Furthermore, each value of objects and arrays is replaced by an option array as highlighted. This allows the declaration of multiple allowed types and structures and ensures the required flexibility. The options array in turn contains other structures or type definitions. In order to keep the grammar neat, the last rule for arbitrary key strings is shortened. Strings and numbers are indicated with the according string, arrays an objects are represented by the actual JSON elements. Since this may be hard to imagine, a practical example is given within listing \ref{lst:security_pattern_example_id}. \\
 
-\begin{lstlisting}[escapechar=!, caption={Security pattern allowing string-based and object-based identifiers as a query parameter}, label={lst:http_request_example}]
+\begin{lstlisting}[escapechar=!, caption={Security pattern allowing string-based and object-based identifiers as a query parameter}, label={lst:security_pattern_example_id}]
 {"_security_pattern_": [{
   "_id": ["String", {"$oid": ["String"]}]
 }]}
