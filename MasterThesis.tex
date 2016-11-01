@@ -26,12 +26,11 @@
 \usepackage[style=alphabetic,citestyle=alphabetic,backend=bibtex]{biblatex}
 \addbibresource[]{bib/bibtex.bib}
 
-%\usepackage{url}
+\usepackage{url}
 \usepackage{eurosym}
 \usepackage{amssymb}
 \usepackage{amsmath}
 \usepackage{amsthm}
-\usepackage{todonotes}
 
 % Fonts
 %\usepackage{courier}
@@ -87,7 +86,7 @@
 % ------------------------------ Befehle ----------------------------------------------------
 \newcommand{\jahr}{2016}			% für Angabe im Copyright-Vermerk der Titelseite
 
-\newcommand{\changefont}[3]{\fontfamily{#1} \fontseries{#2} \fontshape{#3} \selectfont}
+%\newcommand{\changefont}[3]{\fontfamily{#1} \fontseries{#2} \fontshape{#3} \selectfont}
 
 % ------------------------------ Abkürzungen ------------------------------------------------
 \newcommand{\ua}{\mbox{u.\,a.\ }}
@@ -197,7 +196,7 @@
 \begin{document}
 \setcounter{secnumdepth}{3}				% Nummerierungstiefe fürs Inhaltsverzeichnis
 \setcounter{tocdepth}{3}					% Tiefe des Inhaltsverzeichnises
-\changefont{cmr}{m}{n}						% Schriftart definieren
+%\changefont{cmr}{m}{n}						% Schriftart definieren
 
 % ------------------------------ Titelei -----------------------------------------------------
 \include{content/titlepage} 				% erzeugt die Titelseite
@@ -235,7 +234,13 @@
 \end{onehalfspace}
 
 % ---------------------------- Literaturverzeichnis ----------------------------------------------
+\def\rmdefault{bch}
+\def\ttdefault{bch}
+\def\normalsize{\small}
+
+\begin{footnotesize}
 \printbibliography
+\end{footnotesize}
 
 % ------------------------------- Anhang ---------------------------------------------------------
 %\begin{appendix}
