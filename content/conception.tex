@@ -198,13 +198,13 @@ Before concrete injection vectors can be created, the employed query techniques 
 \label{sec:analysisOfQueryTechniques}
 In order to achieve behavioral changes of queries, their design has to be examined. The design involves some way to encode semantics and the semantics in turn define the resulting operations within the database layer. Unfortunately, there exists a variety of query techniques with different designs used for non-relational databases. Each technique works differently, but the basic means to specify a query's semantics can be broken down to a few approaches. In an attacker's perspective, a query can be seen as a set of parameters passed to the database layer. Therefore, the ways parameters encode semantic have to be analysed. Basically, there exist three approaches the semantic encoding for query parameter is accomplished for non-relational databases.\\
 
-\textbf{Value Encoded} \\
+\textbf{Value Encoding} \\
 The parameter's semantic is encoded through its value. Usually string parameters are used for this type of encoding, but other types are also feasible. The values follow a specific pattern, that indicates the operation to be performed. In the case of string values, often a special syntax is used in order to be interpreted within the database engine. An attacker can influence the query's behaviour by altering the parameter's value. SQL injection exploits this kind of semantic encoding by altering string values that are later-on interpreted by the database. Some databases discern between normal and special values of a parameter. Special values or ranges of values trigger other operations compared to normal values. This semantic encoding builds the foundation for the following ones and can be detected in nearly all query techniques.\\
 
-\textbf{Type Encoded} \\
+\textbf{Type Encoding} \\
 In addition to putting semantics into the value a parameter, also the data type can be used for semantic encoding. A passed string may trigger another operation than a passed integer or array. This demands for dynamic typing or overloading capabilities of the query interface. An attacker can influence the query's behaviour by altering the parameter's data type.\\
 
-\textbf{Object Structure Encoded} \\
+\textbf{Object Structure Encoding} \\
 On top the given value and type encoding, semantics can also be defined by a parameter's object structure. This is enabled by parameters composed of complex data types, such as objects and arrays, that in turn can contain further parameters. Thereby, nested objects structures are passed as a parameter to the database layer and operations are triggered depending on this structures. An attacker can influence the query's behaviour by altering the parameter's object structure.\\
 
 These are the three major means of non-relational databases to encode semantics into a query. Consequently, an attacker has to take influence on at least one of the three semantic encodings in order to compromise the targeted security goals.
