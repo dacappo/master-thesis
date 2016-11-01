@@ -51,9 +51,9 @@ In all of the four cases, the default and by MongoDB recommended database driver
 \end{minipage}
 \hfill
 \begin{minipage}[t]{.49\textwidth}
-\begin{lstlisting}[caption={Resulting query of query selector injection}, label={lst:QuerySelectorInjectionResult}]
+\begin{lstlisting}[escapechar=!,caption={Resulting query of query selector injection}, label={lst:QuerySelectorInjectionResult}]
 {'user': 'patrick',
- 'password': {'&gt':''}}
+ 'password': {'&ne':''}}
 \end{lstlisting}
 \end{minipage}
 \end{minipage}
@@ -84,7 +84,7 @@ A login can therefore be bypassed in each investigated case, but this kind of at
  \label{tab:mongo_commands_affected}
 \end{table}
 
-Considered are collection functions, that employ either a \emph{filter} or \emph{query} parameter. Both facilitate the same JSON-like selection format. The affected functions encompass read, update and delete operations. Furthermore, the attacker surface analysis from section \ref{sec:analysisOfQueryTechniques} suggests, that the URL query-string is by far not the only part of the attacker surface allowing this kind of attack. When the application processes other request parameters, the payload can also be placed in form data encoded as well as JSON request bodies. Especially the form data based injection was not taken into account by earlier publications. These circumstances exhibit a way more significant surface for query selector injection as previously indicated. \\
+Considered are functions of collections, that employ either a \emph{filter} or \emph{query} parameter. Both facilitate the same JSON-like selection format. The affected functions encompass read, update and delete operations. Furthermore, the attacker surface analysis from section \ref{sec:analysisOfQueryTechniques} suggests, that the URL query-string is by far not the only part of the attacker surface allowing this kind of attack. When the application processes other request parameters, the payload can also be placed in form data encoded as well as JSON request bodies. Especially the form data based injection was not taken into account by earlier publications. These circumstances exhibit a way more significant surface for query selector injection as previously indicated. \\
 
 \textbf{Attack Summary} \\
 MongoDB's flexible query scheme in combination with the query selector objects make it vulnerable for this kind of injection attack. In general, all non-relational databases employing JSON-like query structures with object structure encoding are potentially vulnerable. The main problem of this attack is the realization of complex query operations. Equality selections can be simply encoded within a JSON-like structure, but for operations as \emph{greater than} a special syntax is required. Thereby each equality check can be replaced by complex query operators, when the object structure is under control of an attacker. All parameters of the attacker surface that allow object structure encoding can be used for this kind of injection. The attack works across all investigated application platforms and with common drivers as well as direct REST interface access. 
@@ -158,7 +158,7 @@ The red highlighted parameters allow the actual insertion of documents, whereby 
 MongoDB's feature for automatic array expansion of stored documents allows this kind of attack. In general, all non-relational databases employing automatic structure resolving or changes are potentially vulnerable. The main problem of this attack is that all stored arrays are expanded by default, but the behaviour is neither typical nor expected in this context. When an attacker is able to inject an array instead of a normal value, all following selection operations will expand the arrays content for the search and therefore change their behaviour. All request parameters of the attacker surface enabling object structure manipulation can be deploy for the expanding array injection. The attack works across all investigated application platforms and with common drivers as well as direct REST interface access. 
 
 \section{Redis}
-This section covers the injection attacks against the key-value store Redis, that were found in scope of this thesis.
+This section covers the injection attack against the key-value store Redis, that was found in scope of this thesis.
 
 \subsection{Parameter Overwrite Injection}
 The parameter overwrite injection against Redis is based on the common attacker model. It requires NodeJS as an application platform in combination with the most prevalent Redis driver \cite{Ranney2016}. In order to understand this attack, it is essential to know how parameters can be passed to this particular database driver. The regular way allows to define each parameter as distinct argument. An alternative way allows to pass all parameters within a single array as the first argument of the interface call. With this knowledge and the control of the first argument, an attacker is able to overwrite the following arguments of a driver function call. An example application, where this becomes critical is shown in listing \ref{lst:parameterOverwriteApp}. \\
@@ -401,7 +401,7 @@ On top of this, the documents imported at this stage can be used in combination 
 Of the investigated databases, CouchDB is the only one affected by data import injection. In general, all non-relational databases storing functional data in the same scope as normal data are potentially vulnerable. The main problem of this attack is the context change, that takes place through data import. Harmless and valid data in one data storage reaches a special meaning in the context of CouchDB. This situation also extends the possibilities for subsequent injection attacks. Given the condition of additional attacker defined data within the targeted database, the confidentiality of otherwise secure data can be compromised. In case of CouchDB, the import processing of design documents requires collection admin authorization, but no database wide administration rights. All selected request parameters can be used for the subsequent injection, since the attacker controlled data often simplifies attack vectors. The attack works across all investigated application platforms and with common drivers as well as direct REST interface access. 
 
 \section{Memcached}
-This section covers the injection attacks against the key-value cache Memcached, that were found in scope of this thesis.
+This section covers the injection attack against the key-value cache Memcached, that was found in scope of this thesis.
 \subsection{Array Key Injection}
 This attack is based on the common attacker model and directed against internal query parameter conversions. By default, Memcached does not separate its data through collections. All cached data is stored within a single scope. Access control has to be considered in the application layer. In order to circumvent such preliminary parameter checks, an attacker is searching for alternative ways to trigger unintended database queries. An example for an application, that is vulnerable for array key injection shown in listing \ref{lst:memcached_array_key_injection_app}.\\
 
