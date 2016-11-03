@@ -58,7 +58,7 @@ In all of the four cases, the default and by MongoDB recommended database driver
 \end{minipage}
 \end{minipage}
 
-A login can therefore be bypassed in each investigated case, but this kind of attack is not restricted to login applications. Nearly all parameterized selection criteria can be influenced by the injection of query selectors. This includes all read, update and delete calls making use of the BSON selection format. Affected functions of the MongoDB API \cite{MongoDB_CollFunc.2016} are listed in table \ref{tab:mongo_commands_affected}.\\
+Thus, a login can be bypassed in each investigated case, but this kind of attack is not restricted to login applications. Nearly all parameterized selection criteria can be influenced by the injection of query selectors. This includes all read, update and delete calls making use of the BSON selection format. Affected functions of the MongoDB API \cite{MongoDB_CollFunc.2016} are listed in table \ref{tab:mongo_commands_affected}.\\
 
 \begin{table}[h]
  \sffamily
@@ -167,7 +167,7 @@ The parameter overwrite injection against Redis is based on the common attacker 
 RedisClient.expireat(req.query.key, new Date("November 8, 2026 11:13:00").getTime());
 \end{lstlisting}
 
-This code makes use of the \emph{expireat} functionality to set the date for the deletion of an entry. In this particular case, the expire date is set to a hard-coded time far in the future. A user can provide a key and the according expire date is updated. The user can therefore only extend the life of an entry behind an arbitrary key, but not really influence the stored data in a negative way. This situation changes, when the second parameter can be overwritten. A conceivable attack could set the expire data to a time in the past. A request, that triggers exactly this operation, is shown in listing \ref{lst:parameterOverwriteAtt}. \\
+This code makes use of the \emph{expireat} functionality to set the date for the deletion of an entry. In this particular case, the expire date is set to a hard-coded time far in the future. A user can provide a key and the according expire date is updated. The user can only extend the life of an entry behind an arbitrary key, but not really influence the stored data in a negative way. This situation changes, when the second parameter can be overwritten. A conceivable attack could set the expire data to a time in the past. A request, that triggers exactly this operation, is shown in listing \ref{lst:parameterOverwriteAtt}. \\
 
 \begin{lstlisting}[caption={Attack vector against Redis for query selector injection via the query-string parameter}, label={lst:parameterOverwriteAtt}]
 GET /expire?key[]=foo&key[]=1117542887 HTTP/1.1
@@ -226,7 +226,7 @@ A function, that returns true or false depending on the success of the credentia
 GET login?user=patrick&password[%24ne]=%20 HTTP/1.1
 \end{lstlisting}
 
-The payload contained within the query-string of the URL leads to an object instead of a string-typed password property. This object will replace the provided password value with a \emph{not equals} selector object within the query options. Therefore, the password check will reliably evaluate to true and the credentials check is bypassed. Table \ref{tab:couchdb_affected_selectors} provides an overview of available query selector objects within CouchDB \cite{ASF2016a}. Since this attack does not only apply to credentials checks, the variety of query selectors can be used depending on the attacked application. Operations making use of the \emph{\_find} document are therefore very sensible for type and object structure injections. \\
+The payload contained within the query-string of the URL leads to an object instead of a string-typed password property. This object will replace the provided password value with a \emph{not equals} selector object within the query options. Therefore, the password check will reliably evaluate to true and the credentials check is bypassed. Table \ref{tab:couchdb_affected_selectors} provides an overview of available query selector objects within CouchDB \cite{ASF2016a}. Since this attack does not only apply to credentials checks, the variety of query selectors can be used depending on the attacked application. Thus, operations making use of the \emph{\_find} document are very sensible for type and object structure injections. \\
 
 \begin{table}[h]
  \sffamily
@@ -282,7 +282,7 @@ An attacker is able to bypass this authentication check with the help of the sto
 GET /login?user=_all_docs HTTP/1.1
 \end{lstlisting}
 
-With the provided user value, a special document is requested instead of a normal record. The database returns the \emph{\_all\_docs} document, that contains meta information about the collection. Important at that point is that the special document does not contain a password property and the according value is therefore undefined. Since the attack vector does not define a password value, the resulting argument is also undefined. Thus, two undefined values are compared for equality. JavaScript as well as Python, Ruby and PHP will evaluate such comparisons to true and pass it to the callback. As a result, the credentials check is successfully bypassed.\\
+With the provided user value, a special document is requested instead of a normal record. The database returns the \emph{\_all\_docs} document, that contains meta information about the collection. Important at that point is that the special document does not contain a password property and the according value is undefined. Since the attack vector does not define a password value, the resulting argument is also undefined. Thus, two undefined values are compared for equality. JavaScript as well as Python, Ruby and PHP will evaluate such comparisons to true and pass it to the callback. As a result, the credentials check is successfully bypassed.\\
 
 CouchDB implements a group of these special documents for different purposes \cite{ASF2016}. Not all of these documents have the same access authorization level. Each of the special documents can be accessed by designated HTTP methods, as shown for a subset in table \ref{tab:couch_special_documents}. \\
 
@@ -354,7 +354,7 @@ function getDocument(key, callback) {
 getDocument(req.query.key, handleResult);
 \end{lstlisting}
 
-The shown example implements a function, that retrieves documents by the according key. In the underlying request the key becomes the first element of the URL's path section. This circumstance allows path traversal by key injection when the slash sign is not escaped. At this point the special documents come into play again. Accessing one of these special documents, would not break a security goal of the given application. The path traversal injection in combination with special \emph{\_design} documents allows access on other database views. This should not be possible with the \emph{get} operation of the CouchDB driver since a dedicated function for separated view access is provided. The URL traversal injection therefore allows an attack reading access on all defined views of a collection. This vulnerability caused by incorrect argument escaping can be found in the Nano driver for NodeJS. Listing \ref{lst:couch_url_traversal_injection_vector} shows an exemplary attack vector for the presented application. \\
+The shown example implements a function, that retrieves documents by the according key. In the underlying request the key becomes the first element of the URL's path section. This circumstance allows path traversal by key injection when the slash sign is not escaped. At this point the special documents come into play again. Accessing one of these special documents, would not break a security goal of the given application. The path traversal injection in combination with special \emph{\_design} documents allows access on other database views. This should not be possible with the \emph{get} operation of the CouchDB driver since a dedicated function for separated view access is provided. Thus, the URL traversal injection allows an attack reading access on all defined views of a collection. This vulnerability caused by incorrect argument escaping can be found in the Nano driver for NodeJS. Listing \ref{lst:couch_url_traversal_injection_vector} shows an exemplary attack vector for the presented application. \\
 
 \begin{lstlisting}[caption={Attack vector against CouchDB for URL traversal injection via the query-string parameter}, label={lst:couch_url_traversal_injection_vector}]
 GET /getDocument?key=_design/credentials/_view/user_password HTTP/1.1
